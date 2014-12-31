@@ -9,7 +9,7 @@ type typedef struct {
 	definedInFileName  string
 	definedOnLineNum   int
 	attributeImports   []string
-	attrdefsById       map[int]attrdef
+	attrdefsById       map[int]attrDef
 	attrsdefsInIdOrder attrdefList
 	methodImports      []string
 	abstractMethods    []string
@@ -17,3 +17,9 @@ type typedef struct {
 	imports            map[string]string
 	persistent         bool
 }
+
+type attrdefList []attrDef
+
+func (l attrdefList) Len() int           { return len(l) }
+func (l attrdefList) Swap(i, j int)      { l[i], l[j] = l[j], l[i] }
+func (l attrdefList) Less(i, j int) bool { return l[i].attributeId < l[j].attributeId }

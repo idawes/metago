@@ -2,131 +2,114 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 )
 
-type attrType uint8
+//go:generate stringer -type=attrClass
+type attrClass uint8
 
 const (
-	ATTR_CLASS_BASIC = iota
-	ATTR_CLASS_TIME
-	ATTR_CLASS_ARRAY
-	ATTR_CLASS_SLICE
-	ATTR_CLASS_MAP
-	ATTR_CLASS_STRUCT
+	ATTR_TYPE_BASIC attrClass = iota
+	ATTR_TYPE_TIME
+	ATTR_TYPE_SLICE
+	ATTR_TYPE_MAP
+	ATTR_TYPE_STRUCT
 )
 
-func (class *attrType) String() string {
-	switch class {
-	case ATTR_CLASS_ARRAY:
-		return "Array"
-	case ATTR_CLASS_BASIC:
-		return "Basic"
-	case ATTR_CLASS_MAP:
-		return "Map"
-	case ATTR_CLASS_SLICE:
-		return "Slice"
-	case ATTR_CLASS_STRUCT:
-		return "Struct"
-	case ATTR_CLASS_TIME:
-		return "Time"
-	}
-}
-
-type mdoAttrDef struct {
+type attrDef struct {
 	typeId              int
 	attributeId         int
 	name                string
 	attributeTypeShort  string
 	attributeTypeFull   string
-	attributeType       attrType
+	class               attrClass
 	collection          bool
 	collectionTypeShort string
 	collectionTypeFull  string
-	collectionType      attrType
+	collectionType      attrClass
 	persistenceType     string
-	srcFileLine         int
+	srcline             int
 }
 
-func parseAttrDef(typeId, srcFileLine int, attrDefFields []string) (mdoAttrDef, error) {
-	var attr mdoAttrDef
-	attr.typeId = typeId
-	attr.srcFileLine = srcFileLine
+func newAttrDef(typeId, srcline int, attrDefFields []string) (*attrDef, error) {
+	a := attrDef{typeId: typeId, srcline: srcline}
+
 	var err error
-	attr.attributeId, err = strconv.Atoi(attrDefFields[0])
+	a.attributeId, err = strconv.Atoi(attrDefFields[0])
 	if err != nil {
 		return nil, fmt.Errorf("Expecting an integer attribute id, found \"%s\"", attrDefFields[0])
 	}
 
 	if len(attrDefFields) < 2 {
-		panic(fmt.Sprintf("Missing attribute name, line %d of file %s", typeDef.fileReader.lineIdx, typeDef.fileReader.filename))
+		return nil, fmt.Errorf("Missing attribute name")
 	}
-	attr.name = attrDefFields[1]
+	a.name = attrDefFields[1]
 
 	if len(attrDefFields) < 3 {
-		panic(fmt.Sprintf("Missing attribute type, line %d of file %s", typeDef.fileReader.lineIdx, typeDef.fileReader.filename))
+		return nil, fmt.Errorf("Missing attribute type")
 	}
-	attr.attributeTypeFull = attrDefFields[2]
-	if strings.Contains(attr.attributeTypeFull, ".") {
-		splitType := strings.Split(attr.attributeTypeFull, ".")
-		attr.attributeTypeShort = splitType[1]
+	a.attributeTypeFull = attrDefFields[2]
+	if strings.Contains(a.attributeTypeFull, ".") {
+		splitType := strings.Split(a.attributeTypeFull, ".")
+		a.attributeTypeShort = splitType[1]
 	} else {
-		attr.attributeTypeShort = attr.attributeTypeFull
+		a.attributeTypeShort = a.attributeTypeFull
 	}
-	attr.attributeType = getAttrType(attr.attributeTypeFull, typeDef.fileReader)
-	switch attr.attributeType {
-	case ATTR_CLASS_SLICE:
-		attr.collection = true
-		attr.collectionTypeFull = attr.attributeTypeFull[2:]
-		attr.collectionType = getClass(attr.collectionTypeFull, typeDef.fileReader)
-	case ATTR_CLASS_ARRAY:
-		attr.collection = true
-		attr.collectionTypeFull = attr.attributeTypeFull[strings.Index(attr.attributeTypeShort, "]")+1:]
-		attr.collectionType = getClass(attr.collectionTypeFull, typeDef.fileReader)
+
+	a.class, err = getClass(a.attributeTypeFull)
+	if err != nil {
+
 	}
-	if strings.Contains(attr.collectionTypeFull, ".") {
-		splitType := strings.Split(attr.collectionTypeFull, ".")
-		attr.collectionTypeShort = splitType[1]
+	switch a.class {
+	case ATTR_TYPE_SLICE:
+		a.collection = true
+		a.collectionTypeFull = a.attributeTypeFull[2:]
+		a.collectionType, err = getClass(a.collectionTypeFull)
+	case ATTR_TYPE_MAP:
+		a.collection = true
+	}
+	if strings.Contains(a.collectionTypeFull, ".") {
+		splitType := strings.Split(a.collectionTypeFull, ".")
+		a.collectionTypeShort = splitType[1]
 	} else {
-		attr.collectionTypeShort = attr.collectionTypeFull
+		a.collectionTypeShort = a.collectionTypeFull
 	}
 
 	if len(attrDefFields) < 4 {
-		attr.persistenceType = "persistent"
+		a.persistenceType = "persistent"
 	} else {
-		attr.persistenceType = attrDefFields[3]
-		switch attr.persistenceType {
+		a.persistenceType = attrDefFields[3]
+		switch a.persistenceType {
 		case "persistent", "non-persistent", "ephemeral":
 			// recognized persistance types
 		default:
-			panic(fmt.Sprintf("Unrecognized persistence type \"%s\", line %d of file %s", attrDefFields[3], typeDef.fileReader.lineIdx, typeDef.fileReader.filename))
+			return nil, fmt.Errorf("Unrecognized persistence type \"%s\"", attrDefFields[3])
 		}
 	}
 
 	if len(attrDefFields) > 6 {
-		panic(fmt.Sprintf("Unrecognized options \"%s\", line %d of file %s", attrDefFields[5:], typeDef.fileReader.lineIdx, typeDef.fileReader.filename))
+		return nil, fmt.Errorf("Unrecognized options \"%s\"", attrDefFields[5:])
 	}
 
-	return attr
+	return &a, nil
 }
 
-func getAttrType(typeName string, fileReader *fileReader) attrType {
+func getClass(typeName string) (attrClass, error) {
 	switch typeName {
 	case "byte", "uint8", "uint16", "uint32", "uint64", "int8", "int16", "int32", "int64", "float32", "float64", "string":
-		return ATTR_CLASS_BASIC
+		return ATTR_TYPE_BASIC, nil
 	case "time.Time":
-		return ATTR_CLASS_TIME
+		return ATTR_TYPE_TIME, nil
 	default:
 		switch {
 		case strings.HasPrefix(typeName, "[]"):
-			return ATTR_CLASS_SLICE
-		case strings.HasPrefix(typeName, "["):
-			return ATTR_CLASS_ARRAY
+			return ATTR_TYPE_SLICE, nil
 		case strings.HasPrefix(typeName, "map"):
-			return ATTR_CLASS_MAP
+			return ATTR_TYPE_MAP, nil
 		default:
-			return ATTR_CLASS_STRUCT
+			return ATTR_TYPE_STRUCT, nil
 		}
 	}
-	panic(fmt.Sprintf("Couldn't determine attribute class for \"%s\", line %d of file %s)", typeName, fileReader.lineIdx, fileReader.filename))
+	panic(fmt.Sprintf("Couldn't determine attribute class for \"%s\")", typeName))
 }

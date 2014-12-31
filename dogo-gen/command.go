@@ -27,7 +27,9 @@ func main() {
 
 func generate(pkgDir string) {
 	for _, srcFilename := range listDODLFiles(pkgDir) {
-
+		if *verbose || *veryVerbose {
+			fmt.Printf("  Parsing %s\n", srcFilename)
+		}
 	}
 }
 
@@ -43,7 +45,7 @@ func listDODLFiles(pkgDir string) []string {
 	}
 	if fileNames == nil {
 		if *verbose || *veryVerbose {
-			fmt.Printf("No .mdo files found in %s\n", srcPkgDir)
+			fmt.Printf("No .mdo files found in %s\n", pkgDir)
 		}
 		return []string{}
 	}
