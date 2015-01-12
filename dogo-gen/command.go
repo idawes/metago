@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"gopkg.in/alecthomas/kingpin.v1"
+	"os"
 	"path/filepath"
 )
 
@@ -16,26 +18,40 @@ var (
 func main() {
 	kingpin.Version("0.0.1")
 	kingpin.Parse()
+	var g Generator
 	for _, pkg := range *pkglist {
-		pkgDir := filepath.Join(*pkgRoot, "src", pkg)
-		if *verbose || *veryVerbose {
-			fmt.Printf("Scanning package %s\n", pkgDir)
-		}
-		generate(pkgDir)
+		g.generate(filepath.Join(*pkgRoot, "src", pkg))
 	}
 }
 
-func generate(pkgDir string) {
-	for _, srcFilename := range listDODLFiles(pkgDir) {
-		if *verbose || *veryVerbose {
-			fmt.Printf("  Parsing %s\n", srcFilename)
-		}
-	}
+type Generator struct {
+	file     *os.File
+	r        *reader
+	buf      bytes.Buffer
+	typedefs []*typedef
 }
 
-func listDODLFiles(pkgDir string) []string {
-	pattern := filepath.Join(pkgDir, "*.dodl")
+func (g *Generator) generate(pkgDir string) {
 	if *verbose || *veryVerbose {
+		fmt.Printf("Scanning package %s\n", pkgDir)
+	}
+	g.buf.Reset()
+	g.typedefs = make([]*typedef, 100)
+	for _, fn := range listSourceFileNames(pkgDir) {
+		if *verbose || *veryVerbose {
+			fmt.Printf("  Parsing %s\n", fn)
+		}
+		if err := g.parseFile(fn); err != nil {
+			fmt.Println(err)
+			return
+		}
+	}
+	return
+}
+
+func listSourceFileNames(pkgDir string) []string {
+	pattern := filepath.Join(pkgDir, "*.dodl")
+	if *veryVerbose {
 		fmt.Printf("  Executing match using pattern %s\n", pattern)
 	}
 	fileNames, err := filepath.Glob(pattern)
@@ -45,9 +61,30 @@ func listDODLFiles(pkgDir string) []string {
 	}
 	if fileNames == nil {
 		if *verbose || *veryVerbose {
-			fmt.Printf("No .mdo files found in %s\n", pkgDir)
+			fmt.Printf("No source files found in %s\n", pkgDir)
 		}
 		return []string{}
 	}
 	return fileNames
+}
+
+func (g *Generator) parseFile(filename string) error {
+	f, err := os.Open(filename)
+	if err != nil {
+		return err
+	}
+	defer f.Close() // f is readOnly, so no need to check for close errors.
+	g.file = f
+	g.r = newReader(f)
+	for {
+		var t *typedef
+		t, err = g.parseTypedef()
+		if err != nil {
+			return err
+		}
+		if t != nil {
+			g.typedefs = append(g.typedefs, t)
+		}
+	}
+	return nil
 }

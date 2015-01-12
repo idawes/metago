@@ -1,0 +1,128 @@
+// Test line comment
+/* BasicAttrTypesObject tests all the basic attribute types, single-line and multi-line methods and method imports. 
+	This comment also tests block comments */
+type 1 BasicAttrTypesObject concrete { 
+	// test internal comment
+	attributes {
+		// test line comment at beginning of attribute block
+		1 ByteField    byte
+		2 U8Field      uint8
+		3 U16Field     uint16
+		// test line comment in the middle of attribute block 
+		4 U32Field     uint32 
+		5 U64Field     uint64
+		6 S8Field      int8
+		7 S16Field     int16
+		8 S32Field     int32
+		9 S64Field     int64
+		10 StringField string
+		11 TimeField   time.Time
+		// test line comment at the end of attribute block
+	}
+	methods {
+		import 	"github.com/davecgh/go-spew/spew"
+		func Dump() string {
+			return spew.Sdump(*this)
+		}
+		func ConditionalDump(t bool) string {
+			if t {
+				return this.Dump()
+			}
+			return ""
+		}
+	}
+}
+
+type 2 ExtendedObject concrete extends BasicAttrTypesObject {
+	attributes {
+		1 ExtendedByteField byte
+	}
+	methods {
+		func Dump() string {
+			this.ExtendedByteField = 4
+			return ##super##()
+		}
+		func ConditionalDump(t bool) string {
+			return ##super##(!t)
+		}		
+	}
+}
+
+type 3 SliceTestObject concrete {
+	attributes {
+		1 ByteSlice    []byte
+		2 U8Slice      []uint8
+		3 U16Slice     []uint16
+		4 U32Slice     []uint32 
+		5 U64Slice     []uint64
+		6 S8Slice      []int8
+		7 S16Slice     []int16
+		8 S32Slice     []int32
+		9 S64Slice     []int64
+		10 StringSlice []string
+		11 TimeSlice   []time.Time
+	}
+	methods {
+		import 	"github.com/davecgh/go-spew/spew"
+		func Dump() string {
+			return spew.Sdump(*this)
+		}
+	}
+}
+
+type 4 StructTestObject concrete {
+	attributes {
+		1 B BasicAttrTypesObject
+	}
+}
+
+/*type 2 MacBasedMoKey concrete extends MoKey {
+	attributes {
+		1 Mac [6]byte
+	}
+	methods {
+		import "net"
+		func String() string {
+			return net.HardwareAddr(this.Mac[:]).String()
+		}
+	}
+}
+
+type 3 ManagedObject abstract {
+	attributes {
+		1 LastChangeTimestamp time.Time non-persistent
+	}
+	methods {
+		func Key() MoKey {
+			return &this.MoKey
+		}
+	}
+}
+
+type 4 HierarchicManagedObject abstract extends ManagedObject {
+	attributes {
+		1 Parent HierarchicManagedObject ephemeral
+		2 Root HierarchicManagedObject ephemeral
+		3 Children []HierarchicManagedObject ephemeral
+	}
+}
+
+type 5 Node concrete extends HierarchicManagedObject {
+	attributes {
+		1 MoKey MacBasedMoKey
+		2 BankA FirmwareBank
+		3 BankB FirmwareBank
+		4 CustomFields []string
+		5 MgmtIpAddress string
+	}
+}
+
+//type 6 FirmwareBank concrete {
+//	attributes {
+//		1 Major uint8
+//		2 Minor uint8
+//		3 Sub uint8
+//		4 Build uint16  
+//	}
+//}
+*/

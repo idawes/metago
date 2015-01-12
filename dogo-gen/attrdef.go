@@ -6,110 +6,138 @@ import (
 	"strings"
 )
 
+/*
+	attribute definition:
+	<id> <name> <type> [<persistence type>]
+*/
+
+func (g *Generator) parseAttribute(t *typedef, fields []string) (attrDef, error) {
+	if len(fields) < 3 {
+		return nil, fmt.Errorf("Invalid attribute specification, line %d of file %s", g.r.line, g.file.Name())
+	}
+	id, err := strconv.Atoi(fields[0])
+	if err != nil {
+		return nil, fmt.Errorf("Expecting an integer attribute id, found \"%s\", line %d of file %s", fields[0], g.r.line, g.file.Name())
+	}
+	p := PERSISTENCE_CLASS_PERSISTENT
+	if len(fields) > 3 {
+		switch fields[3] {
+		case "persistent":
+			p = PERSISTENCE_CLASS_PERSISTENT
+		case "non-persistent":
+			p = PERSISTENCE_CLASS_NON_PERSISTENT
+		case "ephemeral":
+			p = PERSISTENCE_CLASS_EPHEMERAL
+		default:
+			return nil, fmt.Errorf("Unrecognized persistence type \"%s\", line %d of file %s", fields[3], g.r.line, g.file.Name())
+		}
+	}
+	c, err := getClass(fields[2])
+	if err != nil {
+		return nil, fmt.Errorf("Unknown attribute class %s, line %d of file %s", fields[2], g.r.line, g.file.Name())
+	}
+	a := baseAttrDef{parentType: t, attributeId: id, name: fields[1], attrType: fields[2], persistence: p, srcline: g.r.line, srcfile: g.file.Name()}
+	switch c {
+	case ATTR_CLASS_BUILTIN:
+		return &a, nil
+	case ATTR_CLASS_QUALIFIED_BUILTIN:
+		s := strings.Split(fields[2], ".")
+		return &qualifiedTypenameAttrDef{baseAttrDef: a, packageName: s[0]}, nil
+	case ATTR_CLASS_MAP:
+		s := strings.Split(s, "[")
+		s = append(s, strings.Split(s, "]"))
+
+	case ATTR_CLASS_SLICE:
+	case ATTR_CLASS_DIFFABLE_OBJ:
+
+	}
+	return nil, fmt.Errorf("Unknown attribute class %s, line %d of file %s", c, g.r.line, g.file.Name())
+}
+
+func getClass(n string) (attrClass, error) {
+	switch n {
+	case "byte", "uint8", "uint16", "uint32", "uint64", "int8", "int16", "int32", "int64", "float32", "float64", "string":
+		return ATTR_CLASS_BUILTIN, nil
+	case "time.Time":
+		return ATTR_CLASS_QUALIFIED_BUILTIN, nil
+	}
+
+	switch {
+	case strings.HasPrefix(n, "[]"):
+		return ATTR_CLASS_SLICE, nil
+	case strings.HasPrefix(n, "map"):
+		return ATTR_CLASS_MAP, nil
+	default:
+		return ATTR_CLASS_DIFFABLE_OBJ, nil
+	}
+}
+
 //go:generate stringer -type=attrClass
 type attrClass uint8
 
 const (
-	ATTR_TYPE_BASIC attrClass = iota
-	ATTR_TYPE_TIME
-	ATTR_TYPE_SLICE
-	ATTR_TYPE_MAP
-	ATTR_TYPE_STRUCT
+	ATTR_CLASS_BUILTIN attrClass = iota
+	ATTR_CLASS_QUALIFIED_BUILTIN
+	ATTR_CLASS_SLICE
+	ATTR_CLASS_MAP
+	ATTR_CLASS_DIFFABLE_OBJ
 )
 
-type attrDef struct {
-	typeId              int
-	attributeId         int
-	name                string
-	attributeTypeShort  string
-	attributeTypeFull   string
-	class               attrClass
-	collection          bool
-	collectionTypeShort string
-	collectionTypeFull  string
-	collectionType      attrClass
-	persistenceType     string
-	srcline             int
+//go:generate string -type=persistenceClass
+type persistenceClass uint8
+
+const (
+	PERSISTENCE_CLASS_PERSISTENT     persistenceClass = iota // serialized to disk and wire
+	PERSISTENCE_CLASS_NON_PERSISTENT                         // serialized to wire
+	PERSISTENCE_CLASS_EPHEMERAL                              // not serialized - computed locally
+)
+
+type attrDef interface {
+	AttributeId() int
+	Srcline() int
+	Srcfile() string
+	Imports() []string
 }
 
-func newAttrDef(typeId, srcline int, attrDefFields []string) (*attrDef, error) {
-	a := attrDef{typeId: typeId, srcline: srcline}
-
-	var err error
-	a.attributeId, err = strconv.Atoi(attrDefFields[0])
-	if err != nil {
-		return nil, fmt.Errorf("Expecting an integer attribute id, found \"%s\"", attrDefFields[0])
-	}
-
-	if len(attrDefFields) < 2 {
-		return nil, fmt.Errorf("Missing attribute name")
-	}
-	a.name = attrDefFields[1]
-
-	if len(attrDefFields) < 3 {
-		return nil, fmt.Errorf("Missing attribute type")
-	}
-	a.attributeTypeFull = attrDefFields[2]
-	if strings.Contains(a.attributeTypeFull, ".") {
-		splitType := strings.Split(a.attributeTypeFull, ".")
-		a.attributeTypeShort = splitType[1]
-	} else {
-		a.attributeTypeShort = a.attributeTypeFull
-	}
-
-	a.class, err = getClass(a.attributeTypeFull)
-	if err != nil {
-
-	}
-	switch a.class {
-	case ATTR_TYPE_SLICE:
-		a.collection = true
-		a.collectionTypeFull = a.attributeTypeFull[2:]
-		a.collectionType, err = getClass(a.collectionTypeFull)
-	case ATTR_TYPE_MAP:
-		a.collection = true
-	}
-	if strings.Contains(a.collectionTypeFull, ".") {
-		splitType := strings.Split(a.collectionTypeFull, ".")
-		a.collectionTypeShort = splitType[1]
-	} else {
-		a.collectionTypeShort = a.collectionTypeFull
-	}
-
-	if len(attrDefFields) < 4 {
-		a.persistenceType = "persistent"
-	} else {
-		a.persistenceType = attrDefFields[3]
-		switch a.persistenceType {
-		case "persistent", "non-persistent", "ephemeral":
-			// recognized persistance types
-		default:
-			return nil, fmt.Errorf("Unrecognized persistence type \"%s\"", attrDefFields[3])
-		}
-	}
-
-	if len(attrDefFields) > 6 {
-		return nil, fmt.Errorf("Unrecognized options \"%s\"", attrDefFields[5:])
-	}
-
-	return &a, nil
+type baseAttrDef struct {
+	parentType  *typedef
+	attributeId int
+	name        string
+	attrType    string
+	persistence persistenceClass
+	srcline     int
+	srcfile     string
 }
 
-func getClass(typeName string) (attrClass, error) {
-	switch typeName {
-	case "byte", "uint8", "uint16", "uint32", "uint64", "int8", "int16", "int32", "int64", "float32", "float64", "string":
-		return ATTR_TYPE_BASIC, nil
-	case "time.Time":
-		return ATTR_TYPE_TIME, nil
-	default:
-		switch {
-		case strings.HasPrefix(typeName, "[]"):
-			return ATTR_TYPE_SLICE, nil
-		case strings.HasPrefix(typeName, "map"):
-			return ATTR_TYPE_MAP, nil
-		default:
-			return ATTR_TYPE_STRUCT, nil
-		}
-	}
-	panic(fmt.Sprintf("Couldn't determine attribute class for \"%s\")", typeName))
+func (a *baseAttrDef) AttributeId() int {
+	return a.attributeId
+}
+
+func (a *baseAttrDef) Srcline() int {
+	return a.srcline
+}
+
+func (a *baseAttrDef) Srcfile() string {
+	return a.srcfile
+}
+
+func (a *baseAttrDef) Imports() []string {
+	return []string{}
+}
+
+type qualifiedTypenameAttrDef struct {
+	baseAttrDef
+	packageName string
+}
+
+func (a *qualifiedTypenameAttrDef) Imports() []string {
+	return []string{a.packageName}
+}
+
+type sliceAttrDef struct {
+	baseAttrDef
+}
+
+type mapAttrDef struct {
+	baseAttrDef
 }

@@ -6,22 +6,24 @@ import (
 	"strings"
 )
 
-type Reader struct {
-	SkipCommentLines bool
-	r                *bufio.Reader
-	line             int
+type reader struct {
+	r    *bufio.Reader
+	line int
 }
 
-func NewReader(r io.Reader) *Reader {
-	return &Reader{r: bufio.NewReader(r)}
+func newReader(r io.Reader) *reader {
+	return &reader{r: bufio.NewReader(r)}
 }
 
-func (r *Reader) Read() ([]string, error) {
-	var line string
+func (r *reader) read() ([]string, error) {
+	var (
+		line string
+		err  error
+	)
 	inBlockComment := false
 	for {
 		r.line++
-		line, err := r.r.ReadString('\n')
+		line, err = r.r.ReadString('\n')
 		if err != nil {
 			return nil, err
 		}
@@ -29,20 +31,18 @@ func (r *Reader) Read() ([]string, error) {
 		if line == "" {
 			continue
 		}
-		if r.SkipCommentLines {
-			if strings.HasPrefix(line, "//") {
-				continue
+		if strings.HasPrefix(line, "//") {
+			continue
+		}
+		if inBlockComment {
+			if strings.HasSuffix(line, "*/") {
+				inBlockComment = false
 			}
-			if inBlockComment {
-				if strings.HasSuffix(line, "*/") {
-					inBlockComment = false
-				}
-				continue
-			}
-			if strings.HasPrefix(line, "/*") {
-				inBlockComment = true
-				continue
-			}
+			continue
+		}
+		if strings.HasPrefix(line, "/*") {
+			inBlockComment = true
+			continue
 		}
 		break
 	}
