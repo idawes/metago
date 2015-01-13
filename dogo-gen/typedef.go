@@ -29,6 +29,23 @@ func (l attrdefList) Len() int           { return len(l) }
 func (l attrdefList) Swap(i, j int)      { l[i], l[j] = l[j], l[i] }
 func (l attrdefList) Less(i, j int) bool { return l[i].AttributeId() < l[j].AttributeId() }
 
+/*
+	Main internal entry point for parsing a type definition.
+
+	type <typeId> <typeName> <concrete|abstract> [extends <typeName>] {
+		attributes {
+			<attributedef>*
+		}
+		methods {
+			<import|method>*
+		}
+
+	If this type extends another type, the supertype must be defined in the same package. Any method defined on a subtype that has the same name as a method in the supertype must also
+	have the same signature.
+
+	Imports may occur at any point in the method block, allowing them to be specified just above the method that requires it. Imports may be duplicated, they will only be present once in the generated
+	output.
+*/
 func (g *Generator) parseTypedef() (*typedef, error) {
 	t, err := g.parseTypedefHeader()
 	if err != nil {
@@ -67,7 +84,7 @@ func (g *Generator) parseTypedef() (*typedef, error) {
 
 /*
 	typedef header:
-	type <typeId> <typeName> <concrete|abstract> [extends <typeName>] {
+		type <typeId> <typeName> <concrete|abstract> [extends <typeName>] {
 */
 func (g *Generator) parseTypedefHeader() (*typedef, error) {
 	fields, err := g.r.read()
@@ -113,6 +130,12 @@ func (g *Generator) parseTypedefHeader() (*typedef, error) {
 	return t, nil
 }
 
+/*
+	attribute block:
+		attributes {
+			<attributedef>*
+		}
+*/
 func (g *Generator) parseAttributeBlock(t *typedef) error {
 	t.attrdefsById = make(map[int]attrDef, 10)
 	fields, err := g.r.read()
@@ -123,7 +146,11 @@ func (g *Generator) parseAttributeBlock(t *typedef) error {
 		return err
 	}
 	if len(fields) != 2 || fields[0] != "attributes" || fields[1] != "{" {
-		return fmt.Errorf("Invalid attribute block header, line %d of file %s", g.r.line, g.file.Name())
+		if *verbose {
+			fmt.Println("No attributes specified")
+		}
+		g.r.unread(fields)
+		return nil
 	}
 	for {
 		fields, err := g.r.read()
@@ -145,11 +172,23 @@ func (g *Generator) parseAttributeBlock(t *typedef) error {
 			t.imports[i] = struct{}{}
 		}
 		if *veryVerbose {
-			fmt.Printf("      Found attribute spec: %v, Imports: %v\n", a, a.Imports())
+			fmt.Printf("      Found attribute spec: %v\n", a)
 		}
 	}
 }
 
+/*
+	method block:
+		methods {
+			<import|method>*
+		}
+
+	import:
+		standard go import spec.
+
+	method:
+		standard golang method decl, except leaving out the receiver spec, which will be automatically generated. Special syntax ##super##(<args>) can be used to invoke function of same name in supertype.
+*/
 func (g *Generator) parseMethodBlock(t *typedef) error {
 	t.methods = make([]*methodDef, 0)
 	fields, err := g.r.read()
@@ -160,7 +199,11 @@ func (g *Generator) parseMethodBlock(t *typedef) error {
 		return err
 	}
 	if len(fields) != 2 || fields[0] != "methods" || fields[1] != "{" {
-		return fmt.Errorf("Invalid method block header, line %d of file %s", g.r.line, g.file.Name())
+		if *verbose {
+			fmt.Println("No attributes specified")
+		}
+		g.r.unread(fields)
+		return nil
 	}
 	for {
 		fields, err := g.r.read()
@@ -171,7 +214,7 @@ func (g *Generator) parseMethodBlock(t *typedef) error {
 			return nil
 		}
 		if len(fields) == 2 && fields[0] == "import" {
-			t.imports[strings.Replace(fields[1], "\"", "", -1)] = struct{}{}
+			t.imports[strings.Join(fields, " ")] = struct{}{}
 			continue
 		}
 		if len(fields) > 0 && fields[0] == "func" {

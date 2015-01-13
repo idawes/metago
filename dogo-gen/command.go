@@ -82,9 +82,10 @@ func (g *Generator) parseFile(filename string) error {
 		if err != nil {
 			return err
 		}
-		if t != nil {
-			g.typedefs = append(g.typedefs, t)
+		if t == nil {
+			return nil
 		}
+		g.typedefs = append(g.typedefs, t)
 	}
 	return nil
 }

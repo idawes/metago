@@ -2,17 +2,19 @@ package main
 
 import (
 	"bufio"
+	"container/list"
 	"io"
 	"strings"
 )
 
 type reader struct {
-	r    *bufio.Reader
-	line int
+	r           *bufio.Reader
+	line        int
+	unreadLines *list.List
 }
 
 func newReader(r io.Reader) *reader {
-	return &reader{r: bufio.NewReader(r)}
+	return &reader{r: bufio.NewReader(r), unreadLines: list.New()}
 }
 
 func (r *reader) read() ([]string, error) {
@@ -20,6 +22,10 @@ func (r *reader) read() ([]string, error) {
 		line string
 		err  error
 	)
+	if e := r.unreadLines.Front(); e != nil {
+		r.unreadLines.Remove(e)
+		return e.Value.([]string), nil
+	}
 	inBlockComment := false
 	for {
 		r.line++
@@ -47,4 +53,8 @@ func (r *reader) read() ([]string, error) {
 		break
 	}
 	return strings.Fields(line), nil
+}
+
+func (r *reader) unread(fields []string) {
+	r.unreadLines.PushFront(fields)
 }

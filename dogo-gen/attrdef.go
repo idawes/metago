@@ -8,17 +8,18 @@ import (
 
 /*
 	attribute definition:
-	<id> <name> <type> [<persistence type>]
+	<id> <name> <type> [<persistenceType>]
 */
 
 func (g *Generator) parseAttribute(t *typedef, fields []string) (attrDef, error) {
-	if len(fields) < 3 {
+	if len(fields) < 3 || len(fields) > 4 {
 		return nil, fmt.Errorf("Invalid attribute specification, line %d of file %s", g.r.line, g.file.Name())
 	}
 	id, err := strconv.Atoi(fields[0])
 	if err != nil {
 		return nil, fmt.Errorf("Expecting an integer attribute id, found \"%s\", line %d of file %s", fields[0], g.r.line, g.file.Name())
 	}
+	name := fields[1]
 	p := PERSISTENCE_CLASS_PERSISTENT
 	if len(fields) > 3 {
 		switch fields[3] {
@@ -36,7 +37,7 @@ func (g *Generator) parseAttribute(t *typedef, fields []string) (attrDef, error)
 	if err != nil {
 		return nil, fmt.Errorf("Unknown attribute class %s, line %d of file %s", fields[2], g.r.line, g.file.Name())
 	}
-	a := baseAttrDef{parentType: t, attributeId: id, name: fields[1], attrType: fields[2], persistence: p, srcline: g.r.line, srcfile: g.file.Name()}
+	a := baseAttrDef{parentType: t, attributeId: id, name: name, attrType: fields[2], persistence: p, srcline: g.r.line, srcfile: g.file.Name()}
 	switch c {
 	case ATTR_CLASS_BUILTIN:
 		return &a, nil
@@ -44,12 +45,38 @@ func (g *Generator) parseAttribute(t *typedef, fields []string) (attrDef, error)
 		s := strings.Split(fields[2], ".")
 		return &qualifiedTypenameAttrDef{baseAttrDef: a, packageName: s[0]}, nil
 	case ATTR_CLASS_MAP:
-		s := strings.Split(s, "[")
-		s = append(s, strings.Split(s, "]"))
-
+		// map[int]string
+		s := strings.Split(fields[2], "[") // [map int]string]
+		if len(s) != 2 || s[0] != "map" {
+			return nil, fmt.Errorf("invalid map attribute specification %s, line %d of file %s", fields[2], g.r.line, g.file.Name())
+		}
+		s = strings.Split(s[1], "]") // [int string]
+		if len(s) != 3 {
+			return nil, fmt.Errorf("invalid map attribute specification %s, line %d of file %s", fields[2], g.r.line, g.file.Name())
+		}
+		keyClass, err := getClass(s[1])
+		if err != nil {
+			return nil, fmt.Errorf("invalid map attribute specification %s, line %d of file %s", fields[2], g.r.line, g.file.Name())
+		}
+		switch keyClass {
+		case ATTR_CLASS_SLICE:
+		case ATTR_CLASS_MAP:
+			return nil, fmt.Errorf("invalid map key class %s, line %d of file %s", keyClass, g.r.line, g.file.Name())
+		}
+		return &mapAttrDef{baseAttrDef: a, keyType: s[1], valType: s[2]}, nil
 	case ATTR_CLASS_SLICE:
+		// []string
+		s := strings.Split(fields[2], "]") // [[ string]
+		if len(s) != 2 || s[0] != "[" {
+			return nil, fmt.Errorf("invalid slice attribute specification %s, line %d of file %s", fields[2], g.r.line, g.file.Name())
+		}
+		return &sliceAttrDef{baseAttrDef: a, valType: s[1]}, nil
 	case ATTR_CLASS_DIFFABLE_OBJ:
-
+		var p string
+		if i := strings.LastIndex(fields[2], "."); i != -1 {
+			p = fields[2][0:i]
+		}
+		return &diffObjAttrDef{baseAttrDef: a, packageName: p}, nil
 	}
 	return nil, fmt.Errorf("Unknown attribute class %s, line %d of file %s", c, g.r.line, g.file.Name())
 }
@@ -73,7 +100,7 @@ func getClass(n string) (attrClass, error) {
 }
 
 //go:generate stringer -type=attrClass
-type attrClass uint8
+type attrClass int
 
 const (
 	ATTR_CLASS_BUILTIN attrClass = iota
@@ -83,13 +110,13 @@ const (
 	ATTR_CLASS_DIFFABLE_OBJ
 )
 
-//go:generate string -type=persistenceClass
-type persistenceClass uint8
+//go:generate stringer -type=persistenceClass
+type persistenceClass int
 
 const (
 	PERSISTENCE_CLASS_PERSISTENT     persistenceClass = iota // serialized to disk and wire
 	PERSISTENCE_CLASS_NON_PERSISTENT                         // serialized to wire
-	PERSISTENCE_CLASS_EPHEMERAL                              // not serialized - computed locally
+	PERSISTENCE_CLASS_EPHEMERAL                              // computed or temporary storage - not serialized
 )
 
 type attrDef interface {
@@ -136,8 +163,23 @@ func (a *qualifiedTypenameAttrDef) Imports() []string {
 
 type sliceAttrDef struct {
 	baseAttrDef
+	valType string
 }
 
 type mapAttrDef struct {
 	baseAttrDef
+	keyType string
+	valType string
+}
+
+type diffObjAttrDef struct {
+	baseAttrDef
+	packageName string
+}
+
+func (a *diffObjAttrDef) Imports() []string {
+	if a.packageName != "" {
+		return []string{a.packageName}
+	}
+	return []string{}
 }

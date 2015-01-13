@@ -36,6 +36,7 @@ type 1 BasicAttrTypesObject concrete {
 type 2 ExtendedObject concrete extends BasicAttrTypesObject {
 	attributes {
 		1 ExtendedByteField byte
+		2 StructField       github.com/user/pkg.MyStruct
 	}
 	methods {
 		func Dump() string {
