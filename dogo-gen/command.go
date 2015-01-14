@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"github.com/nu7hatch/gouuid"
 	"gopkg.in/alecthomas/kingpin.v1"
 	"os"
 	"path/filepath"
@@ -18,9 +19,11 @@ var (
 func main() {
 	kingpin.Version("0.0.1")
 	kingpin.Parse()
-	var g Generator
 	for _, pkg := range *pkglist {
-		g.generate(filepath.Join(*pkgRoot, "src", pkg))
+		if err := generate(pkg); err != nil {
+			fmt.Println("\nERROR: ", err)
+			os.Exit(-1)
+		}
 	}
 }
 
@@ -28,28 +31,33 @@ type Generator struct {
 	file     *os.File
 	r        *reader
 	buf      bytes.Buffer
-	typedefs []*typedef
+	typedefs map[typeId]*typedef
 }
 
-func (g *Generator) generate(pkgDir string) {
+func generate(pkg string) error {
 	if *verbose || *veryVerbose {
-		fmt.Printf("Scanning package %s\n", pkgDir)
+		fmt.Printf("Scanning package %s\n", pkg)
 	}
-	g.buf.Reset()
-	g.typedefs = make([]*typedef, 100)
-	for _, fn := range listSourceFileNames(pkgDir) {
+	pkgUUID, err := uuid.NewV5(uuid.NamespaceURL, []byte(pkg))
+	if err != nil {
+		return fmt.Errorf("Couldn't create package UUID for package %s, err: %s", pkg, err)
+	}
+	g := Generator{typedefs: make(map[typeId]*typedef, 100)}
+	for _, fn := range listSourceFilenames(filepath.Join(*pkgRoot, "src", pkg)) {
 		if *verbose || *veryVerbose {
-			fmt.Printf("  Parsing %s\n", fn)
+			fmt.Printf("  Parsing %s - UUID:%v\n", fn, pkgUUID)
 		}
-		if err := g.parseFile(fn); err != nil {
-			fmt.Println(err)
-			return
+		if err := g.parseFile(pkgUUID, fn); err != nil {
+			return err
 		}
 	}
-	return
+	if err := g.validate(); err != nil {
+		return err
+	}
+	return nil
 }
 
-func listSourceFileNames(pkgDir string) []string {
+func listSourceFilenames(pkgDir string) []string {
 	pattern := filepath.Join(pkgDir, "*.dodl")
 	if *veryVerbose {
 		fmt.Printf("  Executing match using pattern %s\n", pattern)
@@ -68,7 +76,7 @@ func listSourceFileNames(pkgDir string) []string {
 	return fileNames
 }
 
-func (g *Generator) parseFile(filename string) error {
+func (g *Generator) parseFile(pkgUUID *uuid.UUID, filename string) error {
 	f, err := os.Open(filename)
 	if err != nil {
 		return err
@@ -78,14 +86,35 @@ func (g *Generator) parseFile(filename string) error {
 	g.r = newReader(f)
 	for {
 		var t *typedef
-		t, err = g.parseTypedef()
+		t, err = g.parseTypedef(pkgUUID)
 		if err != nil {
 			return err
 		}
 		if t == nil {
 			return nil
 		}
-		g.typedefs = append(g.typedefs, t)
+		if old, present := g.typedefs[t.typeId]; present {
+			return fmt.Errorf("Duplicate definition of type id %s on line %d of file %s\n   It is also defined on line %d of file %s", t.typeId.String(), t.srcline, t.srcfile, old.srcline, old.srcfile)
+		}
+		g.typedefs[t.typeId] = t
+	}
+	return nil
+}
+
+func (g *Generator) validate() error {
+	if err := g.validateTypenames(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (g *Generator) validateTypenames() error {
+	typenames := make(map[string]*typedef)
+	for _, t := range g.typedefs {
+		if old, present := typenames[t.name]; present {
+			return fmt.Errorf("Duplicate definition of type name %s on line %d of file %s\n   It is also defined on line %d of file %s", t.name, t.srcline, t.srcfile, old.srcline, old.srcfile)
+		}
+		typenames[t.name] = t
 	}
 	return nil
 }

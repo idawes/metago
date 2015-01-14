@@ -2,19 +2,29 @@ package main
 
 import (
 	"fmt"
+	"github.com/nu7hatch/gouuid"
 	"io"
 	"strconv"
 	"strings"
 )
 
+type typeId struct {
+	uuid  *uuid.UUID
+	subid int
+}
+
+func (t *typeId) String() string {
+	return fmt.Sprintf("%s:%d", t.uuid, t.subid)
+}
+
 type typedef struct {
-	typeId             int
+	typeId             typeId
 	name               string
 	abstract           bool
 	extendsName        string
 	extends            *typedef
-	definedInFileName  string
-	definedOnLineNum   int
+	srcfile            string
+	srcline            int
 	attrdefsById       map[int]attrDef
 	attrsdefsInIdOrder attrdefList
 	abstractMethods    []string
@@ -46,8 +56,8 @@ func (l attrdefList) Less(i, j int) bool { return l[i].AttributeId() < l[j].Attr
 	Imports may occur at any point in the method block, allowing them to be specified just above the method that requires it. Imports may be duplicated, they will only be present once in the generated
 	output.
 */
-func (g *Generator) parseTypedef() (*typedef, error) {
-	t, err := g.parseTypedefHeader()
+func (g *Generator) parseTypedef(uuid *uuid.UUID) (*typedef, error) {
+	t, err := g.parseTypedefHeader(uuid)
 	if err != nil {
 		if err == io.EOF {
 			return nil, nil
@@ -86,7 +96,7 @@ func (g *Generator) parseTypedef() (*typedef, error) {
 	typedef header:
 		type <typeId> <typeName> <concrete|abstract> [extends <typeName>] {
 */
-func (g *Generator) parseTypedefHeader() (*typedef, error) {
+func (g *Generator) parseTypedefHeader(uuid *uuid.UUID) (*typedef, error) {
 	fields, err := g.r.read()
 	if err != nil {
 		return nil, err
@@ -100,11 +110,12 @@ func (g *Generator) parseTypedefHeader() (*typedef, error) {
 	if fields[0] != "type" {
 		return nil, fmt.Errorf("Expecting \"type\", found \"%s\", line %d o file %s", fields[0], g.r.line, g.file.Name())
 	}
-	t := &typedef{definedInFileName: g.file.Name(), definedOnLineNum: g.r.line}
-	t.typeId, err = strconv.Atoi(fields[1])
+	t := &typedef{srcfile: g.file.Name(), srcline: g.r.line}
+	subId, err := strconv.Atoi(fields[1])
 	if err != nil {
 		return nil, fmt.Errorf("Expecting integer type number, found \"%s\", line %d of file %s", fields[1], g.r.line, g.file.Name())
 	}
+	t.typeId = typeId{uuid: uuid, subid: subId}
 	t.name = fields[2]
 	if fields[3] == "abstract" {
 		t.abstract = true
@@ -146,8 +157,8 @@ func (g *Generator) parseAttributeBlock(t *typedef) error {
 		return err
 	}
 	if len(fields) != 2 || fields[0] != "attributes" || fields[1] != "{" {
-		if *verbose {
-			fmt.Println("No attributes specified")
+		if *veryVerbose {
+			fmt.Println("    No attributes specified")
 		}
 		g.r.unread(fields)
 		return nil
@@ -165,7 +176,7 @@ func (g *Generator) parseAttributeBlock(t *typedef) error {
 			return err
 		}
 		if old, present := t.attrdefsById[a.AttributeId()]; present {
-			return fmt.Errorf("Attribute id %d redefined on line %d of file %s\n   Previous definition on line %d of file %s", a.AttributeId(), a.Srcline(), a.Srcfile(), old.Srcline(), old.Srcfile())
+			return fmt.Errorf("Duplicate defintion of attribute id %d on line %d of file %s\n   It is also defined on line %d of file %s", a.AttributeId(), a.Srcline(), a.Srcfile(), old.Srcline(), old.Srcfile())
 		}
 		t.attrdefsById[a.AttributeId()] = a
 		for _, i := range a.Imports() {
@@ -199,8 +210,8 @@ func (g *Generator) parseMethodBlock(t *typedef) error {
 		return err
 	}
 	if len(fields) != 2 || fields[0] != "methods" || fields[1] != "{" {
-		if *verbose {
-			fmt.Println("No attributes specified")
+		if *veryVerbose {
+			fmt.Println("    No methods specified")
 		}
 		g.r.unread(fields)
 		return nil
