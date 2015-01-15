@@ -98,7 +98,6 @@ func (g *Generator) parseFile(pkgUUID *uuid.UUID, filename string) error {
 		}
 		g.typedefs[t.typeId] = t
 	}
-	return nil
 }
 
 func (g *Generator) validate() error {
