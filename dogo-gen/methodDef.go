@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func (g *Generator) parseMethod(t *typedef, fields []string) (*methodDef, error) {
+func (g *generator) parseMethod(t *typedef, fields []string) (*methodDef, error) {
 	m := methodDef{parentType: t, signature: strings.Join(fields[:len(fields)-1], " "), srcline: g.r.line, srcfile: g.file.Name()}
 	indentLevel := 0
 	var buf bytes.Buffer

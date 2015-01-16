@@ -3,6 +3,10 @@
 	This comment also tests block comments */
 type 1 BasicAttrTypesObject concrete { 
 	// test internal comment
+	imports {
+		"time"
+		"github.com/davecgh/go-spew/spew"
+	}
 	attributes {
 		// test line comment at beginning of attribute block
 		1 ByteField    byte
@@ -20,7 +24,6 @@ type 1 BasicAttrTypesObject concrete {
 		// test line comment at the end of attribute block
 	}
 	methods {
-		import 	"github.com/davecgh/go-spew/spew"
 		func Dump() string {
 			return spew.Sdump(*this)
 		}
@@ -33,10 +36,13 @@ type 1 BasicAttrTypesObject concrete {
 	}
 }
 
-type 1 ExtendedObject concrete extends BasicAttrTypesObject {
+type 2 ExtendedObject concrete extends BasicAttrTypesObject {
+	imports {
+		"github.com/myUser/myPkg"
+	}
 	attributes {
 		1 ExtendedByteField byte
-		2 StructField       github.com/user/pkg.MyStruct
+		2 StructField       myPkg.MyStruct
 	}
 	methods {
 		func Dump() string {
@@ -50,6 +56,10 @@ type 1 ExtendedObject concrete extends BasicAttrTypesObject {
 }
 
 type 3 SliceTestObject concrete {
+	imports {
+		"time"
+		"github.com/davecgh/go-spew/spew"
+	}
 	attributes {
 		1 ByteSlice    []byte
 		2 U8Slice      []uint8
@@ -64,7 +74,6 @@ type 3 SliceTestObject concrete {
 		11 TimeSlice   []time.Time
 	}
 	methods {
-		import 	"github.com/davecgh/go-spew/spew"
 		func Dump() string {
 			return spew.Sdump(*this)
 		}
@@ -78,11 +87,13 @@ type 4 StructTestObject concrete {
 }
 
 /*type 2 MacBasedMoKey concrete extends MoKey {
+	import {
+		"net"
+	}
 	attributes {
 		1 Mac [6]byte
 	}
 	methods {
-		import "net"
 		func String() string {
 			return net.HardwareAddr(this.Mac[:]).String()
 		}

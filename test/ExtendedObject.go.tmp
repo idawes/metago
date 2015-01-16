@@ -1,0 +1,21 @@
+import (
+  github.com/myUser/myPkg
+  time
+  github.com/davecgh/go-spew/spew
+)
+
+type ExtendedObject struct {
+  ByteField byte
+  U8Field uint8
+  U16Field uint16
+  U32Field uint32
+  U64Field uint64
+  S8Field int8
+  S16Field int16
+  S32Field int32
+  S64Field int64
+  StringField string
+  TimeField time.Time
+  ExtendedByteField byte
+  StructField myPkg.MyStruct
+}

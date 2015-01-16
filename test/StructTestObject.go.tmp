@@ -1,0 +1,6 @@
+import (
+)
+
+type StructTestObject struct {
+  B .BasicAttrTypesObject
+}

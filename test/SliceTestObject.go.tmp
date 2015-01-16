@@ -1,0 +1,18 @@
+import (
+  time
+  github.com/davecgh/go-spew/spew
+)
+
+type SliceTestObject struct {
+  ByteSlice []byte
+  U8Slice []uint8
+  U16Slice []uint16
+  U32Slice []uint32
+  U64Slice []uint64
+  S8Slice []int8
+  S16Slice []int16
+  S32Slice []int32
+  S64Slice []int64
+  StringSlice []string
+  TimeSlice []time.Time
+}
