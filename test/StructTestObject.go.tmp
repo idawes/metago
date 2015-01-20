@@ -2,5 +2,21 @@ import (
 )
 
 type StructTestObject struct {
-  B .BasicAttrTypesObject
+  B BasicAttrTypesObject
+}
+
+func (o1 *StructTestObject) Equals(other interface{}) bool {
+	switch o2 := other.(type) {
+	case *StructTestObject:
+		return o1.equals(o2)
+	case StructTestObject:
+		return o1.equals(&o2)
+	}
+	return false
+}
+
+func (o1 *StructTestObject) equals(o2 *StructTestObject) bool {
+  if o1.B != o2.B {
+    return false
+  }
 }

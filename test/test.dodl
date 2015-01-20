@@ -24,7 +24,7 @@ type 1 BasicAttrTypesObject concrete {
 		// test line comment at the end of attribute block
 	}
 	methods {
-		func Dump() string {
+		func Dump() (string, error) {
 			return spew.Sdump(*this)
 		}
 		func ConditionalDump(t bool) string {

@@ -1,11 +1,11 @@
 package main
 
 import (
-	"bufio"
 	"bytes"
 	"fmt"
 	"github.com/nu7hatch/gouuid"
 	"gopkg.in/alecthomas/kingpin.v1"
+	"io"
 	"os"
 	"path/filepath"
 )
@@ -32,6 +32,7 @@ type generator struct {
 	file           *os.File
 	r              *reader
 	buf            bytes.Buffer
+	err            error
 	typedefs       map[typeID]*typedef
 	typedefsByName map[string]*typedef
 }
@@ -152,21 +153,31 @@ func (g *generator) generate(pkg string) error {
 }
 
 func (g *generator) generateType(t *typedef, pkg string) (err error) {
+	g.buf = bytes.Buffer{}
+	g.err = nil
 	f, err := os.Create(filepath.Join(*pkgRoot, "src", pkg, fmt.Sprintf("%s.go.tmp", t.name)))
 	if err != nil {
 		return err
 	}
-	w := bufio.NewWriter(f)
-	defer func() {
-		if err == nil {
-			err = w.Flush()
-		}
-		if err == nil {
-			err = f.Close()
-		}
-	}()
-	if err := t.generate(w); err != nil {
+	t.generate(g)
+	if err := g.writeTo(f); err != nil {
+		return err
+	}
+	if err := f.Close(); err != nil {
 		return err
 	}
 	return nil
+}
+
+func (g *generator) writeTo(w io.Writer) error {
+	if g.err == nil {
+		_, g.err = g.buf.WriteTo(w)
+	}
+	return g.err
+}
+
+func (g *generator) printf(format string, args ...interface{}) {
+	if g.err == nil {
+		fmt.Fprintf(&g.buf, format, args...)
+	}
 }

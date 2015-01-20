@@ -19,3 +19,77 @@ type ExtendedObject struct {
   ExtendedByteField byte
   StructField myPkg.MyStruct
 }
+
+func (this *ExtendedObject) ConditionalDump(t bool) string {
+    return this.ConditionalDump_super(!t)
+}
+
+// from: BasicAttrTypesObject
+func (this *ExtendedObject) Dump_super() (string, error) {
+    return spew.Sdump(*this)
+}
+
+// from: BasicAttrTypesObject
+func (this *ExtendedObject) ConditionalDump_super(t bool) string {
+    if t {
+        return this.Dump()
+    }
+    return ""
+}
+
+func (this *ExtendedObject) Dump() string {
+    this.ExtendedByteField = 4
+    return this.Dump_super()
+}
+
+func (o1 *ExtendedObject) Equals(other interface{}) bool {
+	switch o2 := other.(type) {
+	case *ExtendedObject:
+		return o1.equals(o2)
+	case ExtendedObject:
+		return o1.equals(&o2)
+	}
+	return false
+}
+
+func (o1 *ExtendedObject) equals(o2 *ExtendedObject) bool {
+  if o1.ByteField != o2.ByteField {
+    return false
+  }
+  if o1.U8Field != o2.U8Field {
+    return false
+  }
+  if o1.U16Field != o2.U16Field {
+    return false
+  }
+  if o1.U32Field != o2.U32Field {
+    return false
+  }
+  if o1.U64Field != o2.U64Field {
+    return false
+  }
+  if o1.S8Field != o2.S8Field {
+    return false
+  }
+  if o1.S16Field != o2.S16Field {
+    return false
+  }
+  if o1.S32Field != o2.S32Field {
+    return false
+  }
+  if o1.S64Field != o2.S64Field {
+    return false
+  }
+  if o1.StringField != o2.StringField {
+    return false
+  }
+  if !o1.TimeField.Equals(o2.TimeField) {
+    return false
+  }
+  if o1.ExtendedByteField != o2.ExtendedByteField {
+    return false
+  }
+  if o1.StructField != o2.StructField {
+    return false
+  }
+}

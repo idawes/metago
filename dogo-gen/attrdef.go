@@ -33,55 +33,27 @@ func (g *generator) parseAttribute(t *typedef, fields []string) (attrDef, error)
 			return nil, fmt.Errorf("Unrecognized persistence type \"%s\", line %d of file %s", fields[3], g.r.line, g.file.Name())
 		}
 	}
-	c, err := getClass(fields[2])
+	return newAttrDef(&baseAttrDef{parentType: t, attributeID: id, name: name, attrType: fields[2], persistence: p, srcline: g.r.line, srcfile: g.file.Name()})
+}
+
+func newAttrDef(b *baseAttrDef) (attrDef, error) {
+	c, err := getClass(b.attrType)
 	if err != nil {
-		return nil, fmt.Errorf("Unknown attribute class %s, line %d of file %s", fields[2], g.r.line, g.file.Name())
+		return nil, fmt.Errorf("Unknown attribute class %s, line %d of file %s", b.attrType, b.srcline, b.srcfile)
 	}
-	a := baseAttrDef{parentType: t, attributeID: id, name: name, attrType: fields[2], persistence: p, srcline: g.r.line, srcfile: g.file.Name()}
 	switch c {
 	case attrClassBuiltin:
-		return &a, nil
-	case attrClassQualifiedBuiltin:
-		s := strings.Split(fields[2], ".")
-		a.attrType = s[1]
-		return &qualifiedTypenameAttrDef{baseAttrDef: a, packageName: s[0]}, nil
+		return b, nil
+	case attrClassTime:
+		return &timeAttrDef{baseAttrDef: *b}, nil
 	case attrClassMap:
-		// map[int]string
-		s := strings.Split(fields[2], "[") // [map int]string]
-		if len(s) != 2 || s[0] != "map" {
-			return nil, fmt.Errorf("invalid map attribute specification %s, line %d of file %s", fields[2], g.r.line, g.file.Name())
-		}
-		s = strings.Split(s[1], "]") // [int string]
-		if len(s) != 3 {
-			return nil, fmt.Errorf("invalid map attribute specification %s, line %d of file %s", fields[2], g.r.line, g.file.Name())
-		}
-		keyClass, err := getClass(s[1])
-		if err != nil {
-			return nil, fmt.Errorf("invalid map attribute specification %s, line %d of file %s", fields[2], g.r.line, g.file.Name())
-		}
-		switch keyClass {
-		case attrClassSlice:
-		case attrClassMap:
-			return nil, fmt.Errorf("invalid map key class %s, line %d of file %s", keyClass, g.r.line, g.file.Name())
-		}
-		return &mapAttrDef{baseAttrDef: a, keyType: s[1], valType: s[2]}, nil
+		return newMapAttrDef(b)
 	case attrClassSlice:
-		// []string
-		s := strings.Split(fields[2], "]") // [[ string]
-		if len(s) != 2 || s[0] != "[" {
-			return nil, fmt.Errorf("invalid slice attribute specification %s, line %d of file %s", fields[2], g.r.line, g.file.Name())
-		}
-		return &sliceAttrDef{baseAttrDef: a, valType: s[1]}, nil
+		return newSliceAttrDef(b)
 	case attrClassDiffableObj:
-		pkg := ""
-		s := strings.Split(fields[2], ".")
-		if len(s) == 2 {
-			pkg = s[0]
-			a.attrType = s[1]
-		}
-		return &diffObjAttrDef{baseAttrDef: a, packageName: pkg}, nil
+		return newDiffableObjAttrDef(b)
 	}
-	return nil, fmt.Errorf("Unknown attribute class %s, line %d of file %s", c, g.r.line, g.file.Name())
+	return nil, fmt.Errorf("Unknown attribute class %s, line %d of file %s", c, b.srcline, b.srcfile)
 }
 
 func getClass(n string) (attrClass, error) {
@@ -89,13 +61,13 @@ func getClass(n string) (attrClass, error) {
 	case "byte", "uint8", "uint16", "uint32", "uint64", "int8", "int16", "int32", "int64", "float32", "float64", "string":
 		return attrClassBuiltin, nil
 	case "time.Time":
-		return attrClassQualifiedBuiltin, nil
+		return attrClassTime, nil
 	}
 
 	switch {
 	case strings.HasPrefix(n, "[]"):
 		return attrClassSlice, nil
-	case strings.HasPrefix(n, "map"):
+	case strings.HasPrefix(n, "map["):
 		return attrClassMap, nil
 	default:
 		return attrClassDiffableObj, nil
@@ -107,7 +79,7 @@ type attrClass int
 
 const (
 	attrClassBuiltin attrClass = iota
-	attrClassQualifiedBuiltin
+	attrClassTime
 	attrClassSlice
 	attrClassMap
 	attrClassDiffableObj
@@ -128,6 +100,7 @@ type attrDef interface {
 	Srcfile() string
 	Name() string
 	Type() string
+	GenerateEquals(g *generator)
 }
 
 type baseAttrDef struct {
@@ -160,31 +133,84 @@ func (a *baseAttrDef) Type() string {
 	return a.attrType
 }
 
-type qualifiedTypenameAttrDef struct {
+func (a *baseAttrDef) GenerateEquals(g *generator) {
+	g.printf("  if o1.%[1]s != o2.%[1]s {\n    return false\n  }\n", a.name)
+}
+
+/************************************************************************/
+/************************** Qualified Type Attribute ********************/
+type timeAttrDef struct {
 	baseAttrDef
-	packageName string
 }
 
-func (a *qualifiedTypenameAttrDef) Type() string {
-	return fmt.Sprintf("%s.%s", a.packageName, a.attrType)
+func (a *timeAttrDef) GenerateEquals(g *generator) {
+	g.printf("  if !o1.%[1]s.Equals(o2.%[1]s) {\n    return false\n  }\n", a.name)
 }
 
+/************************************************************************/
+/**************************** Slice Attribute ***************************/
 type sliceAttrDef struct {
 	baseAttrDef
 	valType string
+	valAttr attrDef
 }
 
+func newSliceAttrDef(b *baseAttrDef) (*sliceAttrDef, error) {
+	valType := b.attrType[2:]
+	valAttr, err := newAttrDef(&baseAttrDef{attrType: valType})
+	if err != nil {
+		return nil, fmt.Errorf("invalid slice attribute specification %s, line %d of file %s", b.attrType, b.srcline, b.srcfile)
+	}
+	return &sliceAttrDef{baseAttrDef: *b, valType: valType, valAttr: valAttr}, nil
+}
+
+const sliceEquals = `    if len(o1.%[1]s) != len(o2.%[1]s) {
+        return false  
+    }
+    for idx, newVal := range o1.%[1]s {
+`
+
+func (a *sliceAttrDef) GenerateEquals(g *generator) {
+	g.printf(sliceEquals, a.name)
+}
+
+/************************************************************************/
+/**************************** Map Attribute *****************************/
 type mapAttrDef struct {
 	baseAttrDef
 	keyType string
+	keyAttr attrDef
 	valType string
+	valAttr attrDef
 }
 
+func newMapAttrDef(b *baseAttrDef) (*mapAttrDef, error) {
+	// map[int]string
+	i := strings.Index(b.attrType, "[")
+	j := strings.Index(b.attrType, "]")
+	if i == -1 || j == -1 {
+		return nil, fmt.Errorf("invalid map attribute specification %s, line %d of file %s", b.attrType, b.srcline, b.srcfile)
+	}
+	keyType := b.attrType[i+1 : j]
+	keyAttr, err := newAttrDef(&baseAttrDef{attrType: keyType})
+	if err != nil {
+		return nil, fmt.Errorf("invalid map attribute specification %s, line %d of file %s", b.attrType, b.srcline, b.srcfile)
+	}
+	valType := b.attrType[j+1:]
+	valAttr, err := newAttrDef(&baseAttrDef{attrType: valType})
+	if err != nil {
+		return nil, fmt.Errorf("invalid map attribute specification %s, line %d of file %s", b.attrType, b.srcline, b.srcfile)
+	}
+	return &mapAttrDef{baseAttrDef: *b, keyType: keyType, keyAttr: keyAttr, valType: valType, valAttr: valAttr}, nil
+}
+
+/************************************************************************/
+/**************************** Diff Obj Attribute ************************/
 type diffObjAttrDef struct {
 	baseAttrDef
 	packageName string
 }
 
-func (a *diffObjAttrDef) Type() string {
-	return fmt.Sprintf("%s.%s", a.packageName, a.attrType)
+func newDiffableObjAttrDef(b *baseAttrDef) (*diffObjAttrDef, error) {
+	return &diffObjAttrDef{baseAttrDef: *b}, nil
 }

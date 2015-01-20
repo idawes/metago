@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"github.com/nu7hatch/gouuid"
 	"io"
@@ -260,7 +259,7 @@ func (g *generator) parseMethodBlock(t *typedef) error {
 			return nil
 		}
 		if len(fields) > 0 && fields[0] == "func" {
-			m, err := g.parseMethod(t, fields[1:])
+			m, err := g.parseMethod(t, fields)
 			if err != nil {
 				return err
 			}
@@ -283,33 +282,20 @@ func (t *typedef) validateTypeHierarchy(typesByName map[string]*typedef) error {
 	return nil
 }
 
-func (t *typedef) generate(w *bufio.Writer) error {
-	if _, err := w.WriteString("import (\n"); err != nil {
-		return err
-	}
-	if err := t.generateImports(w); err != nil {
-		return err
-	}
-	if _, err := w.WriteString(fmt.Sprintf(")\n\ntype %s struct {\n", t.name)); err != nil {
-		return err
-	}
-	if err := t.generateAttributes(w); err != nil {
-		return err
-	}
-	if _, err := w.WriteString("}\n"); err != nil {
-		return err
-	}
-	return nil
+func (t *typedef) generate(g *generator) {
+	g.printf("import (\n")
+	t.generateImports(g)
+	g.printf(")\n\ntype %s struct {\n", t.name)
+	t.generateAttributes(g)
+	g.printf("}\n")
+	t.generateMethods(g)
 }
 
-func (t *typedef) generateImports(w *bufio.Writer) error {
+func (t *typedef) generateImports(g *generator) {
 	t.coalesceImports(t.imports)
-	for im, _ := range t.imports {
-		if _, err := w.WriteString(fmt.Sprintf("  %s\n", im)); err != nil {
-			return err
-		}
+	for im := range t.imports {
+		g.printf("  %s\n", im)
 	}
-	return nil
 }
 
 func (t *typedef) coalesceImports(imports map[string]struct{}) {
@@ -321,14 +307,75 @@ func (t *typedef) coalesceImports(imports map[string]struct{}) {
 	}
 }
 
-func (t *typedef) generateAttributes(w *bufio.Writer) error {
+func (t *typedef) generateAttributes(g *generator) {
 	if t.extends != nil {
-		t.extends.generateAttributes(w)
+		t.extends.generateAttributes(g)
 	}
 	for _, a := range t.attrDefsByIDInOrder {
-		if _, err := w.WriteString(fmt.Sprintf("  %s %s\n", a.Name(), a.Type())); err != nil {
-			return err
-		}
+		g.printf("  %s %s\n", a.Name(), a.Type())
 	}
-	return nil
+}
+
+func (t *typedef) generateMethods(g *generator) {
+	methods := make(map[string]*methodDef)
+	t.resolveMethods(methods)
+	for _, m := range methods {
+		if strings.Contains(m.name, "_super") {
+			g.printf("\n// from: %s", m.parentType.name)
+		}
+		g.printf("\nfunc (this *%s) %s(%s) %s {\n%s}\n", t.name, m.name, m.params, m.returns, m.body)
+	}
+	t.generateEquals(g)
+}
+
+func (t *typedef) resolveMethods(methods map[string]*methodDef) {
+	for _, m := range t.methods {
+		name := m.name
+		super := fmt.Sprintf("this.%s_super", name)
+		for {
+			if _, exists := methods[name]; exists {
+				name = fmt.Sprintf("%s_super", name)
+				super = fmt.Sprintf("%s_super", super)
+			} else {
+				break
+			}
+		}
+		m.name = name
+		m.body = strings.Replace(m.body, "##super##", super, -1)
+		methods[m.name] = m
+	}
+	if t.extends != nil {
+		t.extends.resolveMethods(methods)
+	}
+}
+
+// Arguments to format are:
+// [1]: type name
+const stringEquals = `
+func (o1 *%[1]s) Equals(other interface{}) bool {
+	switch o2 := other.(type) {
+	case *%[1]s:
+		return o1.equals(o2)
+	case %[1]s:
+		return o1.equals(&o2)
+	}
+	return false
+}
+
+func (o1 *%[1]s) equals(o2 *%[1]s) bool {
+`
+
+func (t *typedef) generateEquals(g *generator) {
+	g.printf(stringEquals, t.name)
+	t.generateAttrEquals(g)
+	g.printf("}\n")
+}
+
+func (t *typedef) generateAttrEquals(g *generator) {
+	if t.extends != nil {
+		t.extends.generateAttrEquals(g)
+	}
+	for _, a := range t.attrDefsByIDInOrder {
+		a.GenerateEquals(g)
+	}
 }
