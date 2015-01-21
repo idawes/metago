@@ -172,6 +172,8 @@ const sliceEquals = `    if len(o1.%[1]s) != len(o2.%[1]s) {
 
 func (a *sliceAttrDef) GenerateEquals(g *generator) {
 	g.printf(sliceEquals, a.name)
+
+	g.printf("}\n")
 }
 
 /************************************************************************/
