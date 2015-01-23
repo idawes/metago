@@ -68,7 +68,7 @@ func (g *generator) parseFiles() {
 }
 
 func listSourceFilenames(pkgDir string) []string {
-	pattern := filepath.Join(pkgDir, "*.dodl")
+	pattern := filepath.Join(pkgDir, "*.mtgo")
 	if *veryVerbose {
 		fmt.Printf("  Executing match using pattern %s\n", pattern)
 	}
