@@ -6,6 +6,7 @@ package test
 
 import (
 	"github.com/davecgh/go-spew/spew"
+	"github.com/idawes/metago"
 	"time"
 )
 
@@ -23,10 +24,6 @@ type BasicAttrTypesObject struct {
 	TimeField   time.Time
 }
 
-func (this *BasicAttrTypesObject) Dump() (string, error) {
-	return spew.Sdump(*this)
-}
-
 func (this *BasicAttrTypesObject) ConditionalDump(t bool) string {
 	if t {
 		return this.Dump()
@@ -34,17 +31,11 @@ func (this *BasicAttrTypesObject) ConditionalDump(t bool) string {
 	return ""
 }
 
-func (o1 *BasicAttrTypesObject) Equals(other interface{}) bool {
-	switch o2 := other.(type) {
-	case *BasicAttrTypesObject:
-		return o1.equals(o2)
-	case BasicAttrTypesObject:
-		return o1.equals(&o2)
-	}
-	return false
+func (this *BasicAttrTypesObject) Dump() (string, error) {
+	return spew.Sdump(*this)
 }
 
-func (o1 *BasicAttrTypesObject) equals(o2 *BasicAttrTypesObject) bool {
+func (o1 *BasicAttrTypesObject) Equals(o2 *BasicAttrTypesObject) bool {
 
 	//---------  comparison for ByteField ----------------------------------/
 	if o1.ByteField != o2.ByteField {
@@ -97,6 +88,65 @@ func (o1 *BasicAttrTypesObject) equals(o2 *BasicAttrTypesObject) bool {
 	}
 
 	//---------  comparison for TimeField ----------------------------------/
+	if !o1.TimeField.Equal(o2.TimeField) {
+		return false
+	}
+	return true
+}
+
+func (o1 *BasicAttrTypesObject) Diff(o2 *BasicAttrTypesObject) bool {
+
+	//---------  diff for ByteField ----------------------------------/
+	if o1.ByteField != o2.ByteField {
+		d.Add(NewbyteDiff(AID_BasicAttrTypesObject_ByteField, true, o1.ByteField, o2.ByteField))
+	}
+
+	//---------  diff for U8Field ----------------------------------/
+	if o1.U8Field != o2.U8Field {
+		d.Add(Newuint8Diff(AID_BasicAttrTypesObject_U8Field, true, o1.U8Field, o2.U8Field))
+	}
+
+	//---------  diff for U16Field ----------------------------------/
+	if o1.U16Field != o2.U16Field {
+		d.Add(Newuint16Diff(AID_BasicAttrTypesObject_U16Field, true, o1.U16Field, o2.U16Field))
+	}
+
+	//---------  diff for U32Field ----------------------------------/
+	if o1.U32Field != o2.U32Field {
+		d.Add(Newuint32Diff(AID_BasicAttrTypesObject_U32Field, true, o1.U32Field, o2.U32Field))
+	}
+
+	//---------  diff for U64Field ----------------------------------/
+	if o1.U64Field != o2.U64Field {
+		d.Add(Newuint64Diff(AID_BasicAttrTypesObject_U64Field, true, o1.U64Field, o2.U64Field))
+	}
+
+	//---------  diff for S8Field ----------------------------------/
+	if o1.S8Field != o2.S8Field {
+		d.Add(Newint8Diff(AID_BasicAttrTypesObject_S8Field, true, o1.S8Field, o2.S8Field))
+	}
+
+	//---------  diff for S16Field ----------------------------------/
+	if o1.S16Field != o2.S16Field {
+		d.Add(Newint16Diff(AID_BasicAttrTypesObject_S16Field, true, o1.S16Field, o2.S16Field))
+	}
+
+	//---------  diff for S32Field ----------------------------------/
+	if o1.S32Field != o2.S32Field {
+		d.Add(Newint32Diff(AID_BasicAttrTypesObject_S32Field, true, o1.S32Field, o2.S32Field))
+	}
+
+	//---------  diff for S64Field ----------------------------------/
+	if o1.S64Field != o2.S64Field {
+		d.Add(Newint64Diff(AID_BasicAttrTypesObject_S64Field, true, o1.S64Field, o2.S64Field))
+	}
+
+	//---------  diff for StringField ----------------------------------/
+	if o1.StringField != o2.StringField {
+		d.Add(NewstringDiff(AID_BasicAttrTypesObject_StringField, true, o1.StringField, o2.StringField))
+	}
+
+	//---------  diff for TimeField ----------------------------------/
 	if !o1.TimeField.Equal(o2.TimeField) {
 		return false
 	}

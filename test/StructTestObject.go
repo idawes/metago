@@ -4,27 +4,28 @@
 
 package test
 
-import ()
+import (
+	"github.com/idawes/metago"
+)
 
 type StructTestObject struct {
 	B BasicAttrTypesObject
 }
 
-func (o1 *StructTestObject) Equals(other interface{}) bool {
-	switch o2 := other.(type) {
-	case *StructTestObject:
-		return o1.equals(o2)
-	case StructTestObject:
-		return o1.equals(&o2)
-	}
-	return false
-}
-
-func (o1 *StructTestObject) equals(o2 *StructTestObject) bool {
+func (o1 *StructTestObject) Equals(o2 *StructTestObject) bool {
 
 	//---------  comparison for B ----------------------------------/
 	if o1.B != o2.B {
 		return false
+	}
+	return true
+}
+
+func (o1 *StructTestObject) Diff(o2 *StructTestObject) bool {
+
+	//---------  diff for B ----------------------------------/
+	if o1.B != o2.B {
+		d.Add(NewBasicAttrTypesObjectDiff(AID_StructTestObject_B, true, o1.B, o2.B))
 	}
 	return true
 }

@@ -1,11 +1,14 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"go/format"
 	"io/ioutil"
+	"os"
 	"path/filepath"
+	"strings"
 )
 
 type writer struct {
@@ -33,19 +36,32 @@ func (w *writer) printf(format string, args ...interface{}) {
 func (w *writer) close() error {
 	buf, err := format.Source(w.buf.Bytes())
 	if err != nil {
-		return fmt.Errorf("couldn't format generated src: %s", err)
+		b := &bytes.Buffer{}
+		r := bufio.NewReader(&w.buf)
+		for i := 1; ; i++ {
+			l, err := r.ReadString('\n')
+			if err != nil {
+				break
+			}
+			fmt.Fprintf(b, "%d %s", i, l)
+		}
+		return fmt.Errorf("\n%s\n  Couldn't format generated src: %s\n", string(b.Bytes()), err)
 	}
 	fn := filepath.Join(w.pkg, fmt.Sprintf("%s.go", w.typename))
 	if !isChanged(buf, fn) {
 		return nil
 	}
+	fmt.Println("     ---------------Changed")
+	if err := os.Rename(fn, strings.Replace(fn, ".go", ".go.old", -1)); err != nil {
+		fmt.Println(err)
+	}
 	return ioutil.WriteFile(fn, buf, 0755)
 }
 
-func isChanged(n []byte, fn string) bool {
-	o, err := ioutil.ReadFile(fn)
+func isChanged(newData []byte, fn string) bool {
+	oldData, err := ioutil.ReadFile(fn)
 	if err != nil {
 		return true
 	}
-	return bytes.Equal(o, n)
+	return !bytes.Equal(oldData, newData)
 }

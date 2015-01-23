@@ -305,6 +305,7 @@ func (t *typedef) coalesceImports(imports map[string]struct{}) {
 	for k, v := range t.imports {
 		imports[k] = v
 	}
+	imports["github.com/idawes/metago"] = struct{}{}
 }
 
 func (t *typedef) generateAttributes(w *writer) {
@@ -319,13 +320,20 @@ func (t *typedef) generateAttributes(w *writer) {
 func (t *typedef) generateMethods(w *writer) {
 	methods := make(map[string]*methodDef)
 	t.resolveMethods(methods)
-	for _, m := range methods {
+	s := make([]string, 0)
+	for n, _ := range methods {
+		s = append(s, n)
+	}
+	sort.Strings(s)
+	for _, n := range s {
+		m := methods[n]
 		if strings.Contains(m.name, "_super") {
 			w.printf("\n// from: %s", m.parentType.name)
 		}
 		w.printf("\nfunc (this *%s) %s(%s) %s {\n%s}\n", t.name, m.name, m.params, m.returns, m.body)
 	}
 	t.generateEquals(w)
+	t.generateDiff(w)
 }
 
 func (t *typedef) resolveMethods(methods map[string]*methodDef) {
@@ -340,6 +348,10 @@ func (t *typedef) resolveMethods(methods map[string]*methodDef) {
 				break
 			}
 		}
+		if m.name != name {
+			mcopy := *m
+			m = &mcopy
+		}
 		m.name = name
 		m.body = strings.Replace(m.body, "##super##", super, -1)
 		methods[m.name] = m
@@ -349,24 +361,8 @@ func (t *typedef) resolveMethods(methods map[string]*methodDef) {
 	}
 }
 
-// Arguments to format are:
-// [1]: type name
-const typeEqualsTemplate = `
-func (o1 *%[1]s) Equals(other interface{}) bool {
-	switch o2 := other.(type) {
-	case *%[1]s:
-		return o1.equals(o2)
-	case %[1]s:
-		return o1.equals(&o2)
-	}
-	return false
-}
-
-func (o1 *%[1]s) equals(o2 *%[1]s) bool {
-`
-
 func (t *typedef) generateEquals(w *writer) {
-	w.printf(typeEqualsTemplate, t.name)
+	w.printf("\nfunc (o1 *%[1]s) Equals(o2 *%[1]s) bool {\n", t.name)
 	t.generateAttrEquals(w)
 	w.printf("    return true\n}\n")
 }
@@ -378,5 +374,22 @@ func (t *typedef) generateAttrEquals(w *writer) {
 	for _, a := range t.attrDefsByIDInOrder {
 		w.printf("\n//---------  comparison for %s ----------------------------------/\n", a.Name())
 		a.GenerateEquals(w)
+	}
+}
+
+func (t *typedef) generateDiff(w *writer) {
+	w.printf("\nfunc (o1 *%[1]s) Diff(o2 *%[1]s) bool {\n", t.name)
+	t.generateAttrDiffs(w)
+	w.printf("    return true\n}\n")
+
+}
+
+func (t *typedef) generateAttrDiffs(w *writer) {
+	if t.extends != nil {
+		t.extends.generateAttrDiffs(w)
+	}
+	for _, a := range t.attrDefsByIDInOrder {
+		w.printf("\n//---------  diff for %s ----------------------------------/\n", a.Name())
+		a.GenerateDiff(w)
 	}
 }
