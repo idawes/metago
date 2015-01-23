@@ -22,7 +22,7 @@ var (
 	verbose     = kingpin.Flag("verbose", "Enable verbose output.").Short('v').Bool()
 	veryVerbose = kingpin.Flag("veryverbose", "Enable very verbose output").Short('V').Bool()
 	pkgRoot     = kingpin.Flag("pkgroot", "The package path root. Defaults to $GOPATH. Only needs to be specified if $GOPATH is not a single path").Short('r').OverrideDefaultFromEnvar("GOPATH").ExistingDir()
-	pkglist     = kingpin.Arg("pkgs", "A list of package paths in which to find \".dodl\" files").Strings()
+	pkglist     = kingpin.Arg("pkgs", "A list of package paths in which to find \".mtgo\" files").Strings()
 )
 
 func main() {
