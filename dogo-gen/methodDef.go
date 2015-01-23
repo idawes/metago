@@ -13,29 +13,30 @@ import (
 	 	<body>
 	 }
 */
-func (g *generator) parseMethod(t *typedef, fields []string) (*methodDef, error) {
+func parseMethod(t *typedef, r *reader) (*methodDef, error) {
+	fields, _ := r.read()
 	sig := strings.Join(fields[1:], " ")
 	i := strings.Index(sig, "(")
 	if i == -1 {
-		return nil, fmt.Errorf("Invalid method signature (missing \"(\" for parameters) in %s, line %d of file %s", fields[1], g.r.line, g.file.Name())
+		return nil, fmt.Errorf("invalid method signature (missing \"(\" for parameters) in %s, line %d of file %s", fields[1], r.line, r.f.Name())
 	}
 
 	j := strings.Index(sig, ")")
 	if j == -1 {
-		return nil, fmt.Errorf("Invalid method signature (missing \")\" for parameters) in %s, line %d of file %s", fields[1], g.r.line, g.file.Name())
+		return nil, fmt.Errorf("invalid method signature (missing \")\" for parameters) in %s, line %d of file %s", fields[1], r.line, r.f.Name())
 	}
 	if strings.Index(sig, "{") != len(sig)-1 {
-		return nil, fmt.Errorf("Invalid method signature (missing \")\" for parameters) in %s, line %d of file %s", fields[1], g.r.line, g.file.Name())
+		return nil, fmt.Errorf("invalid method signature (missing \")\" for parameters) in %s, line %d of file %s", fields[1], r.line, r.f.Name())
 	}
-	m := methodDef{parentType: t, name: sig[:i], params: sig[i+1 : j], returns: strings.TrimSpace(sig[j+1 : len(sig)-1]), srcline: g.r.line, srcfile: g.file.Name()}
+	m := methodDef{parentType: t, name: sig[:i], params: sig[i+1 : j], returns: strings.TrimSpace(sig[j+1 : len(sig)-1]), srcline: r.line, srcfile: r.f.Name()}
 	indentLevel := 1
 	var buf bytes.Buffer
 	for {
 		var err error
-		fields, err = g.r.read()
+		fields, err = r.read()
 		if err != nil {
 			if err == io.EOF {
-				return nil, fmt.Errorf("Incomplete method specification, line %d of file %s", g.r.line, g.file.Name())
+				return nil, fmt.Errorf("incomplete method specification, line %d of file %s", r.line, r.f.Name())
 			}
 			return nil, err
 		}

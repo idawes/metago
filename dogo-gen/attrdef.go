@@ -11,13 +11,14 @@ import (
 	<id> <name> <type> [<persistenceType>]
 */
 
-func (g *generator) parseAttribute(t *typedef, fields []string) (attrDef, error) {
+func parseAttribute(t *typedef, r *reader) (attrDef, error) {
+	fields, err := r.read()
 	if len(fields) < 3 || len(fields) > 4 {
-		return nil, fmt.Errorf("Invalid attribute specification, line %d of file %s", g.r.line, g.file.Name())
+		return nil, fmt.Errorf("invalid attribute specification, line %d of file %s", r.line, r.f.Name())
 	}
 	id, err := strconv.Atoi(fields[0])
 	if err != nil {
-		return nil, fmt.Errorf("Expecting an integer attribute id, found \"%s\", line %d of file %s", fields[0], g.r.line, g.file.Name())
+		return nil, fmt.Errorf("expecting an integer attribute id, found \"%s\", line %d of file %s", fields[0], r.line, r.f.Name())
 	}
 	name := fields[1]
 	p := persistenceClassPersistent
@@ -30,16 +31,16 @@ func (g *generator) parseAttribute(t *typedef, fields []string) (attrDef, error)
 		case "ephemeral":
 			p = persistenceClassEphemeral
 		default:
-			return nil, fmt.Errorf("Unrecognized persistence type \"%s\", line %d of file %s", fields[3], g.r.line, g.file.Name())
+			return nil, fmt.Errorf("unrecognized persistence type \"%s\", line %d of file %s", fields[3], r.line, r.f.Name())
 		}
 	}
-	return newAttrDef(&baseAttrDef{parentType: t, attributeID: id, name: name, attrType: fields[2], persistence: p, srcline: g.r.line, srcfile: g.file.Name()})
+	return newAttrDef(&baseAttrDef{parentType: t, attributeID: id, name: name, attrType: fields[2], persistence: p, srcline: r.line, srcfile: r.f.Name()})
 }
 
 func newAttrDef(b *baseAttrDef) (attrDef, error) {
 	c, err := getClass(b.attrType)
 	if err != nil {
-		return nil, fmt.Errorf("Unknown attribute class %s, line %d of file %s", b.attrType, b.srcline, b.srcfile)
+		return nil, fmt.Errorf("unknown attribute class %s, line %d of file %s", b.attrType, b.srcline, b.srcfile)
 	}
 	switch c {
 	case attrClassBuiltin:
@@ -50,8 +51,8 @@ func newAttrDef(b *baseAttrDef) (attrDef, error) {
 		return newMapAttrDef(b)
 	case attrClassSlice:
 		return newSliceAttrDef(b)
-	case attrClassDiffableObj:
-		return newDiffableObjAttrDef(b)
+	case attrClassStruct:
+		return newStructAttrDef(b)
 	}
 	return nil, fmt.Errorf("Unknown attribute class %s, line %d of file %s", c, b.srcline, b.srcfile)
 }
@@ -70,7 +71,7 @@ func getClass(n string) (attrClass, error) {
 	case strings.HasPrefix(n, "map["):
 		return attrClassMap, nil
 	default:
-		return attrClassDiffableObj, nil
+		return attrClassStruct, nil
 	}
 }
 
@@ -82,7 +83,7 @@ const (
 	attrClassTime
 	attrClassSlice
 	attrClassMap
-	attrClassDiffableObj
+	attrClassStruct
 )
 
 //go:generate stringer -type=persistenceClass
@@ -100,7 +101,8 @@ type attrDef interface {
 	Srcfile() string
 	Name() string
 	Type() string
-	GenerateEquals(g *generator)
+	GenerateEquals(w *writer)
+	GenerateSubAttrEquals(w *writer, v1, v2 string)
 }
 
 type baseAttrDef struct {
@@ -133,18 +135,26 @@ func (a *baseAttrDef) Type() string {
 	return a.attrType
 }
 
-func (a *baseAttrDef) GenerateEquals(g *generator) {
-	g.printf("  if o1.%[1]s != o2.%[1]s {\n    return false\n  }\n", a.name)
+func (a *baseAttrDef) GenerateEquals(w *writer) {
+	w.printf("  if o1.%[1]s != o2.%[1]s {\n    return false\n  }\n", a.name)
+}
+
+func (a *baseAttrDef) GenerateSubAttrEquals(w *writer, v1, v2 string) {
+	w.printf("  if %s != %s {\n    return false\n  }\n", v1, v2)
 }
 
 /************************************************************************/
-/************************** Qualified Type Attribute ********************/
+/************************** Time Attribute ********************/
 type timeAttrDef struct {
 	baseAttrDef
 }
 
-func (a *timeAttrDef) GenerateEquals(g *generator) {
-	g.printf("  if !o1.%[1]s.Equals(o2.%[1]s) {\n    return false\n  }\n", a.name)
+func (a *timeAttrDef) GenerateEquals(w *writer) {
+	w.printf("  if !o1.%[1]s.Equal(o2.%[1]s) {\n    return false\n  }\n", a.name)
+}
+
+func (a *timeAttrDef) GenerateSubAttrEquals(w *writer, v1, v2 string) {
+	w.printf("  if !%s.Equal(%s) {\n    return false\n  }\n", v1, v2)
 }
 
 /************************************************************************/
@@ -164,16 +174,30 @@ func newSliceAttrDef(b *baseAttrDef) (*sliceAttrDef, error) {
 	return &sliceAttrDef{baseAttrDef: *b, valType: valType, valAttr: valAttr}, nil
 }
 
-const sliceEquals = `    if len(o1.%[1]s) != len(o2.%[1]s) {
+const sliceAttrEquals = `    if len(o1.%[1]s) != len(o2.%[1]s) {
         return false  
     }
-    for idx, newVal := range o1.%[1]s {
+    for idx, v1 := range o1.%[1]s {
+    	v2 := o2.%[1]s[idx]
 `
 
-func (a *sliceAttrDef) GenerateEquals(g *generator) {
-	g.printf(sliceEquals, a.name)
+func (a *sliceAttrDef) GenerateEquals(w *writer) {
+	w.printf(sliceAttrEquals, a.name)
+	a.valAttr.GenerateSubAttrEquals(w, "v1", "v2")
+	w.printf("  }\n")
+}
 
-	g.printf("}\n")
+const sliceSubAttrEquals = `    if len(%[1]s) != len(%[2]s) {
+        return false  
+    }
+    for idx, %[1]s1 := range %[1]s {
+    	%[2]s2 := %[2]s[idx]
+`
+
+func (a *sliceAttrDef) GenerateSubAttrEquals(w *writer, v1, v2 string) {
+	w.printf(sliceSubAttrEquals, v1, v2)
+	a.valAttr.GenerateSubAttrEquals(w, fmt.Sprintf("%s1", v1), fmt.Sprintf("%s2", v2))
+	w.printf("  }\n")
 }
 
 /************************************************************************/
@@ -208,11 +232,11 @@ func newMapAttrDef(b *baseAttrDef) (*mapAttrDef, error) {
 
 /************************************************************************/
 /**************************** Diff Obj Attribute ************************/
-type diffObjAttrDef struct {
+type structAttrDef struct {
 	baseAttrDef
 	packageName string
 }
 
-func newDiffableObjAttrDef(b *baseAttrDef) (*diffObjAttrDef, error) {
-	return &diffObjAttrDef{baseAttrDef: *b}, nil
+func newStructAttrDef(b *baseAttrDef) (*structAttrDef, error) {
+	return &structAttrDef{baseAttrDef: *b}, nil
 }

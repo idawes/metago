@@ -10,15 +10,16 @@ import (
 )
 
 type typeID struct {
-	uuid  *uuid.UUID
-	subID int
+	pkgUUID *uuid.UUID
+	subID   int
 }
 
 func (t *typeID) String() string {
-	return fmt.Sprintf("%s:%d", t.uuid, t.subID)
+	return fmt.Sprintf("%s:%d", t.pkgUUID, t.subID)
 }
 
 type typedef struct {
+	pkg                 string
 	typeID              typeID
 	name                string
 	abstract            bool
@@ -57,32 +58,29 @@ func (l attrdefList) Less(i, j int) bool { return l[i].AttributeID() < l[j].Attr
 	Imports may occur at any point in the method block, allowing them to be specified just above the method that requires it. Imports may be duplicated, they will only be present once in the generated
 	output.
 */
-func (g *generator) parseTypedef(uuid *uuid.UUID) (*typedef, error) {
-	t, err := g.parseTypedefHeader(uuid)
+func parseTypedef(pkgUUID *uuid.UUID, r *reader) (*typedef, error) {
+	t, err := parseTypedefHeader(pkgUUID, r)
+	if err != nil {
+		return nil, err
+	}
+	if err := t.parseImportBlock(r); err != nil {
+		return nil, err
+	}
+	if err := t.parseAttributeBlock(r); err != nil {
+		return nil, err
+	}
+	if err := t.parseMethodBlock(r); err != nil {
+		return nil, err
+	}
+	fields, err := r.read()
 	if err != nil {
 		if err == io.EOF {
-			return nil, nil
-		}
-		return nil, err
-	}
-	if err := g.parseImportBlock(t); err != nil {
-		return nil, err
-	}
-	if err := g.parseAttributeBlock(t); err != nil {
-		return nil, err
-	}
-	if err := g.parseMethodBlock(t); err != nil {
-		return nil, err
-	}
-	fields, err := g.r.read()
-	if err != nil {
-		if err == io.EOF {
-			return nil, fmt.Errorf("Incomplete type specification, line %d of file %s", g.r.line, g.file.Name())
+			return nil, fmt.Errorf("incomplete type specification, line %d of file %s", r.line, r.f.Name())
 		}
 		return nil, err
 	}
 	if len(fields) != 1 && fields[0] != "}" {
-		return nil, fmt.Errorf("Missing closing \"}\", line %d of file %s", g.r.line, g.file.Name())
+		return nil, fmt.Errorf("missing closing \"}\", line %d of file %s", r.line, r.f.Name())
 	}
 	return t, nil
 }
@@ -91,57 +89,57 @@ func (g *generator) parseTypedef(uuid *uuid.UUID) (*typedef, error) {
 	typedef header:
 		type <typeID> <typeName> <concrete|abstract> [extends <typeName>] {
 */
-func (g *generator) parseTypedefHeader(uuid *uuid.UUID) (*typedef, error) {
-	fields, err := g.r.read()
+func parseTypedefHeader(pkgUUID *uuid.UUID, r *reader) (*typedef, error) {
+	fields, err := r.read()
 	if err != nil {
 		return nil, err
 	}
 	if *veryVerbose {
-		fmt.Printf("    Parsing %q as type def header from line %d of file %s\n", fields, g.r.line, g.file.Name())
+		fmt.Printf("    Parsing %q as type def header from line %d of file %s\n", fields, r.line, r.f.Name())
 	}
 	if len(fields) < 4 {
-		return nil, fmt.Errorf("Invalid type specification, line %d of file %s", g.r.line, g.file.Name())
+		return nil, fmt.Errorf("invalid type specification, line %d of file %s", r.line, r.f.Name())
 	}
 	if fields[0] != "type" {
-		return nil, fmt.Errorf("Expecting \"type\", found \"%s\", line %d o file %s", fields[0], g.r.line, g.file.Name())
+		return nil, fmt.Errorf("expecting \"type\", found \"%s\", line %d o file %s", fields[0], r.line, r.f.Name())
 	}
-	t := &typedef{srcfile: g.file.Name(), srcline: g.r.line}
+	t := &typedef{srcfile: r.f.Name(), srcline: r.line}
 	subID, err := strconv.Atoi(fields[1])
 	if err != nil {
-		return nil, fmt.Errorf("Expecting integer type number, found \"%s\", line %d of file %s", fields[1], g.r.line, g.file.Name())
+		return nil, fmt.Errorf("expecting integer type number, found \"%s\", line %d of file %s", fields[1], r.line, r.f.Name())
 	}
-	t.typeID = typeID{uuid: uuid, subID: subID}
+	t.typeID = typeID{pkgUUID: pkgUUID, subID: subID}
 	t.name = fields[2]
 	if fields[3] == "abstract" {
 		t.abstract = true
 	} else if fields[3] == "concrete" {
 		t.abstract = false
 	} else {
-		return nil, fmt.Errorf("Expecting \"abstract\" or \"concrete\", found \"%s\", line %d of file %s", fields[3], g.r.line, g.file.Name())
+		return nil, fmt.Errorf("expecting \"abstract\" or \"concrete\", found \"%s\", line %d of file %s", fields[3], r.line, r.f.Name())
 	}
 	if fields[len(fields)-1] != "{" {
-		return nil, fmt.Errorf("Missing \"{\", line %d of file %s", g.r.line, g.file.Name())
+		return nil, fmt.Errorf("missing \"{\", line %d of file %s", r.line, r.f.Name())
 	}
 	if len(fields) == 5 {
 		return t, nil
 	}
 	if fields[4] != "extends" {
-		return nil, fmt.Errorf("Expecting \"extends\", found \"%s\", line %d of file %s", fields[5], g.r.line, g.file.Name())
+		return nil, fmt.Errorf("expecting \"extends\", found \"%s\", line %d of file %s", fields[5], r.line, r.f.Name())
 	}
 	if len(fields) < 7 {
-		return nil, fmt.Errorf("Missing base type name, line %d of file %s", g.r.line, g.file.Name())
+		return nil, fmt.Errorf("missing base type name, line %d of file %s", r.line, r.f.Name())
 	}
 	t.extendsName = fields[5]
 
 	return t, nil
 }
 
-func (g *generator) parseImportBlock(t *typedef) error {
+func (t *typedef) parseImportBlock(r *reader) error {
 	t.imports = make(map[string]struct{})
-	fields, err := g.r.read()
+	fields, err := r.read()
 	if err != nil {
 		if err == io.EOF {
-			return fmt.Errorf("Incomplete type specification, line %d of file %s", g.r.line, g.file.Name())
+			return fmt.Errorf("incomplete type specification, line %d of file %s", r.line, r.f.Name())
 		}
 		return err
 	}
@@ -149,16 +147,16 @@ func (g *generator) parseImportBlock(t *typedef) error {
 		if *veryVerbose {
 			fmt.Println("      No imports specified")
 		}
-		g.r.unread(fields)
+		r.unread(fields)
 		return nil
 	}
 	for {
-		fields, err := g.r.read()
+		fields, err := r.read()
 		if err != nil {
 			return err
 		}
 		if len(fields) != 1 {
-			return fmt.Errorf("Invalid import block entry, line %d of file %s", g.r.line, g.file.Name())
+			return fmt.Errorf("invalid import block entry, line %d of file %s", r.line, r.f.Name())
 		}
 		if fields[0] == "}" { // naked "}" means end of block.
 			if *veryVerbose {
@@ -176,12 +174,12 @@ func (g *generator) parseImportBlock(t *typedef) error {
 			<attributedef>*
 		}
 */
-func (g *generator) parseAttributeBlock(t *typedef) error {
+func (t *typedef) parseAttributeBlock(r *reader) error {
 	t.attrDefsByID = make(map[int]attrDef, 10)
-	fields, err := g.r.read()
+	fields, err := r.read()
 	if err != nil {
 		if err == io.EOF {
-			return fmt.Errorf("Incomplete type specification, line %d of file %s", g.r.line, g.file.Name())
+			return fmt.Errorf("incomplete type specification, line %d of file %s", r.line, r.f.Name())
 		}
 		return err
 	}
@@ -189,11 +187,11 @@ func (g *generator) parseAttributeBlock(t *typedef) error {
 		if *veryVerbose {
 			fmt.Println("      No attributes specified")
 		}
-		g.r.unread(fields)
+		r.unread(fields)
 		return nil
 	}
 	for {
-		fields, err := g.r.read()
+		fields, err := r.read()
 		if err != nil {
 			return err
 		}
@@ -208,12 +206,13 @@ func (g *generator) parseAttributeBlock(t *typedef) error {
 			}
 			return nil
 		}
-		a, err := g.parseAttribute(t, fields)
+		r.unread(fields)
+		a, err := parseAttribute(t, r)
 		if err != nil {
 			return err
 		}
 		if old, present := t.attrDefsByID[a.AttributeID()]; present {
-			return fmt.Errorf("Duplicate defintion of attribute id %d on line %d of file %s\n   It is also defined on line %d of file %s", a.AttributeID(), a.Srcline(), a.Srcfile(), old.Srcline(), old.Srcfile())
+			return fmt.Errorf("duplicate defintion of attribute id %d on line %d of file %s\n   It is also defined on line %d of file %s", a.AttributeID(), a.Srcline(), a.Srcfile(), old.Srcline(), old.Srcfile())
 		}
 		t.attrDefsByID[a.AttributeID()] = a
 		if *veryVerbose {
@@ -234,12 +233,12 @@ func (g *generator) parseAttributeBlock(t *typedef) error {
 	method:
 		standard golang method decl, except leaving out the receiver spec, which will be automatically generated. Special syntax ##super##(<args>) can be used to invoke function of same name in supertype.
 */
-func (g *generator) parseMethodBlock(t *typedef) error {
+func (t *typedef) parseMethodBlock(r *reader) error {
 	t.methods = make([]*methodDef, 0)
-	fields, err := g.r.read()
+	fields, err := r.read()
 	if err != nil {
 		if err == io.EOF {
-			return fmt.Errorf("Incomplete type specification, line %d of file %s", g.r.line, g.file.Name())
+			return fmt.Errorf("incomplete type specification, line %d of file %s", r.line, r.f.Name())
 		}
 		return err
 	}
@@ -247,11 +246,11 @@ func (g *generator) parseMethodBlock(t *typedef) error {
 		if *veryVerbose {
 			fmt.Println("      No methods specified")
 		}
-		g.r.unread(fields)
+		r.unread(fields)
 		return nil
 	}
 	for {
-		fields, err := g.r.read()
+		fields, err := r.read()
 		if err != nil {
 			return err
 		}
@@ -259,14 +258,15 @@ func (g *generator) parseMethodBlock(t *typedef) error {
 			return nil
 		}
 		if len(fields) > 0 && fields[0] == "func" {
-			m, err := g.parseMethod(t, fields)
+			r.unread(fields)
+			m, err := parseMethod(t, r)
 			if err != nil {
 				return err
 			}
 			t.methods = append(t.methods, m)
 			continue
 		}
-		return fmt.Errorf("Invalid keyword: \"%s\", line %d of file %s", fields[0], g.r.line, g.file.Name())
+		return fmt.Errorf("invalid keyword: \"%s\", line %d of file %s", fields[0], r.line, r.f.Name())
 	}
 }
 
@@ -276,25 +276,25 @@ func (t *typedef) validateTypeHierarchy(typesByName map[string]*typedef) error {
 	}
 	super, ok := typesByName[t.extendsName]
 	if !ok {
-		return fmt.Errorf("Couldn't find type %s while validating hierarchy for type %s, defined on line %d of file %s", t.extendsName, t.name, t.srcline, t.srcfile)
+		return fmt.Errorf("couldn't find type %s while validating hierarchy for type %s, defined on line %d of file %s", t.extendsName, t.name, t.srcline, t.srcfile)
 	}
 	t.extends = super
 	return nil
 }
 
-func (t *typedef) generate(g *generator) {
-	g.printf("import (\n")
-	t.generateImports(g)
-	g.printf(")\n\ntype %s struct {\n", t.name)
-	t.generateAttributes(g)
-	g.printf("}\n")
-	t.generateMethods(g)
+func (t *typedef) generate(w *writer) {
+	w.printf("import (\n")
+	t.generateImports(w)
+	w.printf(")\n\ntype %s struct {\n", t.name)
+	t.generateAttributes(w)
+	w.printf("}\n")
+	t.generateMethods(w)
 }
 
-func (t *typedef) generateImports(g *generator) {
+func (t *typedef) generateImports(w *writer) {
 	t.coalesceImports(t.imports)
 	for im := range t.imports {
-		g.printf("  %s\n", im)
+		w.printf("  \"%s\"\n", im)
 	}
 }
 
@@ -307,25 +307,25 @@ func (t *typedef) coalesceImports(imports map[string]struct{}) {
 	}
 }
 
-func (t *typedef) generateAttributes(g *generator) {
+func (t *typedef) generateAttributes(w *writer) {
 	if t.extends != nil {
-		t.extends.generateAttributes(g)
+		t.extends.generateAttributes(w)
 	}
 	for _, a := range t.attrDefsByIDInOrder {
-		g.printf("  %s %s\n", a.Name(), a.Type())
+		w.printf("  %s %s\n", a.Name(), a.Type())
 	}
 }
 
-func (t *typedef) generateMethods(g *generator) {
+func (t *typedef) generateMethods(w *writer) {
 	methods := make(map[string]*methodDef)
 	t.resolveMethods(methods)
 	for _, m := range methods {
 		if strings.Contains(m.name, "_super") {
-			g.printf("\n// from: %s", m.parentType.name)
+			w.printf("\n// from: %s", m.parentType.name)
 		}
-		g.printf("\nfunc (this *%s) %s(%s) %s {\n%s}\n", t.name, m.name, m.params, m.returns, m.body)
+		w.printf("\nfunc (this *%s) %s(%s) %s {\n%s}\n", t.name, m.name, m.params, m.returns, m.body)
 	}
-	t.generateEquals(g)
+	t.generateEquals(w)
 }
 
 func (t *typedef) resolveMethods(methods map[string]*methodDef) {
@@ -351,7 +351,7 @@ func (t *typedef) resolveMethods(methods map[string]*methodDef) {
 
 // Arguments to format are:
 // [1]: type name
-const stringEquals = `
+const typeEqualsTemplate = `
 func (o1 *%[1]s) Equals(other interface{}) bool {
 	switch o2 := other.(type) {
 	case *%[1]s:
@@ -365,17 +365,18 @@ func (o1 *%[1]s) Equals(other interface{}) bool {
 func (o1 *%[1]s) equals(o2 *%[1]s) bool {
 `
 
-func (t *typedef) generateEquals(g *generator) {
-	g.printf(stringEquals, t.name)
-	t.generateAttrEquals(g)
-	g.printf("}\n")
+func (t *typedef) generateEquals(w *writer) {
+	w.printf(typeEqualsTemplate, t.name)
+	t.generateAttrEquals(w)
+	w.printf("    return true\n}\n")
 }
 
-func (t *typedef) generateAttrEquals(g *generator) {
+func (t *typedef) generateAttrEquals(w *writer) {
 	if t.extends != nil {
-		t.extends.generateAttrEquals(g)
+		t.extends.generateAttrEquals(w)
 	}
 	for _, a := range t.attrDefsByIDInOrder {
-		a.GenerateEquals(g)
+		w.printf("\n//---------  comparison for %s ----------------------------------/\n", a.Name())
+		a.GenerateEquals(w)
 	}
 }

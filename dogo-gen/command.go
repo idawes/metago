@@ -1,7 +1,15 @@
+// Copyright 2015 Ian Dawes. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+// dogo-gen is a tool to .....
+//
+//
+//
+
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"github.com/nu7hatch/gouuid"
 	"gopkg.in/alecthomas/kingpin.v1"
@@ -28,46 +36,35 @@ func main() {
 	}
 }
 
+// Note: We're using deferred error handling to simplify the main generation code flow. The first error that occurs during generation is
+// captured and will prevent further steps from performing any real work.
 type generator struct {
-	file           *os.File
-	r              *reader
-	buf            bytes.Buffer
-	err            error
+	pkg            string
+	pkgUUID        *uuid.UUID
 	typedefs       map[typeID]*typedef
 	typedefsByName map[string]*typedef
+	err            error
 }
 
 func generate(pkg string) error {
 	if *verbose || *veryVerbose {
 		fmt.Printf("Scanning package %s\n", pkg)
 	}
-	g := generator{typedefs: make(map[typeID]*typedef, 100)}
-	if err := g.parseFiles(pkg); err != nil {
-		return err
+	u, err := uuid.NewV5(uuid.NamespaceURL, []byte(pkg))
+	if err != nil {
+		return fmt.Errorf("couldn't create package UUID for package %s, err: %s", pkg, err)
 	}
-	if err := g.validate(); err != nil {
-		return err
-	}
-	if err := g.generate(pkg); err != nil {
-		return err
-	}
-	return nil
+	g := generator{pkg: pkg, pkgUUID: u, typedefs: make(map[typeID]*typedef, 0)}
+	g.parseFiles()
+	g.validateTypes()
+	g.generate()
+	return g.err
 }
 
-func (g *generator) parseFiles(pkg string) error {
-	pkgUUID, err := uuid.NewV5(uuid.NamespaceURL, []byte(pkg))
-	if err != nil {
-		return fmt.Errorf("Couldn't create package UUID for package %s, err: %s", pkg, err)
+func (g *generator) parseFiles() {
+	for _, f := range listSourceFilenames(filepath.Join(*pkgRoot, "src", g.pkg)) {
+		g.parseFile(f)
 	}
-	for _, fn := range listSourceFilenames(filepath.Join(*pkgRoot, "src", pkg)) {
-		if *verbose || *veryVerbose {
-			fmt.Printf("  Parsing %s - UUID:%v\n", fn, pkgUUID)
-		}
-		if err := g.parseFile(pkgUUID, fn); err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 func listSourceFilenames(pkgDir string) []string {
@@ -89,95 +86,67 @@ func listSourceFilenames(pkgDir string) []string {
 	return fileNames
 }
 
-func (g *generator) parseFile(pkgUUID *uuid.UUID, filename string) error {
-	f, err := os.Open(filename)
-	if err != nil {
-		return err
+func (g *generator) parseFile(f string) {
+	if g.err != nil {
+		return
 	}
-	defer f.Close() // f is readOnly, so no need to check for close errors.
-	g.file = f
-	g.r = newReader(f)
+	if *verbose || *veryVerbose {
+		fmt.Printf("  Parsing %s - UUID:%v\n", f, g.pkgUUID)
+	}
+	r := newReader(f)
+	defer r.close()
 	for {
-		var t *typedef
-		t, err = g.parseTypedef(pkgUUID)
+		t, err := parseTypedef(g.pkgUUID, r)
 		if err != nil {
-			return err
-		}
-		if t == nil {
-			return nil
+			if err == io.EOF {
+				return
+			}
+			g.err = err
+			return
 		}
 		if old, present := g.typedefs[t.typeID]; present {
-			return fmt.Errorf("Duplicate definition of type id %s on line %d of file %s\n   It is also defined on line %d of file %s", t.typeID.String(), t.srcline, t.srcfile, old.srcline, old.srcfile)
+			g.err = fmt.Errorf("duplicate definition of type id %s on line %d of file %s\n   It is also defined on line %d of file %s", t.typeID.String(), t.srcline, t.srcfile, old.srcline, old.srcfile)
+			return
 		}
 		g.typedefs[t.typeID] = t
 	}
 }
 
-func (g *generator) validate() error {
-	if err := g.validateTypenames(); err != nil {
-		return err
-	}
-	if err := g.validateTypeHierarchy(); err != nil {
-		return nil
-	}
-	return nil
+func (g *generator) validateTypes() {
+	g.validateTypenames()
+	g.validateTypeHierarchy()
 }
 
-func (g *generator) validateTypenames() error {
+func (g *generator) validateTypenames() {
+	if g.err != nil {
+		return
+	}
 	g.typedefsByName = make(map[string]*typedef)
 	for _, t := range g.typedefs {
 		if old, present := g.typedefsByName[t.name]; present {
-			return fmt.Errorf("Duplicate definition of type name %s on line %d of file %s\n   It is also defined on line %d of file %s", t.name, t.srcline, t.srcfile, old.srcline, old.srcfile)
+			g.err = fmt.Errorf("duplicate definition of type name %s on line %d of file %s\n   It is also defined on line %d of file %s", t.name, t.srcline, t.srcfile, old.srcline, old.srcfile)
+			return
 		}
 		g.typedefsByName[t.name] = t
 	}
-	return nil
 }
 
-func (g *generator) validateTypeHierarchy() error {
+func (g *generator) validateTypeHierarchy() {
 	for _, t := range g.typedefs {
-		if err := t.validateTypeHierarchy(g.typedefsByName); err != nil {
-			return err
+		if g.err != nil {
+			return
 		}
+		g.err = t.validateTypeHierarchy(g.typedefsByName)
 	}
-	return nil
 }
 
-func (g *generator) generate(pkg string) error {
+func (g *generator) generate() {
 	for _, t := range g.typedefs {
-		if err := g.generateType(t, pkg); err != nil {
-			return err
+		if g.err != nil {
+			return
 		}
-	}
-	return nil
-}
-
-func (g *generator) generateType(t *typedef, pkg string) (err error) {
-	g.buf = bytes.Buffer{}
-	g.err = nil
-	f, err := os.Create(filepath.Join(*pkgRoot, "src", pkg, fmt.Sprintf("%s.go.tmp", t.name)))
-	if err != nil {
-		return err
-	}
-	t.generate(g)
-	if err := g.writeTo(f); err != nil {
-		return err
-	}
-	if err := f.Close(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (g *generator) writeTo(w io.Writer) error {
-	if g.err == nil {
-		_, g.err = g.buf.WriteTo(w)
-	}
-	return g.err
-}
-
-func (g *generator) printf(format string, args ...interface{}) {
-	if g.err == nil {
-		fmt.Fprintf(&g.buf, format, args...)
+		w := newWriter(filepath.Join(*pkgRoot, "src", g.pkg), t.name)
+		t.generate(w)
+		g.err = w.close()
 	}
 }

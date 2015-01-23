@@ -3,18 +3,29 @@ package main
 import (
 	"bufio"
 	"container/list"
-	"io"
+	"os"
 	"strings"
 )
 
 type reader struct {
+	filename    string
+	f           *os.File
 	r           *bufio.Reader
 	line        int
 	unreadLines *list.List
+	err         error
 }
 
-func newReader(r io.Reader) *reader {
-	return &reader{r: bufio.NewReader(r), unreadLines: list.New()}
+func newReader(filename string) *reader {
+	f, err := os.Open(filename)
+	if err != nil {
+		return &reader{err: err}
+	}
+	return &reader{filename: filename, f: f, r: bufio.NewReader(f), unreadLines: list.New()}
+}
+
+func (r *reader) close() {
+	r.f.Close() // ok to ignore errors here, because f is read-only and this is an ephemeral executable
 }
 
 func (r *reader) read() ([]string, error) {

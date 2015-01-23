@@ -72,6 +72,7 @@ type 3 SliceTestObject concrete {
 		9 S64Slice     []int64
 		10 StringSlice []string
 		11 TimeSlice   []time.Time
+		12 String2dSlice [][]string
 	}
 	methods {
 		func Dump() string {
