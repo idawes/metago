@@ -48,6 +48,7 @@ func (w *writer) close() error {
 		return fmt.Errorf("\n%s\n  Couldn't format generated src: %s\n", string(b.Bytes()), err)
 	}
 	fn := filepath.Join(w.pkg, fmt.Sprintf("%s.go", w.typename))
+	fmt.Printf("Checking file: %s\n", fn)
 	if !isChanged(buf, fn) {
 		return nil
 	}

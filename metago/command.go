@@ -141,12 +141,18 @@ func (g *generator) validateTypeHierarchy() {
 }
 
 func (g *generator) generate() {
+	sw := newWriter(filepath.Join(*pkgRoot, "src", g.pkg), "schema")
+	sw.printf("var MetagoPackageUUID = uuid.ParseHex(\"%s\")\n\n", g.pkgUUID.String())
 	for _, t := range g.typedefs {
 		if g.err != nil {
 			return
 		}
 		w := newWriter(filepath.Join(*pkgRoot, "src", g.pkg), t.name)
 		t.generate(w)
+		t.generateSchema(sw)
 		g.err = w.close()
+	}
+	if g.err == nil {
+		g.err = sw.close()
 	}
 }

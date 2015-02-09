@@ -198,10 +198,10 @@ func newSliceAttrDef(b *baseAttrDef) (*sliceAttrDef, error) {
 }
 
 const sliceAttrEquals = `    if len(o1.%[1]s) != len(o2.%[1]s) {
-        return false  
+        return false
     }
     for idx, v1 := range o1.%[1]s {
-    	v2 := o2.%[1]s[idx]
+		v2 := o2.%[1]s[idx]
 `
 
 func (a *sliceAttrDef) GenerateEquals(w *writer) {
@@ -211,10 +211,10 @@ func (a *sliceAttrDef) GenerateEquals(w *writer) {
 }
 
 const sliceSubAttrEquals = `    if len(%[1]s) != len(%[2]s) {
-        return false  
+        return false
     }
     for idx, %[1]s1 := range %[1]s {
-    	%[2]s2 := %[2]s[idx]
+		%[2]s2 := %[2]s[idx]
 `
 
 func (a *sliceAttrDef) GenerateSubAttrEquals(w *writer, v1, v2 string) {
@@ -224,10 +224,10 @@ func (a *sliceAttrDef) GenerateSubAttrEquals(w *writer, v1, v2 string) {
 }
 
 const sliceAttrDiff = `    if len(o1.%[1]s) != len(o2.%[1]s) {
-        return false  
+	return false
     }
     for idx, v1 := range o1.%[1]s {
-    	v2 := o2.%[1]s[idx]
+		v2 := o2.%[1]s[idx]
 `
 
 func (a *sliceAttrDef) GenerateDiff(w *writer) {
@@ -237,10 +237,10 @@ func (a *sliceAttrDef) GenerateDiff(w *writer) {
 }
 
 const sliceSubAttrDiff = `    if len(%[1]s) != len(%[2]s) {
-        return false  
+        return false
     }
     for idx, %[1]s1 := range %[1]s {
-    	%[2]s2 := %[2]s[idx]
+		%[2]s2 := %[2]s[idx]
 `
 
 func (a *sliceAttrDef) GenerateSubAttrDiff(w *writer, v1, v2 string) {

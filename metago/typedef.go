@@ -10,12 +10,12 @@ import (
 )
 
 type typeID struct {
-	pkgUUID *uuid.UUID
-	subID   int
+	pkg *uuid.UUID
+	typ uint32
 }
 
 func (t *typeID) String() string {
-	return fmt.Sprintf("%s:%d", t.pkgUUID, t.subID)
+	return fmt.Sprintf("%s:%d", t.pkg, t.typ)
 }
 
 type typedef struct {
@@ -108,7 +108,7 @@ func parseTypedefHeader(pkgUUID *uuid.UUID, r *reader) (*typedef, error) {
 	if err != nil {
 		return nil, fmt.Errorf("expecting integer type number, found \"%s\", line %d of file %s", fields[1], r.line, r.f.Name())
 	}
-	t.typeID = typeID{pkgUUID: pkgUUID, subID: subID}
+	t.typeID = typeID{pkg: pkgUUID, typ: uint32(subID)}
 	t.name = fields[2]
 	if fields[3] == "abstract" {
 		t.abstract = true
@@ -283,6 +283,9 @@ func (t *typedef) validateTypeHierarchy(typesByName map[string]*typedef) error {
 }
 
 func (t *typedef) generate(w *writer) {
+	if t.abstract {
+		return
+	}
 	w.printf("import (\n")
 	t.generateImports(w)
 	w.printf(")\n\ntype %s struct {\n", t.name)
@@ -392,4 +395,12 @@ func (t *typedef) generateAttrDiffs(w *writer) {
 		w.printf("\n//---------  diff for %s ----------------------------------/\n", a.Name())
 		a.GenerateDiff(w)
 	}
+}
+
+func (t *typedef) generateSchema(w *writer) {
+	if t.abstract {
+		return
+	}
+	fmt.Printf("generating Schema for %s", t.name)
+	w.printf("var %sID = TypeID{pkg: MetagoPackageUUID, typ: %d}\n", t.name, t.typeID.typ)
 }
