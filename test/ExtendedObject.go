@@ -51,67 +51,54 @@ func (this *ExtendedObject) Dump_super() (string, error) {
 
 func (o1 *ExtendedObject) Equals(o2 *ExtendedObject) bool {
 
-	//---------  comparison for ByteField ----------------------------------/
 	if o1.ByteField != o2.ByteField {
 		return false
 	}
 
-	//---------  comparison for U8Field ----------------------------------/
 	if o1.U8Field != o2.U8Field {
 		return false
 	}
 
-	//---------  comparison for U16Field ----------------------------------/
 	if o1.U16Field != o2.U16Field {
 		return false
 	}
 
-	//---------  comparison for U32Field ----------------------------------/
 	if o1.U32Field != o2.U32Field {
 		return false
 	}
 
-	//---------  comparison for U64Field ----------------------------------/
 	if o1.U64Field != o2.U64Field {
 		return false
 	}
 
-	//---------  comparison for S8Field ----------------------------------/
 	if o1.S8Field != o2.S8Field {
 		return false
 	}
 
-	//---------  comparison for S16Field ----------------------------------/
 	if o1.S16Field != o2.S16Field {
 		return false
 	}
 
-	//---------  comparison for S32Field ----------------------------------/
 	if o1.S32Field != o2.S32Field {
 		return false
 	}
 
-	//---------  comparison for S64Field ----------------------------------/
 	if o1.S64Field != o2.S64Field {
 		return false
 	}
 
-	//---------  comparison for StringField ----------------------------------/
 	if o1.StringField != o2.StringField {
 		return false
 	}
 
-	//---------  comparison for TimeField ----------------------------------/
 	if !o1.TimeField.Equal(o2.TimeField) {
 		return false
 	}
 
-	//---------  comparison for ExtendedByteField ----------------------------------/
 	if o1.ExtendedByteField != o2.ExtendedByteField {
 		return false
 	}
 
-	//---------  comparison for StructField ----------------------------------/
 	if o1.StructField != o2.StructField {
 		return false
 	}
@@ -120,69 +107,56 @@ func (o1 *ExtendedObject) Equals(o2 *ExtendedObject) bool {
 
 func (o1 *ExtendedObject) Diff(o2 *ExtendedObject) bool {
 
-	//---------  diff for ByteField ----------------------------------/
 	if o1.ByteField != o2.ByteField {
-		d.Add(NewbyteDiff(AID_BasicAttrTypesObject_ByteField, true, o1.ByteField, o2.ByteField))
+		d.Add(NewByteDiff(AID_BasicAttrTypesObject_ByteField, true, o1.ByteField, o2.ByteField))
 	}
 
-	//---------  diff for U8Field ----------------------------------/
 	if o1.U8Field != o2.U8Field {
-		d.Add(Newuint8Diff(AID_BasicAttrTypesObject_U8Field, true, o1.U8Field, o2.U8Field))
+		d.Add(NewUint8Diff(AID_BasicAttrTypesObject_U8Field, true, o1.U8Field, o2.U8Field))
 	}
 
-	//---------  diff for U16Field ----------------------------------/
 	if o1.U16Field != o2.U16Field {
-		d.Add(Newuint16Diff(AID_BasicAttrTypesObject_U16Field, true, o1.U16Field, o2.U16Field))
+		d.Add(NewUint16Diff(AID_BasicAttrTypesObject_U16Field, true, o1.U16Field, o2.U16Field))
 	}
 
-	//---------  diff for U32Field ----------------------------------/
 	if o1.U32Field != o2.U32Field {
-		d.Add(Newuint32Diff(AID_BasicAttrTypesObject_U32Field, true, o1.U32Field, o2.U32Field))
+		d.Add(NewUint32Diff(AID_BasicAttrTypesObject_U32Field, true, o1.U32Field, o2.U32Field))
 	}
 
-	//---------  diff for U64Field ----------------------------------/
 	if o1.U64Field != o2.U64Field {
-		d.Add(Newuint64Diff(AID_BasicAttrTypesObject_U64Field, true, o1.U64Field, o2.U64Field))
+		d.Add(NewUint64Diff(AID_BasicAttrTypesObject_U64Field, true, o1.U64Field, o2.U64Field))
 	}
 
-	//---------  diff for S8Field ----------------------------------/
 	if o1.S8Field != o2.S8Field {
-		d.Add(Newint8Diff(AID_BasicAttrTypesObject_S8Field, true, o1.S8Field, o2.S8Field))
+		d.Add(NewInt8Diff(AID_BasicAttrTypesObject_S8Field, true, o1.S8Field, o2.S8Field))
 	}
 
-	//---------  diff for S16Field ----------------------------------/
 	if o1.S16Field != o2.S16Field {
-		d.Add(Newint16Diff(AID_BasicAttrTypesObject_S16Field, true, o1.S16Field, o2.S16Field))
+		d.Add(NewInt16Diff(AID_BasicAttrTypesObject_S16Field, true, o1.S16Field, o2.S16Field))
 	}
 
-	//---------  diff for S32Field ----------------------------------/
 	if o1.S32Field != o2.S32Field {
-		d.Add(Newint32Diff(AID_BasicAttrTypesObject_S32Field, true, o1.S32Field, o2.S32Field))
+		d.Add(NewInt32Diff(AID_BasicAttrTypesObject_S32Field, true, o1.S32Field, o2.S32Field))
 	}
 
-	//---------  diff for S64Field ----------------------------------/
 	if o1.S64Field != o2.S64Field {
-		d.Add(Newint64Diff(AID_BasicAttrTypesObject_S64Field, true, o1.S64Field, o2.S64Field))
+		d.Add(NewInt64Diff(AID_BasicAttrTypesObject_S64Field, true, o1.S64Field, o2.S64Field))
 	}
 
-	//---------  diff for StringField ----------------------------------/
 	if o1.StringField != o2.StringField {
-		d.Add(NewstringDiff(AID_BasicAttrTypesObject_StringField, true, o1.StringField, o2.StringField))
+		d.Add(NewStringDiff(AID_BasicAttrTypesObject_StringField, true, o1.StringField, o2.StringField))
 	}
 
-	//---------  diff for TimeField ----------------------------------/
 	if !o1.TimeField.Equal(o2.TimeField) {
 		return false
 	}
 
-	//---------  diff for ExtendedByteField ----------------------------------/
 	if o1.ExtendedByteField != o2.ExtendedByteField {
-		d.Add(NewbyteDiff(AID_ExtendedObject_ExtendedByteField, true, o1.ExtendedByteField, o2.ExtendedByteField))
+		d.Add(NewByteDiff(AID_ExtendedObject_ExtendedByteField, true, o1.ExtendedByteField, o2.ExtendedByteField))
 	}
 
-	//---------  diff for StructField ----------------------------------/
 	if o1.StructField != o2.StructField {
-		d.Add(NewmyPkg.MyStructDiff(AID_ExtendedObject_StructField, true, o1.StructField, o2.StructField))
+		d.Add(NewMyPkg.MyStructDiff(AID_ExtendedObject_StructField, true, o1.StructField, o2.StructField))
 	}
 	return true
 }

@@ -31,7 +31,6 @@ func (this *SliceTestObject) Dump() string {
 
 func (o1 *SliceTestObject) Equals(o2 *SliceTestObject) bool {
 
-	//---------  comparison for ByteSlice ----------------------------------/
 	if len(o1.ByteSlice) != len(o2.ByteSlice) {
 		return false
 	}
@@ -42,7 +41,6 @@ func (o1 *SliceTestObject) Equals(o2 *SliceTestObject) bool {
 		}
 	}
 
-	//---------  comparison for U8Slice ----------------------------------/
 	if len(o1.U8Slice) != len(o2.U8Slice) {
 		return false
 	}
@@ -53,7 +51,6 @@ func (o1 *SliceTestObject) Equals(o2 *SliceTestObject) bool {
 		}
 	}
 
-	//---------  comparison for U16Slice ----------------------------------/
 	if len(o1.U16Slice) != len(o2.U16Slice) {
 		return false
 	}
@@ -64,7 +61,6 @@ func (o1 *SliceTestObject) Equals(o2 *SliceTestObject) bool {
 		}
 	}
 
-	//---------  comparison for U32Slice ----------------------------------/
 	if len(o1.U32Slice) != len(o2.U32Slice) {
 		return false
 	}
@@ -75,7 +71,6 @@ func (o1 *SliceTestObject) Equals(o2 *SliceTestObject) bool {
 		}
 	}
 
-	//---------  comparison for U64Slice ----------------------------------/
 	if len(o1.U64Slice) != len(o2.U64Slice) {
 		return false
 	}
@@ -86,7 +81,6 @@ func (o1 *SliceTestObject) Equals(o2 *SliceTestObject) bool {
 		}
 	}
 
-	//---------  comparison for S8Slice ----------------------------------/
 	if len(o1.S8Slice) != len(o2.S8Slice) {
 		return false
 	}
@@ -97,7 +91,6 @@ func (o1 *SliceTestObject) Equals(o2 *SliceTestObject) bool {
 		}
 	}
 
-	//---------  comparison for S16Slice ----------------------------------/
 	if len(o1.S16Slice) != len(o2.S16Slice) {
 		return false
 	}
@@ -108,7 +101,6 @@ func (o1 *SliceTestObject) Equals(o2 *SliceTestObject) bool {
 		}
 	}
 
-	//---------  comparison for S32Slice ----------------------------------/
 	if len(o1.S32Slice) != len(o2.S32Slice) {
 		return false
 	}
@@ -119,7 +111,6 @@ func (o1 *SliceTestObject) Equals(o2 *SliceTestObject) bool {
 		}
 	}
 
-	//---------  comparison for S64Slice ----------------------------------/
 	if len(o1.S64Slice) != len(o2.S64Slice) {
 		return false
 	}
@@ -130,7 +121,6 @@ func (o1 *SliceTestObject) Equals(o2 *SliceTestObject) bool {
 		}
 	}
 
-	//---------  comparison for StringSlice ----------------------------------/
 	if len(o1.StringSlice) != len(o2.StringSlice) {
 		return false
 	}
@@ -141,7 +131,6 @@ func (o1 *SliceTestObject) Equals(o2 *SliceTestObject) bool {
 		}
 	}
 
-	//---------  comparison for TimeSlice ----------------------------------/
 	if len(o1.TimeSlice) != len(o2.TimeSlice) {
 		return false
 	}
@@ -152,7 +141,6 @@ func (o1 *SliceTestObject) Equals(o2 *SliceTestObject) bool {
 		}
 	}
 
-	//---------  comparison for String2dSlice ----------------------------------/
 	if len(o1.String2dSlice) != len(o2.String2dSlice) {
 		return false
 	}
@@ -173,7 +161,6 @@ func (o1 *SliceTestObject) Equals(o2 *SliceTestObject) bool {
 
 func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) bool {
 
-	//---------  diff for ByteSlice ----------------------------------/
 	if len(o1.ByteSlice) != len(o2.ByteSlice) {
 		return false
 	}
@@ -184,7 +171,6 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) bool {
 		}
 	}
 
-	//---------  diff for U8Slice ----------------------------------/
 	if len(o1.U8Slice) != len(o2.U8Slice) {
 		return false
 	}
@@ -195,7 +181,6 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) bool {
 		}
 	}
 
-	//---------  diff for U16Slice ----------------------------------/
 	if len(o1.U16Slice) != len(o2.U16Slice) {
 		return false
 	}
@@ -206,7 +191,6 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) bool {
 		}
 	}
 
-	//---------  diff for U32Slice ----------------------------------/
 	if len(o1.U32Slice) != len(o2.U32Slice) {
 		return false
 	}
@@ -217,7 +201,6 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) bool {
 		}
 	}
 
-	//---------  diff for U64Slice ----------------------------------/
 	if len(o1.U64Slice) != len(o2.U64Slice) {
 		return false
 	}
@@ -228,7 +211,6 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) bool {
 		}
 	}
 
-	//---------  diff for S8Slice ----------------------------------/
 	if len(o1.S8Slice) != len(o2.S8Slice) {
 		return false
 	}
@@ -239,7 +221,6 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) bool {
 		}
 	}
 
-	//---------  diff for S16Slice ----------------------------------/
 	if len(o1.S16Slice) != len(o2.S16Slice) {
 		return false
 	}
@@ -250,7 +231,6 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) bool {
 		}
 	}
 
-	//---------  diff for S32Slice ----------------------------------/
 	if len(o1.S32Slice) != len(o2.S32Slice) {
 		return false
 	}
@@ -261,7 +241,6 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) bool {
 		}
 	}
 
-	//---------  diff for S64Slice ----------------------------------/
 	if len(o1.S64Slice) != len(o2.S64Slice) {
 		return false
 	}
@@ -272,7 +251,6 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) bool {
 		}
 	}
 
-	//---------  diff for StringSlice ----------------------------------/
 	if len(o1.StringSlice) != len(o2.StringSlice) {
 		return false
 	}
@@ -283,7 +261,6 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) bool {
 		}
 	}
 
-	//---------  diff for TimeSlice ----------------------------------/
 	if len(o1.TimeSlice) != len(o2.TimeSlice) {
 		return false
 	}
@@ -294,7 +271,6 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) bool {
 		}
 	}
 
-	//---------  diff for String2dSlice ----------------------------------/
 	if len(o1.String2dSlice) != len(o2.String2dSlice) {
 		return false
 	}

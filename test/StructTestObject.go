@@ -14,7 +14,6 @@ type StructTestObject struct {
 
 func (o1 *StructTestObject) Equals(o2 *StructTestObject) bool {
 
-	//---------  comparison for B ----------------------------------/
 	if o1.B != o2.B {
 		return false
 	}
@@ -23,7 +22,6 @@ func (o1 *StructTestObject) Equals(o2 *StructTestObject) bool {
 
 func (o1 *StructTestObject) Diff(o2 *StructTestObject) bool {
 
-	//---------  diff for B ----------------------------------/
 	if o1.B != o2.B {
 		d.Add(NewBasicAttrTypesObjectDiff(AID_StructTestObject_B, true, o1.B, o2.B))
 	}

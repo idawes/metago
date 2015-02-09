@@ -1,3 +1,7 @@
+// Copyright 2015 Ian Dawes. All rights reserved.
+// Use of this source code is governed by a MIT
+// license that can be found in the LICENSE file.
+
 package main
 
 import (
@@ -151,7 +155,7 @@ const baseAttrDiffTemplate = `  if o1.%[2]s != o2.%[2]s {
 `
 
 func (a *baseAttrDef) GenerateDiff(w *writer) {
-	w.printf(baseAttrDiffTemplate, a.parentType.name, a.name, a.attrType, a.persistence == persistenceClassPersistent)
+	w.printf(baseAttrDiffTemplate, a.parentType.name, a.name, strings.Title(a.attrType), a.persistence == persistenceClassPersistent)
 }
 
 func (a *baseAttrDef) GenerateSubAttrDiff(w *writer, v1, v2 string) {

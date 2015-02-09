@@ -1,3 +1,7 @@
+// Copyright 2015 Ian Dawes. All rights reserved.
+// Use of this source code is governed by a MIT
+// license that can be found in the LICENSE file.
+
 package main
 
 import (
@@ -375,7 +379,7 @@ func (t *typedef) generateAttrEquals(w *writer) {
 		t.extends.generateAttrEquals(w)
 	}
 	for _, a := range t.attrDefsByIDInOrder {
-		w.printf("\n//---------  comparison for %s ----------------------------------/\n", a.Name())
+		w.printf("\n")
 		a.GenerateEquals(w)
 	}
 }
@@ -392,7 +396,7 @@ func (t *typedef) generateAttrDiffs(w *writer) {
 		t.extends.generateAttrDiffs(w)
 	}
 	for _, a := range t.attrDefsByIDInOrder {
-		w.printf("\n//---------  diff for %s ----------------------------------/\n", a.Name())
+		w.printf("\n")
 		a.GenerateDiff(w)
 	}
 }

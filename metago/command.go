@@ -1,5 +1,5 @@
 // Copyright 2015 Ian Dawes. All rights reserved.
-// Use of this source code is governed by a BSD-style
+// Use of this source code is governed by a MIT
 // license that can be found in the LICENSE file.
 
 // metago is a tool to .....

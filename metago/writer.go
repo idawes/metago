@@ -1,3 +1,7 @@
+// Copyright 2015 Ian Dawes. All rights reserved.
+// Use of this source code is governed by a MIT
+// license that can be found in the LICENSE file.
+
 package main
 
 import (
@@ -6,9 +10,7 @@ import (
 	"fmt"
 	"go/format"
 	"io/ioutil"
-	"os"
 	"path/filepath"
-	"strings"
 )
 
 type writer struct {
@@ -52,10 +54,7 @@ func (w *writer) close() error {
 	if !isChanged(buf, fn) {
 		return nil
 	}
-	fmt.Println("     ---------------Changed")
-	if err := os.Rename(fn, strings.Replace(fn, ".go", ".go.old", -1)); err != nil {
-		fmt.Println(err)
-	}
+	fmt.Printf("     %s ---------------Changed\n", w.typename)
 	return ioutil.WriteFile(fn, buf, 0755)
 }
 
