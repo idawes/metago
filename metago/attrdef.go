@@ -227,10 +227,10 @@ func (a *sliceAttrDef) GenerateSubAttrEquals(w *writer, v1, v2 string) {
 	w.printf("  }\n")
 }
 
-const sliceAttrDiff = `    if len(o1.%[1]s) != len(o2.%[1]s) {
-	return false
-    }
-    for idx, v1 := range o1.%[1]s {
+const sliceAttrDiff = `    for idx, v1 := range o1.%[1]s {
+		if idx >= len(o2.%[1]s) {
+			//d.Changes = append(d.Changes, NewSliceChange(%[2]s, 
+		}
 		v2 := o2.%[1]s[idx]
 `
 

@@ -3,18 +3,18 @@
 package metago
 
 type Int32Diff struct {
-    BaseAttrDiff
-    OldValue int32
-    NewValue int32
+	BaseAttrChg
+	OldValue int32
+	NewValue int32
 }
 
-func NewInt32Diff(schemaref *Attrdef, values ...int32) AttrDiff {
-    d := Int32Diff{BaseAttrDiff: BaseAttrDiff{schemaref: schemaref}}
-    if len(values) > 0 {
-        d.OldValue = values[0]
-    }
-    if len(values) > 1 {
-        d.NewValue = values[1]
-    }
-    return &d
+func NewInt32Diff(schemaref *Attrdef, values ...int32) AttrChg {
+	d := Int32Diff{BaseAttrChg: BaseAttrChg{schemaref: schemaref}}
+	if len(values) > 0 {
+		d.OldValue = values[0]
+	}
+	if len(values) > 1 {
+		d.NewValue = values[1]
+	}
+	return &d
 }

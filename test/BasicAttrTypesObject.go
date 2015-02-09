@@ -83,7 +83,7 @@ func (o1 *BasicAttrTypesObject) Equals(o2 *BasicAttrTypesObject) bool {
 	return true
 }
 
-func (o1 *BasicAttrTypesObject) Diff(o2 *BasicAttrTypesObject) bool {
+func (o1 *BasicAttrTypesObject) Diff(o2 *BasicAttrTypesObject) (d *metago.Diff) {
 
 	if o1.ByteField != o2.ByteField {
 		d.Add(NewByteDiff(AID_BasicAttrTypesObject_ByteField, true, o1.ByteField, o2.ByteField))

@@ -7,7 +7,6 @@ package test
 import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/idawes/metago"
-	"github.com/myUser/myPkg"
 	"time"
 )
 
@@ -24,7 +23,6 @@ type ExtendedObject struct {
 	StringField       string
 	TimeField         time.Time
 	ExtendedByteField byte
-	StructField       myPkg.MyStruct
 }
 
 func (this *ExtendedObject) ConditionalDump(t bool) string {
@@ -98,14 +96,10 @@ func (o1 *ExtendedObject) Equals(o2 *ExtendedObject) bool {
 	if o1.ExtendedByteField != o2.ExtendedByteField {
 		return false
 	}
-
-	if o1.StructField != o2.StructField {
-		return false
-	}
 	return true
 }
 
-func (o1 *ExtendedObject) Diff(o2 *ExtendedObject) bool {
+func (o1 *ExtendedObject) Diff(o2 *ExtendedObject) (d *metago.Diff) {
 
 	if o1.ByteField != o2.ByteField {
 		d.Add(NewByteDiff(AID_BasicAttrTypesObject_ByteField, true, o1.ByteField, o2.ByteField))
@@ -153,10 +147,6 @@ func (o1 *ExtendedObject) Diff(o2 *ExtendedObject) bool {
 
 	if o1.ExtendedByteField != o2.ExtendedByteField {
 		d.Add(NewByteDiff(AID_ExtendedObject_ExtendedByteField, true, o1.ExtendedByteField, o2.ExtendedByteField))
-	}
-
-	if o1.StructField != o2.StructField {
-		d.Add(NewMyPkg.MyStructDiff(AID_ExtendedObject_StructField, true, o1.StructField, o2.StructField))
 	}
 	return true
 }

@@ -8,36 +8,36 @@ import (
 
 // TypeId is a globally unique identifier for a metago object type
 type TypeID struct {
-	pkg *uuid.UUID
-	typ int
+	Pkg *uuid.UUID
+	Typ int
 }
 
 func (t *TypeID) Equals(o *TypeID) bool {
-	if t.pkg != o.pkg {
+	if t.Pkg != o.Pkg {
 		return false
 	}
-	if t.typ != o.typ {
+	if t.Typ != o.Typ {
 		return false
 	}
 	return true
 }
 
 func (t *TypeID) Compare(o *TypeID) int {
-	v := bytes.Compare(t.pkg[:], o.pkg[:])
+	v := bytes.Compare(t.Pkg[:], o.Pkg[:])
 	if v != 0 {
 		return v
 	}
-	return t.typ - o.typ
+	return t.Typ - o.Typ
 }
 
 // AttrID is a globally unique identifier for an attribute in a metago object type
 type AttrID struct {
 	TypeID
-	attr int
+	Attr int
 }
 
 func (a *AttrID) Equals(o *AttrID) bool {
-	if a.attr != o.attr {
+	if a.Attr != o.Attr {
 		return false
 	}
 	if !a.TypeID.Equals(&o.TypeID) {
@@ -51,5 +51,5 @@ func (a *AttrID) Compare(o *AttrID) int {
 	if v != 0 {
 		return v
 	}
-	return a.attr - o.attr
+	return a.Attr - o.Attr
 }

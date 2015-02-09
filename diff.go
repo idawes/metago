@@ -1,28 +1,28 @@
 package metago
 
-type Diff interface {
-	Changes() []AttrDiff
+type Diff struct {
+	Changes []AttrChg
 }
 
-type AttrDiff interface {
+type AttrChg interface {
 	AttributeId() AttrID
 }
 
-type BaseAttrDiff struct {
+type BaseAttrChg struct {
 	schemaref *Attrdef
 }
 
-func (d *BaseAttrDiff) AttributeId() AttrID {
+func (d *BaseAttrChg) AttributeId() AttrID {
 	return d.schemaref.ID
 }
 
-func (d *BaseAttrDiff) PersistenceClass() PersistenceClass {
+func (d *BaseAttrChg) PersistenceClass() PersistenceClass {
 	return d.schemaref.Persistence
 }
 
-func (d *BaseAttrDiff) WriteTo(w *Writer) error {
-	w.Write(d.schemaref.ID.pkg[:])
-	w.WriteVarint(int64(d.schemaref.ID.typ))
-	w.WriteVarint(int64(d.schemaref.ID.attr))
+func (d *BaseAttrChg) WriteTo(w *Writer) error {
+	w.Write(d.schemaref.ID.Pkg[:])
+	w.WriteVarint(int64(d.schemaref.ID.Typ))
+	w.WriteVarint(int64(d.schemaref.ID.Attr))
 	return nil
 }

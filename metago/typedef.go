@@ -385,7 +385,7 @@ func (t *typedef) generateAttrEquals(w *writer) {
 }
 
 func (t *typedef) generateDiff(w *writer) {
-	w.printf("\nfunc (o1 *%[1]s) Diff(o2 *%[1]s) bool {\n", t.name)
+	w.printf("\nfunc (o1 *%[1]s) Diff(o2 *%[1]s) (d *metago.Diff) {\n", t.name)
 	t.generateAttrDiffs(w)
 	w.printf("    return true\n}\n")
 

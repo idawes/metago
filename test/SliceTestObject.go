@@ -159,122 +159,122 @@ func (o1 *SliceTestObject) Equals(o2 *SliceTestObject) bool {
 	return true
 }
 
-func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) bool {
+func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 
-	if len(o1.ByteSlice) != len(o2.ByteSlice) {
-		return false
-	}
 	for idx, v1 := range o1.ByteSlice {
+		if idx >= len(o2.ByteSlice) {
+			//d.Changes = append(d.Changes, NewSliceChange(%!s(BADINDEX),
+		}
 		v2 := o2.ByteSlice[idx]
 		if v1 != v2 {
 			return false
 		}
 	}
 
-	if len(o1.U8Slice) != len(o2.U8Slice) {
-		return false
-	}
 	for idx, v1 := range o1.U8Slice {
+		if idx >= len(o2.U8Slice) {
+			//d.Changes = append(d.Changes, NewSliceChange(%!s(BADINDEX),
+		}
 		v2 := o2.U8Slice[idx]
 		if v1 != v2 {
 			return false
 		}
 	}
 
-	if len(o1.U16Slice) != len(o2.U16Slice) {
-		return false
-	}
 	for idx, v1 := range o1.U16Slice {
+		if idx >= len(o2.U16Slice) {
+			//d.Changes = append(d.Changes, NewSliceChange(%!s(BADINDEX),
+		}
 		v2 := o2.U16Slice[idx]
 		if v1 != v2 {
 			return false
 		}
 	}
 
-	if len(o1.U32Slice) != len(o2.U32Slice) {
-		return false
-	}
 	for idx, v1 := range o1.U32Slice {
+		if idx >= len(o2.U32Slice) {
+			//d.Changes = append(d.Changes, NewSliceChange(%!s(BADINDEX),
+		}
 		v2 := o2.U32Slice[idx]
 		if v1 != v2 {
 			return false
 		}
 	}
 
-	if len(o1.U64Slice) != len(o2.U64Slice) {
-		return false
-	}
 	for idx, v1 := range o1.U64Slice {
+		if idx >= len(o2.U64Slice) {
+			//d.Changes = append(d.Changes, NewSliceChange(%!s(BADINDEX),
+		}
 		v2 := o2.U64Slice[idx]
 		if v1 != v2 {
 			return false
 		}
 	}
 
-	if len(o1.S8Slice) != len(o2.S8Slice) {
-		return false
-	}
 	for idx, v1 := range o1.S8Slice {
+		if idx >= len(o2.S8Slice) {
+			//d.Changes = append(d.Changes, NewSliceChange(%!s(BADINDEX),
+		}
 		v2 := o2.S8Slice[idx]
 		if v1 != v2 {
 			return false
 		}
 	}
 
-	if len(o1.S16Slice) != len(o2.S16Slice) {
-		return false
-	}
 	for idx, v1 := range o1.S16Slice {
+		if idx >= len(o2.S16Slice) {
+			//d.Changes = append(d.Changes, NewSliceChange(%!s(BADINDEX),
+		}
 		v2 := o2.S16Slice[idx]
 		if v1 != v2 {
 			return false
 		}
 	}
 
-	if len(o1.S32Slice) != len(o2.S32Slice) {
-		return false
-	}
 	for idx, v1 := range o1.S32Slice {
+		if idx >= len(o2.S32Slice) {
+			//d.Changes = append(d.Changes, NewSliceChange(%!s(BADINDEX),
+		}
 		v2 := o2.S32Slice[idx]
 		if v1 != v2 {
 			return false
 		}
 	}
 
-	if len(o1.S64Slice) != len(o2.S64Slice) {
-		return false
-	}
 	for idx, v1 := range o1.S64Slice {
+		if idx >= len(o2.S64Slice) {
+			//d.Changes = append(d.Changes, NewSliceChange(%!s(BADINDEX),
+		}
 		v2 := o2.S64Slice[idx]
 		if v1 != v2 {
 			return false
 		}
 	}
 
-	if len(o1.StringSlice) != len(o2.StringSlice) {
-		return false
-	}
 	for idx, v1 := range o1.StringSlice {
+		if idx >= len(o2.StringSlice) {
+			//d.Changes = append(d.Changes, NewSliceChange(%!s(BADINDEX),
+		}
 		v2 := o2.StringSlice[idx]
 		if v1 != v2 {
 			return false
 		}
 	}
 
-	if len(o1.TimeSlice) != len(o2.TimeSlice) {
-		return false
-	}
 	for idx, v1 := range o1.TimeSlice {
+		if idx >= len(o2.TimeSlice) {
+			//d.Changes = append(d.Changes, NewSliceChange(%!s(BADINDEX),
+		}
 		v2 := o2.TimeSlice[idx]
 		if !v1.Equal(v2) {
 			return false
 		}
 	}
 
-	if len(o1.String2dSlice) != len(o2.String2dSlice) {
-		return false
-	}
 	for idx, v1 := range o1.String2dSlice {
+		if idx >= len(o2.String2dSlice) {
+			//d.Changes = append(d.Changes, NewSliceChange(%!s(BADINDEX),
+		}
 		v2 := o2.String2dSlice[idx]
 		if len(v1) != len(v2) {
 			return false
