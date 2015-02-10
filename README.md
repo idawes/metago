@@ -1,4 +1,4 @@
-DOGo
+Metago
 ====
 
 A meta-language for building Go types with some interesting built in functionality:
