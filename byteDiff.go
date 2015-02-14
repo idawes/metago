@@ -2,19 +2,19 @@
 
 package metago
 
-type ByteDiff struct {
-	BaseAttrChg
-	OldValue byte
-	NewValue byte
+type ByteChg struct {
+    BaseAttrChg
+    OldValue byte
+    NewValue byte
 }
 
-func NewByteDiff(schemaref *Attrdef, values ...byte) AttrChg {
-	d := ByteDiff{BaseAttrChg: BaseAttrChg{schemaref: schemaref}}
-	if len(values) > 0 {
-		d.OldValue = values[0]
-	}
-	if len(values) > 1 {
-		d.NewValue = values[1]
-	}
-	return &d
+func NewByteChg(s *Attrdef, values ...byte) AttrChg {
+    d := ByteChg{BaseAttrChg: BaseAttrChg{schemaref: s}}
+    if len(values) > 0 {
+        d.NewValue = values[0]
+    }
+    if len(values) > 1 {
+        d.OldValue = values[1]
+    }
+    return &d
 }

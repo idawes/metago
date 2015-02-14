@@ -2,19 +2,19 @@
 
 package metago
 
-type Uint16Diff struct {
-	BaseAttrChg
-	OldValue uint16
-	NewValue uint16
+type Uint16Chg struct {
+    BaseAttrChg
+    OldValue uint16
+    NewValue uint16
 }
 
-func NewUint16Diff(schemaref *Attrdef, values ...uint16) AttrChg {
-	d := Uint16Diff{BaseAttrChg: BaseAttrChg{schemaref: schemaref}}
-	if len(values) > 0 {
-		d.OldValue = values[0]
-	}
-	if len(values) > 1 {
-		d.NewValue = values[1]
-	}
-	return &d
+func NewUint16Chg(s *Attrdef, values ...uint16) AttrChg {
+    d := Uint16Chg{BaseAttrChg: BaseAttrChg{schemaref: s}}
+    if len(values) > 0 {
+        d.NewValue = values[0]
+    }
+    if len(values) > 1 {
+        d.OldValue = values[1]
+    }
+    return &d
 }

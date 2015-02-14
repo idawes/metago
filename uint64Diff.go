@@ -2,19 +2,19 @@
 
 package metago
 
-type Uint64Diff struct {
-	BaseAttrChg
-	OldValue uint64
-	NewValue uint64
+type Uint64Chg struct {
+    BaseAttrChg
+    OldValue uint64
+    NewValue uint64
 }
 
-func NewUint64Diff(schemaref *Attrdef, values ...uint64) AttrChg {
-	d := Uint64Diff{BaseAttrChg: BaseAttrChg{schemaref: schemaref}}
-	if len(values) > 0 {
-		d.OldValue = values[0]
-	}
-	if len(values) > 1 {
-		d.NewValue = values[1]
-	}
-	return &d
+func NewUint64Chg(s *Attrdef, values ...uint64) AttrChg {
+    d := Uint64Chg{BaseAttrChg: BaseAttrChg{schemaref: s}}
+    if len(values) > 0 {
+        d.NewValue = values[0]
+    }
+    if len(values) > 1 {
+        d.OldValue = values[1]
+    }
+    return &d
 }

@@ -9,7 +9,7 @@ type @@T@@Chg struct {
 }
 
 func New@@T@@Chg(s *Attrdef, values ...@@t@@) AttrChg {
-    d := @@T@@Diff{BaseAttrChg: BaseAttrChg{schemaref: s}}
+    d := @@T@@Chg{BaseAttrChg: BaseAttrChg{schemaref: s}}
     if len(values) > 0 {
         d.NewValue = values[0]
     }

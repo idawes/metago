@@ -26,3 +26,19 @@ func (d *BaseAttrChg) WriteTo(w *Writer) error {
 	w.WriteVarint(int64(d.schemaref.ID.Attr))
 	return nil
 }
+
+//go:generate stringer -type=ChangeType
+type ChangeType int
+
+const (
+	ChangeTypeInsert ChangeType = iota
+	ChangeTypeDelete
+	ChangeTypeModify
+)
+
+type SliceAttrChg struct {
+	BaseAttrChg
+	idx int
+	typ ChangeType
+	chg AttrChg
+}

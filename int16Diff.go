@@ -2,19 +2,19 @@
 
 package metago
 
-type Int16Diff struct {
-	BaseAttrChg
-	OldValue int16
-	NewValue int16
+type Int16Chg struct {
+    BaseAttrChg
+    OldValue int16
+    NewValue int16
 }
 
-func NewInt16Diff(schemaref *Attrdef, values ...int16) AttrChg {
-	d := Int16Diff{BaseAttrChg: BaseAttrChg{schemaref: schemaref}}
-	if len(values) > 0 {
-		d.OldValue = values[0]
-	}
-	if len(values) > 1 {
-		d.NewValue = values[1]
-	}
-	return &d
+func NewInt16Chg(s *Attrdef, values ...int16) AttrChg {
+    d := Int16Chg{BaseAttrChg: BaseAttrChg{schemaref: s}}
+    if len(values) > 0 {
+        d.NewValue = values[0]
+    }
+    if len(values) > 1 {
+        d.OldValue = values[1]
+    }
+    return &d
 }

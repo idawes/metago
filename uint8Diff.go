@@ -2,19 +2,19 @@
 
 package metago
 
-type Uint8Diff struct {
-	BaseAttrChg
-	OldValue uint8
-	NewValue uint8
+type Uint8Chg struct {
+    BaseAttrChg
+    OldValue uint8
+    NewValue uint8
 }
 
-func NewUint8Diff(schemaref *Attrdef, values ...uint8) AttrChg {
-	d := Uint8Diff{BaseAttrChg: BaseAttrChg{schemaref: schemaref}}
-	if len(values) > 0 {
-		d.OldValue = values[0]
-	}
-	if len(values) > 1 {
-		d.NewValue = values[1]
-	}
-	return &d
+func NewUint8Chg(s *Attrdef, values ...uint8) AttrChg {
+    d := Uint8Chg{BaseAttrChg: BaseAttrChg{schemaref: s}}
+    if len(values) > 0 {
+        d.NewValue = values[0]
+    }
+    if len(values) > 1 {
+        d.OldValue = values[1]
+    }
+    return &d
 }
