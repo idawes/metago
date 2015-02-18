@@ -1,8 +1,8 @@
 package metago
 
 type StringMapAttrChg struct {
-    BaseAttrChg
-    key string
-    typ ChangeType
-    chg AttrChg
+	BaseChg
+	key string
+	typ ChangeType
+	chg Chg
 }

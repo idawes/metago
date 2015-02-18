@@ -3,8 +3,8 @@ package metago
 import "time"
 
 type TimeMapAttrChg struct {
-	BaseAttrChg
+	BaseChg
 	key time.Time
 	typ ChangeType
-	chg AttrChg
+	chg Chg
 }

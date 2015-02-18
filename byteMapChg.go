@@ -1,8 +1,8 @@
 package metago
 
 type ByteMapAttrChg struct {
-    BaseAttrChg
-    key byte
-    typ ChangeType
-    chg AttrChg
+	BaseChg
+	key byte
+	typ ChangeType
+	chg Chg
 }

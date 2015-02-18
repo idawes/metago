@@ -16,7 +16,7 @@ func init() {
 	MetagoPackageUUID = *id
 }
 
-var BasicAttrTypesObjectID = metago.TypeID{Pkg: MetagoPackageUUID, Typ: 1}
-var ExtendedObjectID = metago.TypeID{Pkg: MetagoPackageUUID, Typ: 2}
-var SliceTestObjectID = metago.TypeID{Pkg: MetagoPackageUUID, Typ: 3}
-var StructTestObjectID = metago.TypeID{Pkg: MetagoPackageUUID, Typ: 4}
+var BasicAttrTypesObjectID = metago.TypeID{Pkg: &MetagoPackageUUID, Typ: 1}
+var ExtendedObjectID = metago.TypeID{Pkg: &MetagoPackageUUID, Typ: 2}
+var SliceTestObjectID = metago.TypeID{Pkg: &MetagoPackageUUID, Typ: 3}
+var StructTestObjectID = metago.TypeID{Pkg: &MetagoPackageUUID, Typ: 4}

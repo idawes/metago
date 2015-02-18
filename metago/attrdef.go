@@ -150,7 +150,7 @@ func (a *baseAttrDef) GenerateSubAttrEquals(w *writer, v1, v2 string) {
 }
 
 const baseAttrDiffTemplate = `  if o1.%[2]s != o2.%[2]s {
-		d.Add(New%[3]sDiff(AID_%[1]s_%[2]s, %[4]t, o1.%[2]s, o2.%[2]s))
+		d.Add(New%[3]sChg(AID_%[1]s_%[2]s, %[4]t, o1.%[2]s, o2.%[2]s))
 	}
 `
 
@@ -176,8 +176,13 @@ func (a *timeAttrDef) GenerateSubAttrEquals(w *writer, v1, v2 string) {
 	w.printf("  if !%s.Equal(%s) {\n    return false\n  }\n", v1, v2)
 }
 
+const TimeDiffTemplate = `  if o1.%[2]s != o2.%[2]s {
+		d.Add(NewTimeChg(AID_%[1]s_%[2]s, %[3]t, o1.%[2]s, o2.%[2]s))
+	}
+`
+
 func (a *timeAttrDef) GenerateDiff(w *writer) {
-	w.printf("  if !o1.%[1]s.Equal(o2.%[1]s) {\n    return false\n  }\n", a.name)
+	w.printf(TimeDiffTemplate, a.parentType.name, a.name, strings.Title(a.attrType), a.persistence == persistenceClassPersistent)
 }
 
 func (a *timeAttrDef) GenerateSubAttrDiff(w *writer, v1, v2 string) {
@@ -228,8 +233,10 @@ func (a *sliceAttrDef) GenerateSubAttrEquals(w *writer, v1, v2 string) {
 }
 
 const sliceAttrDiff = `    for idx, v1 := range o1.%[1]s {
-		if idx >= len(o2.%[1]s) {
-			//d.Changes = append(d.Changes, NewSliceChange(%[2]s, 
+		if idx < len(o2.%[1]s) {
+			v2 := o2.%[1]s[idx]
+			
+			d.Changes = append(d.Changes, SliceAttrChg{BaseAttrChg: BaseAttrChg%[2]s, 
 		}
 		v2 := o2.%[1]s[idx]
 `
@@ -240,11 +247,8 @@ func (a *sliceAttrDef) GenerateDiff(w *writer) {
 	w.printf("  }\n")
 }
 
-const sliceSubAttrDiff = `    if len(%[1]s) != len(%[2]s) {
-        return false
-    }
-    for idx, %[1]s1 := range %[1]s {
-		%[2]s2 := %[2]s[idx]
+const sliceSubAttrDiff = `    %[1]s1 := metago.Diff{}
+		for %[2]s1, %[3]s1 := range %[3]s
 `
 
 func (a *sliceAttrDef) GenerateSubAttrDiff(w *writer, v1, v2 string) {

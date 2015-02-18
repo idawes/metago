@@ -5,13 +5,13 @@ package metago
 import "time"
 
 type TimeChg struct {
-	BaseAttrChg
+	BaseChg
 	OldValue time.Time
 	NewValue time.Time
 }
 
-func NewTimeChg(s *Attrdef, values ...time.Time) AttrChg {
-	d := TimeChg{BaseAttrChg: BaseAttrChg{schemaref: s}}
+func NewTimeChg(s *Attrdef, values ...time.Time) Chg {
+	d := TimeChg{BaseChg: BaseChg{schemaref: s}}
 	if len(values) > 0 {
 		d.NewValue = values[0]
 	}

@@ -167,7 +167,7 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 		}
 		v2 := o2.ByteSlice[idx]
 		if v1 != v2 {
-			return false
+			// return false
 		}
 	}
 
@@ -177,7 +177,7 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 		}
 		v2 := o2.U8Slice[idx]
 		if v1 != v2 {
-			return false
+			// return false
 		}
 	}
 
@@ -187,7 +187,7 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 		}
 		v2 := o2.U16Slice[idx]
 		if v1 != v2 {
-			return false
+			// return false
 		}
 	}
 
@@ -197,7 +197,7 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 		}
 		v2 := o2.U32Slice[idx]
 		if v1 != v2 {
-			return false
+			// return false
 		}
 	}
 
@@ -207,7 +207,7 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 		}
 		v2 := o2.U64Slice[idx]
 		if v1 != v2 {
-			return false
+			// return false
 		}
 	}
 
@@ -217,7 +217,7 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 		}
 		v2 := o2.S8Slice[idx]
 		if v1 != v2 {
-			return false
+			// return false
 		}
 	}
 
@@ -227,7 +227,7 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 		}
 		v2 := o2.S16Slice[idx]
 		if v1 != v2 {
-			return false
+			// return false
 		}
 	}
 
@@ -237,7 +237,7 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 		}
 		v2 := o2.S32Slice[idx]
 		if v1 != v2 {
-			return false
+			// return false
 		}
 	}
 
@@ -247,7 +247,7 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 		}
 		v2 := o2.S64Slice[idx]
 		if v1 != v2 {
-			return false
+			// return false
 		}
 	}
 
@@ -257,7 +257,7 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 		}
 		v2 := o2.StringSlice[idx]
 		if v1 != v2 {
-			return false
+			// return false
 		}
 	}
 
@@ -267,7 +267,7 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 		}
 		v2 := o2.TimeSlice[idx]
 		if !v1.Equal(v2) {
-			return false
+			// return false
 		}
 	}
 
@@ -277,14 +277,14 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 		}
 		v2 := o2.String2dSlice[idx]
 		if len(v1) != len(v2) {
-			return false
+			// return false
 		}
 		for idx, v11 := range v1 {
 			v22 := v2[idx]
 			if v11 != v22 {
-				return false
+				// return false
 			}
 		}
 	}
-	return true
+	return
 }
