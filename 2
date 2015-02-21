@@ -144,7 +144,7 @@ func (a *baseAttrDef) GenerateEquals(w *writer, levelID string) {
 		w.printf("    {\n")
 		w.printf("        va, vb := o1.%[1]s, o2.%[1]s\n", a.name)
 	}
-	w.printf("  if va%[1]s != vb%[1]s {\n    return false\n  }\n", levelID)
+	w.printf("  if va%[1]s != vb%[1]s {\n    return false\n  }\n", a.name)
 	if levelID == "" {
 		w.printf("    }\n")
 	}
@@ -181,7 +181,7 @@ func (a *timeAttrDef) GenerateEquals(w *writer, levelID string) {
 		w.printf("    {\n")
 		w.printf("        va, vb := o1.%[1]s, o2.%[1]s\n", a.name)
 	}
-	w.printf("  if va%[1]s.Equal(vb%[1]s) {\n    return false\n  }\n", levelID)
+	w.printf("  if va%[1]s.Equal(vb%[1]s) {\n    return false\n  }\n", a.name)
 	if levelID == "" {
 		w.printf("    }\n")
 	}

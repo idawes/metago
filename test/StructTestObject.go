@@ -14,16 +14,22 @@ type StructTestObject struct {
 
 func (o1 *StructTestObject) Equals(o2 *StructTestObject) bool {
 
-	if o1.B != o2.B {
-		return false
+	{
+		va, vb := o1.B, o2.B
+		if va != vb {
+			return false
+		}
 	}
 	return true
 }
 
 func (o1 *StructTestObject) Diff(o2 *StructTestObject) (d *metago.Diff) {
 
-	if o1.B != o2.B {
-		// d.Add(NewBasicAttrTypesObjectDiff(AID_StructTestObject_B, true, o1.B, o2.B))
+	{
+		va, vb := o1.B, o2.B
+		if va != vb {
+			d.Add(NewBasicAttrTypesObjectChg(StructTestObjectB, true, vb, va))
+		}
 	}
-	return
+	return true
 }

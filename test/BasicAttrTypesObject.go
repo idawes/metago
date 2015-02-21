@@ -21,7 +21,7 @@ type BasicAttrTypesObject struct {
 	S32Field    int32
 	S64Field    int64
 	StringField string
-	TimeField   time.Time
+	TimeField   Time
 }
 
 func (this *BasicAttrTypesObject) ConditionalDump(t bool) string {
@@ -31,102 +31,168 @@ func (this *BasicAttrTypesObject) ConditionalDump(t bool) string {
 	return ""
 }
 
-func (this *BasicAttrTypesObject) Dump() string {
+func (this *BasicAttrTypesObject) Dump() (string, error) {
 	return spew.Sdump(*this)
 }
 
 func (o1 *BasicAttrTypesObject) Equals(o2 *BasicAttrTypesObject) bool {
 
-	if o1.ByteField != o2.ByteField {
-		return false
+	{
+		va, vb := o1.ByteField, o2.ByteField
+		if va != vb {
+			return false
+		}
 	}
 
-	if o1.U8Field != o2.U8Field {
-		return false
+	{
+		va, vb := o1.U8Field, o2.U8Field
+		if va != vb {
+			return false
+		}
 	}
 
-	if o1.U16Field != o2.U16Field {
-		return false
+	{
+		va, vb := o1.U16Field, o2.U16Field
+		if va != vb {
+			return false
+		}
 	}
 
-	if o1.U32Field != o2.U32Field {
-		return false
+	{
+		va, vb := o1.U32Field, o2.U32Field
+		if va != vb {
+			return false
+		}
 	}
 
-	if o1.U64Field != o2.U64Field {
-		return false
+	{
+		va, vb := o1.U64Field, o2.U64Field
+		if va != vb {
+			return false
+		}
 	}
 
-	if o1.S8Field != o2.S8Field {
-		return false
+	{
+		va, vb := o1.S8Field, o2.S8Field
+		if va != vb {
+			return false
+		}
 	}
 
-	if o1.S16Field != o2.S16Field {
-		return false
+	{
+		va, vb := o1.S16Field, o2.S16Field
+		if va != vb {
+			return false
+		}
 	}
 
-	if o1.S32Field != o2.S32Field {
-		return false
+	{
+		va, vb := o1.S32Field, o2.S32Field
+		if va != vb {
+			return false
+		}
 	}
 
-	if o1.S64Field != o2.S64Field {
-		return false
+	{
+		va, vb := o1.S64Field, o2.S64Field
+		if va != vb {
+			return false
+		}
 	}
 
-	if o1.StringField != o2.StringField {
-		return false
+	{
+		va, vb := o1.StringField, o2.StringField
+		if va != vb {
+			return false
+		}
 	}
 
-	if !o1.TimeField.Equal(o2.TimeField) {
-		return false
+	{
+		va, vb := o1.TimeField, o2.TimeField
+		if va.Equal(vb) {
+			return false
+		}
 	}
 	return true
 }
 
 func (o1 *BasicAttrTypesObject) Diff(o2 *BasicAttrTypesObject) (d *metago.Diff) {
 
-	if o1.ByteField != o2.ByteField {
-		// d.Add(NewByteDiff(AID_BasicAttrTypesObject_ByteField, true, o1.ByteField, o2.ByteField))
+	{
+		va, vb := o1.ByteField, o2.ByteField
+		if va != vb {
+			d.Add(NewbyteChg(BasicAttrTypesObjectByteField, true, vb, va))
+		}
 	}
 
-	if o1.U8Field != o2.U8Field {
-		// d.Add(NewUint8Diff(AID_BasicAttrTypesObject_U8Field, true, o1.U8Field, o2.U8Field))
+	{
+		va, vb := o1.U8Field, o2.U8Field
+		if va != vb {
+			d.Add(Newuint8Chg(BasicAttrTypesObjectU8Field, true, vb, va))
+		}
 	}
 
-	if o1.U16Field != o2.U16Field {
-		// d.Add(NewUint16Diff(AID_BasicAttrTypesObject_U16Field, true, o1.U16Field, o2.U16Field))
+	{
+		va, vb := o1.U16Field, o2.U16Field
+		if va != vb {
+			d.Add(Newuint16Chg(BasicAttrTypesObjectU16Field, true, vb, va))
+		}
 	}
 
-	if o1.U32Field != o2.U32Field {
-		// d.Add(NewUint32Diff(AID_BasicAttrTypesObject_U32Field, true, o1.U32Field, o2.U32Field))
+	{
+		va, vb := o1.U32Field, o2.U32Field
+		if va != vb {
+			d.Add(Newuint32Chg(BasicAttrTypesObjectU32Field, true, vb, va))
+		}
 	}
 
-	if o1.U64Field != o2.U64Field {
-		// d.Add(NewUint64Diff(AID_BasicAttrTypesObject_U64Field, true, o1.U64Field, o2.U64Field))
+	{
+		va, vb := o1.U64Field, o2.U64Field
+		if va != vb {
+			d.Add(Newuint64Chg(BasicAttrTypesObjectU64Field, true, vb, va))
+		}
 	}
 
-	if o1.S8Field != o2.S8Field {
-		// d.Add(NewInt8Diff(AID_BasicAttrTypesObject_S8Field, true, o1.S8Field, o2.S8Field))
+	{
+		va, vb := o1.S8Field, o2.S8Field
+		if va != vb {
+			d.Add(Newint8Chg(BasicAttrTypesObjectS8Field, true, vb, va))
+		}
 	}
 
-	if o1.S16Field != o2.S16Field {
-		// d.Add(NewInt16Diff(AID_BasicAttrTypesObject_S16Field, true, o1.S16Field, o2.S16Field))
+	{
+		va, vb := o1.S16Field, o2.S16Field
+		if va != vb {
+			d.Add(Newint16Chg(BasicAttrTypesObjectS16Field, true, vb, va))
+		}
 	}
 
-	if o1.S32Field != o2.S32Field {
-		// d.Add(NewInt32Diff(AID_BasicAttrTypesObject_S32Field, true, o1.S32Field, o2.S32Field))
+	{
+		va, vb := o1.S32Field, o2.S32Field
+		if va != vb {
+			d.Add(Newint32Chg(BasicAttrTypesObjectS32Field, true, vb, va))
+		}
 	}
 
-	if o1.S64Field != o2.S64Field {
-		// d.Add(NewInt64Diff(AID_BasicAttrTypesObject_S64Field, true, o1.S64Field, o2.S64Field))
+	{
+		va, vb := o1.S64Field, o2.S64Field
+		if va != vb {
+			d.Add(Newint64Chg(BasicAttrTypesObjectS64Field, true, vb, va))
+		}
 	}
 
-	if o1.StringField != o2.StringField {
-		// d.Add(NewStringDiff(AID_BasicAttrTypesObject_StringField, true, o1.StringField, o2.StringField))
+	{
+		va, vb := o1.StringField, o2.StringField
+		if va != vb {
+			d.Add(NewstringChg(BasicAttrTypesObjectStringField, true, vb, va))
+		}
 	}
 
-	if !o1.TimeField.Equal(o2.TimeField) {
-		return
+	{
+		va, vb := o1.TimeField, o2.TimeField
+		if vaBasicAttrTypesObject.Equal(vbBasicAttrTypesObject) {
+			d.Add(NewTimeChg(TimeFieldTime.Time, true, vbBasicAttrTypesObject, vaBasicAttrTypesObject))
+		}
 	}
-	return
+	return true
 }

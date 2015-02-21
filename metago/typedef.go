@@ -380,7 +380,7 @@ func (t *typedef) generateAttrEquals(w *writer) {
 	}
 	for _, a := range t.attrDefsByIDInOrder {
 		w.printf("\n")
-		a.GenerateEquals(w)
+		a.GenerateEquals(w, "")
 	}
 }
 
@@ -397,7 +397,7 @@ func (t *typedef) generateAttrDiffs(w *writer) {
 	}
 	for _, a := range t.attrDefsByIDInOrder {
 		w.printf("\n")
-		a.GenerateDiff(w)
+		a.GenerateDiff(w, "")
 	}
 }
 
