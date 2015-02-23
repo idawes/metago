@@ -28,8 +28,8 @@ func (o1 *StructTestObject) Diff(o2 *StructTestObject) (d *metago.Diff) {
 	{
 		va, vb := o1.B, o2.B
 		if va != vb {
-			d.Add(NewBasicAttrTypesObjectChg(StructTestObjectB, true, vb, va))
+			d.Add(metago.NewBasicAttrTypesObjectChg(&StructTestObjectBSREF, vb, va))
 		}
 	}
-	return true
+	return d
 }

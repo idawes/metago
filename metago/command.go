@@ -11,11 +11,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/nu7hatch/gouuid"
-	"gopkg.in/alecthomas/kingpin.v1"
 	"io"
 	"os"
 	"path/filepath"
+	"sort"
+
+	"github.com/nu7hatch/gouuid"
+	"gopkg.in/alecthomas/kingpin.v1"
 )
 
 var (
@@ -140,10 +142,43 @@ func (g *generator) validateTypeHierarchy() {
 	}
 }
 
+type typedefList []*typedef
+
+func (l typedefList) Len() int           { return len(l) }
+func (l typedefList) Swap(i, j int)      { l[i], l[j] = l[j], l[i] }
+func (l typedefList) Less(i, j int) bool { return l[i].typeID.Compare(&l[j].typeID) < 0 }
+
+const schemaHeader = `
+
+import ( 
+	"fmt"
+
+	"github.com/idawes/metago"
+	"github.com/nu7hatch/gouuid"
+)
+
+var MetagoPackageUUID uuid.UUID
+
+func init() {
+	id, err := uuid.ParseHex("%s")
+	if err != nil {
+		panic(fmt.Sprintf("Couldn't parse package UUID for package %s"))
+	}
+	MetagoPackageUUID = *id
+}
+
+var (
+`
+
 func (g *generator) generate() {
 	sw := newWriter(filepath.Join(*pkgRoot, "src", g.pkg), "schema")
-	sw.printf("var MetagoPackageUUID = uuid.ParseHex(\"%s\")\n\n", g.pkgUUID.String())
+	sw.printf(schemaHeader, g.pkgUUID.String(), g.pkg)
+	sortedTypedefs := make(typedefList, 0)
 	for _, t := range g.typedefs {
+		sortedTypedefs = append(sortedTypedefs, t)
+	}
+	sort.Sort(sortedTypedefs)
+	for _, t := range sortedTypedefs {
 		if g.err != nil {
 			return
 		}
@@ -152,6 +187,7 @@ func (g *generator) generate() {
 		t.generateSchema(sw)
 		g.err = w.close()
 	}
+	sw.printf(")")
 	if g.err == nil {
 		g.err = sw.close()
 	}

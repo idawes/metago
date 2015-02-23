@@ -5,12 +5,14 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
-	"github.com/nu7hatch/gouuid"
 	"io"
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/nu7hatch/gouuid"
 )
 
 type typeID struct {
@@ -20,6 +22,13 @@ type typeID struct {
 
 func (t *typeID) String() string {
 	return fmt.Sprintf("%s:%d", t.pkg, t.typ)
+}
+
+func (t *typeID) Compare(o *typeID) int {
+	if t.pkg != o.pkg {
+		return bytes.Compare((*t.pkg)[:], (*o.pkg)[:])
+	}
+	return int(t.typ) - int(o.typ)
 }
 
 type typedef struct {
@@ -387,7 +396,7 @@ func (t *typedef) generateAttrEquals(w *writer) {
 func (t *typedef) generateDiff(w *writer) {
 	w.printf("\nfunc (o1 *%[1]s) Diff(o2 *%[1]s) (d *metago.Diff) {\n", t.name)
 	t.generateAttrDiffs(w)
-	w.printf("    return true\n}\n")
+	w.printf("    return d\n}\n")
 
 }
 
@@ -405,6 +414,12 @@ func (t *typedef) generateSchema(w *writer) {
 	if t.abstract {
 		return
 	}
-	fmt.Printf("generating Schema for %s", t.name)
-	w.printf("var %sID = TypeID{pkg: MetagoPackageUUID, typ: %d}\n", t.name, t.typeID.typ)
+	if *verbose {
+		fmt.Printf("generating Schema for %s\n", t.name)
+	}
+	w.printf("\n  %sTID metago.TypeID = metago.TypeID{Pkg: &MetagoPackageUUID, Typ: %d}\n", t.name, t.typeID.typ)
+	for _, a := range t.attrDefsByIDInOrder {
+		w.printf("  %[1]s%[2]sAID metago.AttrID = metago.AttrID{TypeID: &%[1]sTID, Attr: %[3]d}\n", t.name, a.Name(), a.AttributeID())
+		w.printf("  %[1]s%[2]sSREF metago.Attrdef = metago.Attrdef{ID: &%[1]s%[2]sAID, Persistence: metago.%[3]s}\n", t.name, a.Name(), strings.Title(a.PersistenceClass().String()))
+	}
 }

@@ -4,9 +4,79 @@
 
 package test
 
-var MetagoPackageUUID = uuid.ParseHex("2ddeafcf-0764-545c-6e7b-047e00947709")
+import (
+	"fmt"
 
-var StructTestObjectID = TypeID{pkg: MetagoPackageUUID, typ: 4}
-var BasicAttrTypesObjectID = TypeID{pkg: MetagoPackageUUID, typ: 1}
-var ExtendedObjectID = TypeID{pkg: MetagoPackageUUID, typ: 2}
-var SliceTestObjectID = TypeID{pkg: MetagoPackageUUID, typ: 3}
+	"github.com/idawes/metago"
+	"github.com/nu7hatch/gouuid"
+)
+
+var MetagoPackageUUID uuid.UUID
+
+func init() {
+	id, err := uuid.ParseHex("2ddeafcf-0764-545c-6e7b-047e00947709")
+	if err != nil {
+		panic(fmt.Sprintf("Couldn't parse package UUID for package github.com/idawes/metago/test"))
+	}
+	MetagoPackageUUID = *id
+}
+
+var (
+	BasicAttrTypesObjectTID             metago.TypeID  = metago.TypeID{Pkg: &MetagoPackageUUID, Typ: 1}
+	BasicAttrTypesObjectByteFieldAID    metago.AttrID  = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 1}
+	BasicAttrTypesObjectByteFieldSREF   metago.Attrdef = metago.Attrdef{ID: &BasicAttrTypesObjectByteFieldAID, Persistence: metago.PersistenceClassPersistent}
+	BasicAttrTypesObjectU8FieldAID      metago.AttrID  = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 2}
+	BasicAttrTypesObjectU8FieldSREF     metago.Attrdef = metago.Attrdef{ID: &BasicAttrTypesObjectU8FieldAID, Persistence: metago.PersistenceClassPersistent}
+	BasicAttrTypesObjectU16FieldAID     metago.AttrID  = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 3}
+	BasicAttrTypesObjectU16FieldSREF    metago.Attrdef = metago.Attrdef{ID: &BasicAttrTypesObjectU16FieldAID, Persistence: metago.PersistenceClassPersistent}
+	BasicAttrTypesObjectU32FieldAID     metago.AttrID  = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 4}
+	BasicAttrTypesObjectU32FieldSREF    metago.Attrdef = metago.Attrdef{ID: &BasicAttrTypesObjectU32FieldAID, Persistence: metago.PersistenceClassPersistent}
+	BasicAttrTypesObjectU64FieldAID     metago.AttrID  = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 5}
+	BasicAttrTypesObjectU64FieldSREF    metago.Attrdef = metago.Attrdef{ID: &BasicAttrTypesObjectU64FieldAID, Persistence: metago.PersistenceClassPersistent}
+	BasicAttrTypesObjectS8FieldAID      metago.AttrID  = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 6}
+	BasicAttrTypesObjectS8FieldSREF     metago.Attrdef = metago.Attrdef{ID: &BasicAttrTypesObjectS8FieldAID, Persistence: metago.PersistenceClassPersistent}
+	BasicAttrTypesObjectS16FieldAID     metago.AttrID  = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 7}
+	BasicAttrTypesObjectS16FieldSREF    metago.Attrdef = metago.Attrdef{ID: &BasicAttrTypesObjectS16FieldAID, Persistence: metago.PersistenceClassPersistent}
+	BasicAttrTypesObjectS32FieldAID     metago.AttrID  = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 8}
+	BasicAttrTypesObjectS32FieldSREF    metago.Attrdef = metago.Attrdef{ID: &BasicAttrTypesObjectS32FieldAID, Persistence: metago.PersistenceClassPersistent}
+	BasicAttrTypesObjectS64FieldAID     metago.AttrID  = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 9}
+	BasicAttrTypesObjectS64FieldSREF    metago.Attrdef = metago.Attrdef{ID: &BasicAttrTypesObjectS64FieldAID, Persistence: metago.PersistenceClassPersistent}
+	BasicAttrTypesObjectStringFieldAID  metago.AttrID  = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 10}
+	BasicAttrTypesObjectStringFieldSREF metago.Attrdef = metago.Attrdef{ID: &BasicAttrTypesObjectStringFieldAID, Persistence: metago.PersistenceClassPersistent}
+	BasicAttrTypesObjectTimeFieldAID    metago.AttrID  = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 11}
+	BasicAttrTypesObjectTimeFieldSREF   metago.Attrdef = metago.Attrdef{ID: &BasicAttrTypesObjectTimeFieldAID, Persistence: metago.PersistenceClassPersistent}
+
+	ExtendedObjectTID                   metago.TypeID  = metago.TypeID{Pkg: &MetagoPackageUUID, Typ: 2}
+	ExtendedObjectExtendedByteFieldAID  metago.AttrID  = metago.AttrID{TypeID: &ExtendedObjectTID, Attr: 1}
+	ExtendedObjectExtendedByteFieldSREF metago.Attrdef = metago.Attrdef{ID: &ExtendedObjectExtendedByteFieldAID, Persistence: metago.PersistenceClassPersistent}
+
+	SliceTestObjectTID               metago.TypeID  = metago.TypeID{Pkg: &MetagoPackageUUID, Typ: 3}
+	SliceTestObjectByteSliceAID      metago.AttrID  = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 1}
+	SliceTestObjectByteSliceSREF     metago.Attrdef = metago.Attrdef{ID: &SliceTestObjectByteSliceAID, Persistence: metago.PersistenceClassPersistent}
+	SliceTestObjectU8SliceAID        metago.AttrID  = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 2}
+	SliceTestObjectU8SliceSREF       metago.Attrdef = metago.Attrdef{ID: &SliceTestObjectU8SliceAID, Persistence: metago.PersistenceClassPersistent}
+	SliceTestObjectU16SliceAID       metago.AttrID  = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 3}
+	SliceTestObjectU16SliceSREF      metago.Attrdef = metago.Attrdef{ID: &SliceTestObjectU16SliceAID, Persistence: metago.PersistenceClassPersistent}
+	SliceTestObjectU32SliceAID       metago.AttrID  = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 4}
+	SliceTestObjectU32SliceSREF      metago.Attrdef = metago.Attrdef{ID: &SliceTestObjectU32SliceAID, Persistence: metago.PersistenceClassPersistent}
+	SliceTestObjectU64SliceAID       metago.AttrID  = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 5}
+	SliceTestObjectU64SliceSREF      metago.Attrdef = metago.Attrdef{ID: &SliceTestObjectU64SliceAID, Persistence: metago.PersistenceClassPersistent}
+	SliceTestObjectS8SliceAID        metago.AttrID  = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 6}
+	SliceTestObjectS8SliceSREF       metago.Attrdef = metago.Attrdef{ID: &SliceTestObjectS8SliceAID, Persistence: metago.PersistenceClassPersistent}
+	SliceTestObjectS16SliceAID       metago.AttrID  = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 7}
+	SliceTestObjectS16SliceSREF      metago.Attrdef = metago.Attrdef{ID: &SliceTestObjectS16SliceAID, Persistence: metago.PersistenceClassPersistent}
+	SliceTestObjectS32SliceAID       metago.AttrID  = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 8}
+	SliceTestObjectS32SliceSREF      metago.Attrdef = metago.Attrdef{ID: &SliceTestObjectS32SliceAID, Persistence: metago.PersistenceClassPersistent}
+	SliceTestObjectS64SliceAID       metago.AttrID  = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 9}
+	SliceTestObjectS64SliceSREF      metago.Attrdef = metago.Attrdef{ID: &SliceTestObjectS64SliceAID, Persistence: metago.PersistenceClassPersistent}
+	SliceTestObjectStringSliceAID    metago.AttrID  = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 10}
+	SliceTestObjectStringSliceSREF   metago.Attrdef = metago.Attrdef{ID: &SliceTestObjectStringSliceAID, Persistence: metago.PersistenceClassPersistent}
+	SliceTestObjectTimeSliceAID      metago.AttrID  = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 11}
+	SliceTestObjectTimeSliceSREF     metago.Attrdef = metago.Attrdef{ID: &SliceTestObjectTimeSliceAID, Persistence: metago.PersistenceClassPersistent}
+	SliceTestObjectString2dSliceAID  metago.AttrID  = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 12}
+	SliceTestObjectString2dSliceSREF metago.Attrdef = metago.Attrdef{ID: &SliceTestObjectString2dSliceAID, Persistence: metago.PersistenceClassPersistent}
+
+	StructTestObjectTID   metago.TypeID  = metago.TypeID{Pkg: &MetagoPackageUUID, Typ: 4}
+	StructTestObjectBAID  metago.AttrID  = metago.AttrID{TypeID: &StructTestObjectTID, Attr: 1}
+	StructTestObjectBSREF metago.Attrdef = metago.Attrdef{ID: &StructTestObjectBAID, Persistence: metago.PersistenceClassPersistent}
+)

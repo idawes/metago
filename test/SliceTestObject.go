@@ -202,11 +202,11 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 		for idx, va1 := range va {
 			if idx < len(vb) {
 				vb1 := vb[idx]
-				d1 := metago.Diff{}
+				d1 := &metago.Diff{}
 				if va1 != vb1 {
-					d.Add(NewbyteChg(SliceTestObject, true, vb1, va1))
+					d.Add(metago.NewByteChg(&SliceTestObjectByteSliceSREF, vb1, va1))
 				}
-				d1.Changes = append(d.Changes, metago.NewSliceChg(SliceTestObjectByteSliceAID, idx, metago.ChangeTypeModify, &d))
+				d1.Changes = append(d.Changes, metago.NewSliceChg(&SliceTestObjectByteSliceSREF, idx, metago.ChangeTypeModify, d))
 			}
 		}
 	}
@@ -216,11 +216,11 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 		for idx, va1 := range va {
 			if idx < len(vb) {
 				vb1 := vb[idx]
-				d1 := metago.Diff{}
+				d1 := &metago.Diff{}
 				if va1 != vb1 {
-					d.Add(Newuint8Chg(SliceTestObject, true, vb1, va1))
+					d.Add(metago.NewUint8Chg(&SliceTestObjectU8SliceSREF, vb1, va1))
 				}
-				d1.Changes = append(d.Changes, metago.NewSliceChg(SliceTestObjectU8SliceAID, idx, metago.ChangeTypeModify, &d))
+				d1.Changes = append(d.Changes, metago.NewSliceChg(&SliceTestObjectU8SliceSREF, idx, metago.ChangeTypeModify, d))
 			}
 		}
 	}
@@ -230,11 +230,11 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 		for idx, va1 := range va {
 			if idx < len(vb) {
 				vb1 := vb[idx]
-				d1 := metago.Diff{}
+				d1 := &metago.Diff{}
 				if va1 != vb1 {
-					d.Add(Newuint16Chg(SliceTestObject, true, vb1, va1))
+					d.Add(metago.NewUint16Chg(&SliceTestObjectU16SliceSREF, vb1, va1))
 				}
-				d1.Changes = append(d.Changes, metago.NewSliceChg(SliceTestObjectU16SliceAID, idx, metago.ChangeTypeModify, &d))
+				d1.Changes = append(d.Changes, metago.NewSliceChg(&SliceTestObjectU16SliceSREF, idx, metago.ChangeTypeModify, d))
 			}
 		}
 	}
@@ -244,11 +244,11 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 		for idx, va1 := range va {
 			if idx < len(vb) {
 				vb1 := vb[idx]
-				d1 := metago.Diff{}
+				d1 := &metago.Diff{}
 				if va1 != vb1 {
-					d.Add(Newuint32Chg(SliceTestObject, true, vb1, va1))
+					d.Add(metago.NewUint32Chg(&SliceTestObjectU32SliceSREF, vb1, va1))
 				}
-				d1.Changes = append(d.Changes, metago.NewSliceChg(SliceTestObjectU32SliceAID, idx, metago.ChangeTypeModify, &d))
+				d1.Changes = append(d.Changes, metago.NewSliceChg(&SliceTestObjectU32SliceSREF, idx, metago.ChangeTypeModify, d))
 			}
 		}
 	}
@@ -258,11 +258,11 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 		for idx, va1 := range va {
 			if idx < len(vb) {
 				vb1 := vb[idx]
-				d1 := metago.Diff{}
+				d1 := &metago.Diff{}
 				if va1 != vb1 {
-					d.Add(Newuint64Chg(SliceTestObject, true, vb1, va1))
+					d.Add(metago.NewUint64Chg(&SliceTestObjectU64SliceSREF, vb1, va1))
 				}
-				d1.Changes = append(d.Changes, metago.NewSliceChg(SliceTestObjectU64SliceAID, idx, metago.ChangeTypeModify, &d))
+				d1.Changes = append(d.Changes, metago.NewSliceChg(&SliceTestObjectU64SliceSREF, idx, metago.ChangeTypeModify, d))
 			}
 		}
 	}
@@ -272,11 +272,11 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 		for idx, va1 := range va {
 			if idx < len(vb) {
 				vb1 := vb[idx]
-				d1 := metago.Diff{}
+				d1 := &metago.Diff{}
 				if va1 != vb1 {
-					d.Add(Newint8Chg(SliceTestObject, true, vb1, va1))
+					d.Add(metago.NewInt8Chg(&SliceTestObjectS8SliceSREF, vb1, va1))
 				}
-				d1.Changes = append(d.Changes, metago.NewSliceChg(SliceTestObjectS8SliceAID, idx, metago.ChangeTypeModify, &d))
+				d1.Changes = append(d.Changes, metago.NewSliceChg(&SliceTestObjectS8SliceSREF, idx, metago.ChangeTypeModify, d))
 			}
 		}
 	}
@@ -286,11 +286,11 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 		for idx, va1 := range va {
 			if idx < len(vb) {
 				vb1 := vb[idx]
-				d1 := metago.Diff{}
+				d1 := &metago.Diff{}
 				if va1 != vb1 {
-					d.Add(Newint16Chg(SliceTestObject, true, vb1, va1))
+					d.Add(metago.NewInt16Chg(&SliceTestObjectS16SliceSREF, vb1, va1))
 				}
-				d1.Changes = append(d.Changes, metago.NewSliceChg(SliceTestObjectS16SliceAID, idx, metago.ChangeTypeModify, &d))
+				d1.Changes = append(d.Changes, metago.NewSliceChg(&SliceTestObjectS16SliceSREF, idx, metago.ChangeTypeModify, d))
 			}
 		}
 	}
@@ -300,11 +300,11 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 		for idx, va1 := range va {
 			if idx < len(vb) {
 				vb1 := vb[idx]
-				d1 := metago.Diff{}
+				d1 := &metago.Diff{}
 				if va1 != vb1 {
-					d.Add(Newint32Chg(SliceTestObject, true, vb1, va1))
+					d.Add(metago.NewInt32Chg(&SliceTestObjectS32SliceSREF, vb1, va1))
 				}
-				d1.Changes = append(d.Changes, metago.NewSliceChg(SliceTestObjectS32SliceAID, idx, metago.ChangeTypeModify, &d))
+				d1.Changes = append(d.Changes, metago.NewSliceChg(&SliceTestObjectS32SliceSREF, idx, metago.ChangeTypeModify, d))
 			}
 		}
 	}
@@ -314,11 +314,11 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 		for idx, va1 := range va {
 			if idx < len(vb) {
 				vb1 := vb[idx]
-				d1 := metago.Diff{}
+				d1 := &metago.Diff{}
 				if va1 != vb1 {
-					d.Add(Newint64Chg(SliceTestObject, true, vb1, va1))
+					d.Add(metago.NewInt64Chg(&SliceTestObjectS64SliceSREF, vb1, va1))
 				}
-				d1.Changes = append(d.Changes, metago.NewSliceChg(SliceTestObjectS64SliceAID, idx, metago.ChangeTypeModify, &d))
+				d1.Changes = append(d.Changes, metago.NewSliceChg(&SliceTestObjectS64SliceSREF, idx, metago.ChangeTypeModify, d))
 			}
 		}
 	}
@@ -328,11 +328,11 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 		for idx, va1 := range va {
 			if idx < len(vb) {
 				vb1 := vb[idx]
-				d1 := metago.Diff{}
+				d1 := &metago.Diff{}
 				if va1 != vb1 {
-					d.Add(NewstringChg(SliceTestObject, true, vb1, va1))
+					d.Add(metago.NewStringChg(&SliceTestObjectStringSliceSREF, vb1, va1))
 				}
-				d1.Changes = append(d.Changes, metago.NewSliceChg(SliceTestObjectStringSliceAID, idx, metago.ChangeTypeModify, &d))
+				d1.Changes = append(d.Changes, metago.NewSliceChg(&SliceTestObjectStringSliceSREF, idx, metago.ChangeTypeModify, d))
 			}
 		}
 	}
@@ -342,11 +342,11 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 		for idx, va1 := range va {
 			if idx < len(vb) {
 				vb1 := vb[idx]
-				d1 := metago.Diff{}
-				if vaSliceTestObject.Equal(vbSliceTestObject) {
-					d.Add(NewTimeChg(Time.Time, true, vbSliceTestObject, vaSliceTestObject))
+				d1 := &metago.Diff{}
+				if va1.Equal(vb1) {
+					d.Add(metago.NewTimeChg(&SliceTestObjectTimeSliceSREF, vb1, va1))
 				}
-				d1.Changes = append(d.Changes, metago.NewSliceChg(SliceTestObjectTimeSliceAID, idx, metago.ChangeTypeModify, &d))
+				d1.Changes = append(d.Changes, metago.NewSliceChg(&SliceTestObjectTimeSliceSREF, idx, metago.ChangeTypeModify, d))
 			}
 		}
 	}
@@ -356,20 +356,20 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 		for idx, va1 := range va {
 			if idx < len(vb) {
 				vb1 := vb[idx]
-				d1 := metago.Diff{}
+				d1 := &metago.Diff{}
 				for idx1, va11 := range va1 {
 					if idx1 < len(vb1) {
 						vb11 := vb1[idx1]
-						d11 := metago.Diff{}
+						d11 := &metago.Diff{}
 						if va11 != vb11 {
-							d.Add(NewstringChg(SliceTestObject, true, vb11, va11))
+							d.Add(metago.NewStringChg(&SliceTestObjectString2dSliceSREF, vb11, va11))
 						}
-						d11.Changes = append(d1.Changes, metago.NewSliceChg(SliceTestObjectAID, idx1, metago.ChangeTypeModify, &d1))
+						d11.Changes = append(d1.Changes, metago.NewSliceChg(&SliceTestObjectString2dSliceSREF, idx1, metago.ChangeTypeModify, d1))
 					}
 				}
-				d1.Changes = append(d.Changes, metago.NewSliceChg(SliceTestObjectString2dSliceAID, idx, metago.ChangeTypeModify, &d))
+				d1.Changes = append(d.Changes, metago.NewSliceChg(&SliceTestObjectString2dSliceSREF, idx, metago.ChangeTypeModify, d))
 			}
 		}
 	}
-	return true
+	return d
 }

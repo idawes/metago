@@ -14,7 +14,7 @@ const (
 )
 
 type Attrdef struct {
-	ID          AttrID
+	ID          *AttrID
 	Persistence PersistenceClass
 }
 

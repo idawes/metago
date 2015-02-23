@@ -101,6 +101,7 @@ const (
 
 type attrDef interface {
 	AttributeID() int
+	PersistenceClass() persistenceClass
 	Srcline() int
 	Srcfile() string
 	Name() string
@@ -121,6 +122,10 @@ type baseAttrDef struct {
 
 func (a *baseAttrDef) AttributeID() int {
 	return a.attributeID
+}
+
+func (a *baseAttrDef) PersistenceClass() persistenceClass {
+	return a.persistence
 }
 
 func (a *baseAttrDef) Srcline() int {
@@ -151,7 +156,7 @@ func (a *baseAttrDef) GenerateEquals(w *writer, levelID string) {
 }
 
 const baseAttrDiffTemplate = `  if va%[1]s != vb%[1]s {
-		d.Add(New%[2]sChg(%[3]s%[4]s, %[5]t, vb%[1]s, va%[1]s))
+		d.Add(metago.New%[2]sChg(&%[3]s%[4]sSREF, vb%[1]s, va%[1]s))
 	}
 `
 
@@ -160,7 +165,7 @@ func (a *baseAttrDef) GenerateDiff(w *writer, levelID string) {
 		w.printf("    {\n")
 		w.printf("        va, vb := o1.%[1]s, o2.%[1]s\n", a.name)
 	}
-	w.printf(baseAttrDiffTemplate, levelID, a.Type(), a.parentType.name, a.name, a.persistence == persistenceClassPersistent)
+	w.printf(baseAttrDiffTemplate, levelID, strings.Title(a.Type()), a.parentType.name, a.name)
 	if levelID == "" {
 		w.printf("    }\n")
 	}
@@ -170,10 +175,6 @@ func (a *baseAttrDef) GenerateDiff(w *writer, levelID string) {
 /************************** Time Attribute ******************************/
 type timeAttrDef struct {
 	baseAttrDef
-}
-
-func (a *timeAttrDef) Type() string {
-	return "Time"
 }
 
 func (a *timeAttrDef) GenerateEquals(w *writer, levelID string) {
@@ -188,7 +189,7 @@ func (a *timeAttrDef) GenerateEquals(w *writer, levelID string) {
 }
 
 const TimeDiffTemplate = `  if va%[1]s.Equal(vb%[1]s) {
-		d.Add(NewTimeChg(%[2]s%[3]s, %[4]t, vb%[1]s, va%[1]s))
+		d.Add(metago.NewTimeChg(&%[2]s%[3]sSREF, vb%[1]s, va%[1]s))
 	}
 `
 
@@ -197,7 +198,7 @@ func (a *timeAttrDef) GenerateDiff(w *writer, levelID string) {
 		w.printf("    {\n")
 		w.printf("        va, vb := o1.%[1]s, o2.%[1]s\n", a.name)
 	}
-	w.printf(TimeDiffTemplate, a.parentType.name, a.name, strings.Title(a.attrType), a.persistence == persistenceClassPersistent)
+	w.printf(TimeDiffTemplate, levelID, a.parentType.name, a.name)
 	if levelID == "" {
 		w.printf("    }\n")
 	}
@@ -213,7 +214,7 @@ type sliceAttrDef struct {
 
 func newSliceAttrDef(b *baseAttrDef) (*sliceAttrDef, error) {
 	valType := b.attrType[2:]
-	valAttr, err := newAttrDef(&baseAttrDef{parentType: b.parentType, attrType: valType})
+	valAttr, err := newAttrDef(&baseAttrDef{parentType: b.parentType, name: b.name, attrType: valType})
 	if err != nil {
 		return nil, fmt.Errorf("invalid slice attribute specification %s, line %d of file %s", b.attrType, b.srcline, b.srcfile)
 	}
@@ -250,10 +251,10 @@ func (a *sliceAttrDef) GenerateEquals(w *writer, levelID string) {
 const sliceModHeader = `    for idx%[1]s, va%[2]s := range va%[1]s {
 		if idx%[1]s  < len(vb%[1]s) {
 			vb%[2]s := vb%[1]s[idx%[1]s]
-			d%[2]s := metago.Diff{} 
+			d%[2]s := &metago.Diff{} 
 `
 
-const sliceModFooter = `            d%[2]s.Changes = append(d%[1]s.Changes, metago.NewSliceChg(%[3]s, idx%[1]s, metago.ChangeTypeModify, &d%[1]s))
+const sliceModFooter = `            d%[2]s.Changes = append(d%[1]s.Changes, metago.NewSliceChg(&%[3]s, idx%[1]s, metago.ChangeTypeModify, d%[1]s))
 		}
 	}
 `
@@ -266,7 +267,7 @@ func (a *sliceAttrDef) GenerateDiff(w *writer, levelID string) {
 	}
 	w.printf(sliceModHeader, levelID, nextLevelID)
 	a.valAttr.GenerateDiff(w, nextLevelID)
-	w.printf(sliceModFooter, levelID, nextLevelID, fmt.Sprintf("%s%sAID", a.parentType.name, a.name))
+	w.printf(sliceModFooter, levelID, nextLevelID, fmt.Sprintf("%s%sSREF", a.parentType.name, a.name))
 	if levelID == "" {
 		w.printf("    }\n")
 	}

@@ -21,7 +21,7 @@ type BasicAttrTypesObject struct {
 	S32Field    int32
 	S64Field    int64
 	StringField string
-	TimeField   Time
+	TimeField   time.Time
 }
 
 func (this *BasicAttrTypesObject) ConditionalDump(t bool) string {
@@ -31,7 +31,7 @@ func (this *BasicAttrTypesObject) ConditionalDump(t bool) string {
 	return ""
 }
 
-func (this *BasicAttrTypesObject) Dump() (string, error) {
+func (this *BasicAttrTypesObject) Dump() string {
 	return spew.Sdump(*this)
 }
 
@@ -121,78 +121,78 @@ func (o1 *BasicAttrTypesObject) Diff(o2 *BasicAttrTypesObject) (d *metago.Diff) 
 	{
 		va, vb := o1.ByteField, o2.ByteField
 		if va != vb {
-			d.Add(NewbyteChg(BasicAttrTypesObjectByteField, true, vb, va))
+			d.Add(metago.NewByteChg(&BasicAttrTypesObjectByteFieldSREF, vb, va))
 		}
 	}
 
 	{
 		va, vb := o1.U8Field, o2.U8Field
 		if va != vb {
-			d.Add(Newuint8Chg(BasicAttrTypesObjectU8Field, true, vb, va))
+			d.Add(metago.NewUint8Chg(&BasicAttrTypesObjectU8FieldSREF, vb, va))
 		}
 	}
 
 	{
 		va, vb := o1.U16Field, o2.U16Field
 		if va != vb {
-			d.Add(Newuint16Chg(BasicAttrTypesObjectU16Field, true, vb, va))
+			d.Add(metago.NewUint16Chg(&BasicAttrTypesObjectU16FieldSREF, vb, va))
 		}
 	}
 
 	{
 		va, vb := o1.U32Field, o2.U32Field
 		if va != vb {
-			d.Add(Newuint32Chg(BasicAttrTypesObjectU32Field, true, vb, va))
+			d.Add(metago.NewUint32Chg(&BasicAttrTypesObjectU32FieldSREF, vb, va))
 		}
 	}
 
 	{
 		va, vb := o1.U64Field, o2.U64Field
 		if va != vb {
-			d.Add(Newuint64Chg(BasicAttrTypesObjectU64Field, true, vb, va))
+			d.Add(metago.NewUint64Chg(&BasicAttrTypesObjectU64FieldSREF, vb, va))
 		}
 	}
 
 	{
 		va, vb := o1.S8Field, o2.S8Field
 		if va != vb {
-			d.Add(Newint8Chg(BasicAttrTypesObjectS8Field, true, vb, va))
+			d.Add(metago.NewInt8Chg(&BasicAttrTypesObjectS8FieldSREF, vb, va))
 		}
 	}
 
 	{
 		va, vb := o1.S16Field, o2.S16Field
 		if va != vb {
-			d.Add(Newint16Chg(BasicAttrTypesObjectS16Field, true, vb, va))
+			d.Add(metago.NewInt16Chg(&BasicAttrTypesObjectS16FieldSREF, vb, va))
 		}
 	}
 
 	{
 		va, vb := o1.S32Field, o2.S32Field
 		if va != vb {
-			d.Add(Newint32Chg(BasicAttrTypesObjectS32Field, true, vb, va))
+			d.Add(metago.NewInt32Chg(&BasicAttrTypesObjectS32FieldSREF, vb, va))
 		}
 	}
 
 	{
 		va, vb := o1.S64Field, o2.S64Field
 		if va != vb {
-			d.Add(Newint64Chg(BasicAttrTypesObjectS64Field, true, vb, va))
+			d.Add(metago.NewInt64Chg(&BasicAttrTypesObjectS64FieldSREF, vb, va))
 		}
 	}
 
 	{
 		va, vb := o1.StringField, o2.StringField
 		if va != vb {
-			d.Add(NewstringChg(BasicAttrTypesObjectStringField, true, vb, va))
+			d.Add(metago.NewStringChg(&BasicAttrTypesObjectStringFieldSREF, vb, va))
 		}
 	}
 
 	{
 		va, vb := o1.TimeField, o2.TimeField
-		if vaBasicAttrTypesObject.Equal(vbBasicAttrTypesObject) {
-			d.Add(NewTimeChg(TimeFieldTime.Time, true, vbBasicAttrTypesObject, vaBasicAttrTypesObject))
+		if va.Equal(vb) {
+			d.Add(metago.NewTimeChg(&BasicAttrTypesObjectTimeFieldSREF, vb, va))
 		}
 	}
-	return true
+	return d
 }

@@ -32,7 +32,7 @@ func (t *TypeID) Compare(o *TypeID) int {
 
 // AttrID is a globally unique identifier for an attribute in a metago object type
 type AttrID struct {
-	TypeID
+	*TypeID
 	Attr int
 }
 
@@ -40,14 +40,14 @@ func (a *AttrID) Equals(o *AttrID) bool {
 	if a.Attr != o.Attr {
 		return false
 	}
-	if !a.TypeID.Equals(&o.TypeID) {
+	if !a.TypeID.Equals(o.TypeID) {
 		return false
 	}
 	return true
 }
 
 func (a *AttrID) Compare(o *AttrID) int {
-	v := a.TypeID.Compare(&o.TypeID)
+	v := a.TypeID.Compare(o.TypeID)
 	if v != 0 {
 		return v
 	}

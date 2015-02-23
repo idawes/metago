@@ -4,8 +4,12 @@ type Diff struct {
 	Changes []Chg
 }
 
+func (d *Diff) Add(chg Chg) {
+	d.Changes = append(d.Changes, chg)
+}
+
 type Chg interface {
-	AttributeId() AttrID
+	AttributeId() *AttrID
 	Schemaref() *Attrdef
 }
 
@@ -13,7 +17,7 @@ type BaseChg struct {
 	schemaref *Attrdef
 }
 
-func (d *BaseChg) AttributeId() AttrID {
+func (d *BaseChg) AttributeId() *AttrID {
 	return d.schemaref.ID
 }
 
