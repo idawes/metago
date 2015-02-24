@@ -108,6 +108,7 @@ type attrDef interface {
 	Type() string
 	GenerateEquals(w *writer, levelID string)
 	GenerateDiff(w *writer, levelID string)
+	GenerateIns(w *writer, levelID string)
 }
 
 type baseAttrDef struct {
@@ -155,8 +156,13 @@ func (a *baseAttrDef) GenerateEquals(w *writer, levelID string) {
 	}
 }
 
+// parameters:
+// 1: current level id
+// 2: attribute type
+// 3: type name
+// 4: attribute name
 const baseAttrDiffTemplate = `  if va%[1]s != vb%[1]s {
-		d.Add(metago.New%[2]sChg(&%[3]s%[4]sSREF, vb%[1]s, va%[1]s))
+		d%[1]s.Add(metago.New%[2]sChg(&%[3]s%[4]sSREF, vb%[1]s, va%[1]s))
 	}
 `
 
@@ -169,6 +175,10 @@ func (a *baseAttrDef) GenerateDiff(w *writer, levelID string) {
 	if levelID == "" {
 		w.printf("    }\n")
 	}
+}
+
+func (a *baseAttrDef) GenerateIns(w *writer, levelID string) {
+	w.printf("d%[1]s.Add(metago.New%[2]sChg(&%[3]s%[4]sSREF, va%[1]s))\n", levelID, strings.Title(a.Type()), a.parentType.name, a.name)
 }
 
 /************************************************************************/
@@ -188,8 +198,12 @@ func (a *timeAttrDef) GenerateEquals(w *writer, levelID string) {
 	}
 }
 
+// parameters:
+// 1: current level id
+// 2: type name
+// 3: attribute name
 const TimeDiffTemplate = `  if va%[1]s.Equal(vb%[1]s) {
-		d.Add(metago.NewTimeChg(&%[2]s%[3]sSREF, vb%[1]s, va%[1]s))
+		d%[1]s.Add(metago.NewTimeChg(&%[2]s%[3]sSREF, vb%[1]s, va%[1]s))
 	}
 `
 
@@ -202,6 +216,10 @@ func (a *timeAttrDef) GenerateDiff(w *writer, levelID string) {
 	if levelID == "" {
 		w.printf("    }\n")
 	}
+}
+
+func (a *timeAttrDef) GenerateIns(w *writer, levelID string) {
+	w.printf("d%[1]s.Add(metago.NewTimeChg(&%[2]s%[3]sSREF, va%[1]s))\n", levelID, a.parentType.name, a.name)
 }
 
 /************************************************************************/
@@ -248,15 +266,32 @@ func (a *sliceAttrDef) GenerateEquals(w *writer, levelID string) {
 // parameters:
 // 1: current level id
 // 2: next level id
-const sliceModHeader = `    for idx%[1]s, va%[2]s := range va%[1]s {
-		if idx%[1]s  < len(vb%[1]s) {
+const sliceModHeader = `    if idx%[1]s  < len(vb%[1]s) {
 			vb%[2]s := vb%[1]s[idx%[1]s]
 			d%[2]s := &metago.Diff{} 
 `
 
-const sliceModFooter = `            d%[2]s.Changes = append(d%[1]s.Changes, metago.NewSliceChg(&%[3]s, idx%[1]s, metago.ChangeTypeModify, d%[1]s))
+// parameters:
+// 1: current level id
+// 2: next level id
+// 3: type name
+// 4: attribute name
+const sliceModFooter = `            if len(d%[2]s.Changes) != 0 {
+				d%[1]s.Changes = append(d%[1]s.Changes, metago.NewSliceChg(&%[3]s%[4]sSREF, idx%[1]s, metago.ChangeTypeModify, d%[2]s))
+			}
+		} else {
+			d%[2]s := &metago.Diff{}
+`
+
+// parameters:
+// 1: current level id
+// 2: next level id
+// 3: type name
+// 4: attribute name
+const sliceInsFooter = `            if len(d%[2]s.Changes) != 0 {
+				d%[1]s.Changes = append(d%[1]s.Changes, metago.NewSliceChg(&%[3]s%[4]sSREF, idx%[1]s, metago.ChangeTypeInsert, d%[2]s))
+			}
 		}
-	}
 `
 
 func (a *sliceAttrDef) GenerateDiff(w *writer, levelID string) {
@@ -265,12 +300,24 @@ func (a *sliceAttrDef) GenerateDiff(w *writer, levelID string) {
 		w.printf("    {\n")
 		w.printf("        va, vb := o1.%[1]s, o2.%[1]s\n", a.name)
 	}
+	w.printf("    for idx%[1]s, va%[2]s := range va%[1]s {\n", levelID, nextLevelID)
 	w.printf(sliceModHeader, levelID, nextLevelID)
 	a.valAttr.GenerateDiff(w, nextLevelID)
-	w.printf(sliceModFooter, levelID, nextLevelID, fmt.Sprintf("%s%sSREF", a.parentType.name, a.name))
+	w.printf(sliceModFooter, levelID, nextLevelID, a.parentType.name, a.name)
+	a.valAttr.GenerateIns(w, nextLevelID)
+	w.printf(sliceInsFooter, levelID, nextLevelID, a.parentType.name, a.name)
+	w.printf("    }\n")
 	if levelID == "" {
 		w.printf("    }\n")
 	}
+}
+
+func (a *sliceAttrDef) GenerateIns(w *writer, levelID string) {
+	nextLevelID := fmt.Sprintf("%s1", levelID)
+	w.printf("    for idx%[1]s, va%[2]s := range va%[1]s {\n", levelID, nextLevelID)
+	w.printf("        d%s := &metago.Diff{}\n", nextLevelID)
+	a.valAttr.GenerateIns(w, nextLevelID)
+	w.printf("    }\n")
 }
 
 /************************************************************************/
