@@ -217,6 +217,13 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 				}
 			}
 		}
+		for idx, vb1 := range vb {
+			d1 := &metago.Diff{}
+			d1.Add(metago.NewByteChg(&SliceTestObjectByteSliceSREF, vb1))
+			if len(d1.Changes) != 0 {
+				d.Changes = append(d.Changes, metago.NewSliceChg(&SliceTestObjectByteSliceSREF, idx, metago.ChangeTypeDelete, d1))
+			}
+		}
 	}
 
 	{
@@ -237,6 +244,13 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 				if len(d1.Changes) != 0 {
 					d.Changes = append(d.Changes, metago.NewSliceChg(&SliceTestObjectU8SliceSREF, idx, metago.ChangeTypeInsert, d1))
 				}
+			}
+		}
+		for idx, vb1 := range vb {
+			d1 := &metago.Diff{}
+			d1.Add(metago.NewUint8Chg(&SliceTestObjectU8SliceSREF, vb1))
+			if len(d1.Changes) != 0 {
+				d.Changes = append(d.Changes, metago.NewSliceChg(&SliceTestObjectU8SliceSREF, idx, metago.ChangeTypeDelete, d1))
 			}
 		}
 	}
@@ -261,6 +275,13 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 				}
 			}
 		}
+		for idx, vb1 := range vb {
+			d1 := &metago.Diff{}
+			d1.Add(metago.NewUint16Chg(&SliceTestObjectU16SliceSREF, vb1))
+			if len(d1.Changes) != 0 {
+				d.Changes = append(d.Changes, metago.NewSliceChg(&SliceTestObjectU16SliceSREF, idx, metago.ChangeTypeDelete, d1))
+			}
+		}
 	}
 
 	{
@@ -281,6 +302,13 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 				if len(d1.Changes) != 0 {
 					d.Changes = append(d.Changes, metago.NewSliceChg(&SliceTestObjectU32SliceSREF, idx, metago.ChangeTypeInsert, d1))
 				}
+			}
+		}
+		for idx, vb1 := range vb {
+			d1 := &metago.Diff{}
+			d1.Add(metago.NewUint32Chg(&SliceTestObjectU32SliceSREF, vb1))
+			if len(d1.Changes) != 0 {
+				d.Changes = append(d.Changes, metago.NewSliceChg(&SliceTestObjectU32SliceSREF, idx, metago.ChangeTypeDelete, d1))
 			}
 		}
 	}
@@ -305,6 +333,13 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 				}
 			}
 		}
+		for idx, vb1 := range vb {
+			d1 := &metago.Diff{}
+			d1.Add(metago.NewUint64Chg(&SliceTestObjectU64SliceSREF, vb1))
+			if len(d1.Changes) != 0 {
+				d.Changes = append(d.Changes, metago.NewSliceChg(&SliceTestObjectU64SliceSREF, idx, metago.ChangeTypeDelete, d1))
+			}
+		}
 	}
 
 	{
@@ -325,6 +360,13 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 				if len(d1.Changes) != 0 {
 					d.Changes = append(d.Changes, metago.NewSliceChg(&SliceTestObjectS8SliceSREF, idx, metago.ChangeTypeInsert, d1))
 				}
+			}
+		}
+		for idx, vb1 := range vb {
+			d1 := &metago.Diff{}
+			d1.Add(metago.NewInt8Chg(&SliceTestObjectS8SliceSREF, vb1))
+			if len(d1.Changes) != 0 {
+				d.Changes = append(d.Changes, metago.NewSliceChg(&SliceTestObjectS8SliceSREF, idx, metago.ChangeTypeDelete, d1))
 			}
 		}
 	}
@@ -349,6 +391,13 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 				}
 			}
 		}
+		for idx, vb1 := range vb {
+			d1 := &metago.Diff{}
+			d1.Add(metago.NewInt16Chg(&SliceTestObjectS16SliceSREF, vb1))
+			if len(d1.Changes) != 0 {
+				d.Changes = append(d.Changes, metago.NewSliceChg(&SliceTestObjectS16SliceSREF, idx, metago.ChangeTypeDelete, d1))
+			}
+		}
 	}
 
 	{
@@ -369,6 +418,13 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 				if len(d1.Changes) != 0 {
 					d.Changes = append(d.Changes, metago.NewSliceChg(&SliceTestObjectS32SliceSREF, idx, metago.ChangeTypeInsert, d1))
 				}
+			}
+		}
+		for idx, vb1 := range vb {
+			d1 := &metago.Diff{}
+			d1.Add(metago.NewInt32Chg(&SliceTestObjectS32SliceSREF, vb1))
+			if len(d1.Changes) != 0 {
+				d.Changes = append(d.Changes, metago.NewSliceChg(&SliceTestObjectS32SliceSREF, idx, metago.ChangeTypeDelete, d1))
 			}
 		}
 	}
@@ -393,6 +449,13 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 				}
 			}
 		}
+		for idx, vb1 := range vb {
+			d1 := &metago.Diff{}
+			d1.Add(metago.NewInt64Chg(&SliceTestObjectS64SliceSREF, vb1))
+			if len(d1.Changes) != 0 {
+				d.Changes = append(d.Changes, metago.NewSliceChg(&SliceTestObjectS64SliceSREF, idx, metago.ChangeTypeDelete, d1))
+			}
+		}
 	}
 
 	{
@@ -415,6 +478,13 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 				}
 			}
 		}
+		for idx, vb1 := range vb {
+			d1 := &metago.Diff{}
+			d1.Add(metago.NewStringChg(&SliceTestObjectStringSliceSREF, vb1))
+			if len(d1.Changes) != 0 {
+				d.Changes = append(d.Changes, metago.NewSliceChg(&SliceTestObjectStringSliceSREF, idx, metago.ChangeTypeDelete, d1))
+			}
+		}
 	}
 
 	{
@@ -435,6 +505,13 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 				if len(d1.Changes) != 0 {
 					d.Changes = append(d.Changes, metago.NewSliceChg(&SliceTestObjectTimeSliceSREF, idx, metago.ChangeTypeInsert, d1))
 				}
+			}
+		}
+		for idx, vb1 := range vb {
+			d1 := &metago.Diff{}
+			d1.Add(metago.NewTimeChg(&SliceTestObjectTimeSliceSREF, vb1))
+			if len(d1.Changes) != 0 {
+				d.Changes = append(d.Changes, metago.NewSliceChg(&SliceTestObjectTimeSliceSREF, idx, metago.ChangeTypeDelete, d1))
 			}
 		}
 	}
@@ -463,6 +540,13 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 						}
 					}
 				}
+				for idx1, vb11 := range vb1 {
+					d11 := &metago.Diff{}
+					d11.Add(metago.NewStringChg(&SliceTestObjectString2dSliceSREF, vb11))
+					if len(d11.Changes) != 0 {
+						d1.Changes = append(d1.Changes, metago.NewSliceChg(&SliceTestObjectString2dSliceSREF, idx1, metago.ChangeTypeDelete, d11))
+					}
+				}
 				if len(d1.Changes) != 0 {
 					d.Changes = append(d.Changes, metago.NewSliceChg(&SliceTestObjectString2dSliceSREF, idx, metago.ChangeTypeModify, d1))
 				}
@@ -471,10 +555,26 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 				for idx1, va11 := range va1 {
 					d11 := &metago.Diff{}
 					d11.Add(metago.NewStringChg(&SliceTestObjectString2dSliceSREF, va11))
+					if len(d11.Changes) != 0 {
+						d1.Changes = append(d1.Changes, metago.NewSliceChg(&SliceTestObjectString2dSliceSREF, idx1, metago.ChangeTypeInsert, d11))
+					}
 				}
 				if len(d1.Changes) != 0 {
 					d.Changes = append(d.Changes, metago.NewSliceChg(&SliceTestObjectString2dSliceSREF, idx, metago.ChangeTypeInsert, d1))
 				}
+			}
+		}
+		for idx, vb1 := range vb {
+			d1 := &metago.Diff{}
+			for idx1, va11 := range va1 {
+				d11 := &metago.Diff{}
+				d11.Add(metago.NewStringChg(&SliceTestObjectString2dSliceSREF, vb11))
+				if len(d11.Changes) != 0 {
+					d1.Changes = append(d1.Changes, metago.NewSliceChg(&SliceTestObjectString2dSliceSREF, idx1, metago.ChangeTypeDelete, d11))
+				}
+			}
+			if len(d1.Changes) != 0 {
+				d.Changes = append(d.Changes, metago.NewSliceChg(&SliceTestObjectString2dSliceSREF, idx, metago.ChangeTypeDelete, d1))
 			}
 		}
 	}
