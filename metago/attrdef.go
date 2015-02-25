@@ -146,36 +146,33 @@ func (a *baseAttrDef) Type() string {
 	return a.attrType
 }
 
-func (a *baseAttrDef) GenerateEquals(w *writer, levelID string) {
+func (a *baseAttrDef) CheckLevel0Hdr(w *writer, levelID string) {
 	if levelID == "" {
 		w.printf("    {\n")
 		w.printf("        va, vb := o1.%[1]s, o2.%[1]s\n", a.name)
 	}
-	w.printf("  if va%[1]s != vb%[1]s {\n    return false\n  }\n", levelID)
+}
+
+func (a *baseAttrDef) CheckLevel0Ftr(w *writer, levelID string) {
 	if levelID == "" {
 		w.printf("    }\n")
 	}
 }
 
-// parameters:
-// 1: current level id
-// 2: attribute type
-// 3: type name
-// 4: attribute name
-const baseAttrDiffTemplate = `  if va%[1]s != vb%[1]s {
+func (a *baseAttrDef) GenerateEquals(w *writer, levelID string) {
+	a.CheckLevel0Hdr(w, levelID)
+	w.printf("  if va%[1]s != vb%[1]s {\n    return false\n  }\n", levelID)
+	a.CheckLevel0Ftr(w, levelID)
+}
+
+func (a *baseAttrDef) GenerateDiff(w *writer, levelID string) {
+	a.CheckLevel0Hdr(w, levelID)
+	format := `  if va%[1]s != vb%[1]s {
 		d%[1]s.Add(metago.New%[2]sChg(&%[3]s%[4]sSREF, vb%[1]s, va%[1]s))
 	}
 `
-
-func (a *baseAttrDef) GenerateDiff(w *writer, levelID string) {
-	if levelID == "" {
-		w.printf("    {\n")
-		w.printf("        va, vb := o1.%[1]s, o2.%[1]s\n", a.name)
-	}
-	w.printf(baseAttrDiffTemplate, levelID, strings.Title(a.Type()), a.parentType.name, a.name)
-	if levelID == "" {
-		w.printf("    }\n")
-	}
+	w.printf(format, levelID, strings.Title(a.Type()), a.parentType.name, a.name)
+	a.CheckLevel0Ftr(w, levelID)
 }
 
 func (a *baseAttrDef) GenerateIns(w *writer, levelID string) {
@@ -193,14 +190,9 @@ type timeAttrDef struct {
 }
 
 func (a *timeAttrDef) GenerateEquals(w *writer, levelID string) {
-	if levelID == "" {
-		w.printf("    {\n")
-		w.printf("        va, vb := o1.%[1]s, o2.%[1]s\n", a.name)
-	}
+	a.CheckLevel0Hdr(w, levelID)
 	w.printf("  if va%[1]s.Equal(vb%[1]s) {\n    return false\n  }\n", levelID)
-	if levelID == "" {
-		w.printf("    }\n")
-	}
+	a.CheckLevel0Ftr(w, levelID)
 }
 
 // parameters:
@@ -213,14 +205,9 @@ const TimeDiffTemplate = `  if va%[1]s.Equal(vb%[1]s) {
 `
 
 func (a *timeAttrDef) GenerateDiff(w *writer, levelID string) {
-	if levelID == "" {
-		w.printf("    {\n")
-		w.printf("        va, vb := o1.%[1]s, o2.%[1]s\n", a.name)
-	}
+	a.CheckLevel0Hdr(w, levelID)
 	w.printf(TimeDiffTemplate, levelID, a.parentType.name, a.name)
-	if levelID == "" {
-		w.printf("    }\n")
-	}
+	a.CheckLevel0Ftr(w, levelID)
 }
 
 func (a *timeAttrDef) GenerateIns(w *writer, levelID string) {
@@ -250,10 +237,7 @@ func newSliceAttrDef(b *baseAttrDef) (*sliceAttrDef, error) {
 
 func (a *sliceAttrDef) GenerateEquals(w *writer, levelID string) {
 	nextLevelID := fmt.Sprintf("%s1", levelID)
-	if levelID == "" {
-		w.printf("    {\n")
-		w.printf("        va, vb := o1.%[1]s, o2.%[1]s\n", a.name)
-	}
+	a.CheckLevel0Hdr(w, levelID)
 	format := `    if len(va%[1]s) != len(vb%[1]s) {
         return false
     }
@@ -263,17 +247,12 @@ func (a *sliceAttrDef) GenerateEquals(w *writer, levelID string) {
 	w.printf(format, levelID, nextLevelID)
 	a.valAttr.GenerateEquals(w, nextLevelID)
 	w.printf("  }\n")
-	if levelID == "" {
-		w.printf("    }\n")
-	}
+	a.CheckLevel0Ftr(w, levelID)
 }
 
 func (a *sliceAttrDef) GenerateDiff(w *writer, levelID string) {
 	nextLevelID := fmt.Sprintf("%s1", levelID)
-	if levelID == "" {
-		w.printf("    {\n")
-		w.printf("        va, vb := o1.%[1]s, o2.%[1]s\n", a.name)
-	}
+	a.CheckLevel0Hdr(w, levelID)
 	format := `    for idx%[1]s, va%[2]s := range va%[1]s {
         if idx%[1]s  < len(vb%[1]s) {
 			vb%[2]s := vb%[1]s[idx%[1]s]
@@ -305,9 +284,7 @@ func (a *sliceAttrDef) GenerateDiff(w *writer, levelID string) {
 	}
 `
 	w.printf(format, levelID, nextLevelID, a.parentType.name, a.name)
-	if levelID == "" {
-		w.printf("    }\n")
-	}
+	a.CheckLevel0Ftr(w, levelID)
 }
 
 func (a *sliceAttrDef) GenerateIns(w *writer, levelID string) {
