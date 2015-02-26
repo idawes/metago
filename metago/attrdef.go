@@ -38,13 +38,13 @@ func parseAttribute(t *typedef, r *reader) (attrDef, error) {
 			return nil, fmt.Errorf("unrecognized persistence type \"%s\", line %d of file %s", fields[3], r.line, r.f.Name())
 		}
 	}
-	return newAttrDef(&baseAttrDef{parentType: t, attributeID: id, name: name, attrType: fields[2], persistence: p, srcline: r.line, srcfile: r.f.Name()})
+	return newAttrDef(&baseAttrDef{parentType: t, attrID: id, nm: name, typ: fields[2], persistence: p, sline: r.line, sfile: r.f.Name()})
 }
 
 func newAttrDef(b *baseAttrDef) (attrDef, error) {
-	c, err := getClass(b.attrType)
+	c, err := getClass(b.typ)
 	if err != nil {
-		return nil, fmt.Errorf("unknown attribute class %s, line %d of file %s", b.attrType, b.srcline, b.srcfile)
+		return nil, fmt.Errorf("unknown attribute class %s, line %d of file %s", b.typ, b.sline, b.sfile)
 	}
 	switch c {
 	case attrClassBuiltin:
@@ -58,7 +58,7 @@ func newAttrDef(b *baseAttrDef) (attrDef, error) {
 	case attrClassStruct:
 		return newStructAttrDef(b)
 	}
-	return nil, fmt.Errorf("Unknown attribute class %s, line %d of file %s", c, b.srcline, b.srcfile)
+	return nil, fmt.Errorf("Unknown attribute class %s, line %d of file %s", c, b.sline, b.sfile)
 }
 
 func getClass(n string) (attrClass, error) {
@@ -100,87 +100,87 @@ const (
 )
 
 type attrDef interface {
-	AttributeID() int
-	PersistenceClass() persistenceClass
-	Srcline() int
-	Srcfile() string
-	Name() string
-	Type() string
-	GenerateEquals(w *writer, levelID string)
-	GenerateDiff(w *writer, levelID string)
-	GenerateIns(w *writer, levelID string)
-	GenerateDel(w *writer, levelID string)
+	attributeID() int
+	persistenceClass() persistenceClass
+	srcline() int
+	srcfile() string
+	name() string
+	typeName() string
+	generateEquals(w *writer, levelID string)
+	generateDiff(w *writer, levelID string)
+	generateIns(w *writer, levelID string)
+	generateDel(w *writer, levelID string)
 }
 
 type baseAttrDef struct {
 	parentType  *typedef
-	attributeID int
-	name        string
-	attrType    string
+	attrID      int
+	nm          string
+	typ         string
 	persistence persistenceClass
-	srcline     int
-	srcfile     string
+	sline       int
+	sfile       string
 }
 
-func (a *baseAttrDef) AttributeID() int {
-	return a.attributeID
+func (a *baseAttrDef) attributeID() int {
+	return a.attrID
 }
 
-func (a *baseAttrDef) PersistenceClass() persistenceClass {
+func (a *baseAttrDef) persistenceClass() persistenceClass {
 	return a.persistence
 }
 
-func (a *baseAttrDef) Srcline() int {
-	return a.srcline
+func (a *baseAttrDef) srcline() int {
+	return a.sline
 }
 
-func (a *baseAttrDef) Srcfile() string {
-	return a.srcfile
+func (a *baseAttrDef) srcfile() string {
+	return a.sfile
 }
 
-func (a *baseAttrDef) Name() string {
-	return a.name
+func (a *baseAttrDef) name() string {
+	return a.nm
 }
 
-func (a *baseAttrDef) Type() string {
-	return a.attrType
+func (a *baseAttrDef) typeName() string {
+	return a.typ
 }
 
-func (a *baseAttrDef) CheckLevel0Hdr(w *writer, levelID string) {
+func (a *baseAttrDef) checkLevel0Hdr(w *writer, levelID string) {
 	if levelID == "" {
 		w.printf("    {\n")
-		w.printf("        va, vb := o1.%[1]s, o2.%[1]s\n", a.name)
+		w.printf("        va, vb := o1.%[1]s, o2.%[1]s\n", a.nm)
 	}
 }
 
-func (a *baseAttrDef) CheckLevel0Ftr(w *writer, levelID string) {
+func (a *baseAttrDef) checkLevel0Ftr(w *writer, levelID string) {
 	if levelID == "" {
 		w.printf("    }\n")
 	}
 }
 
-func (a *baseAttrDef) GenerateEquals(w *writer, levelID string) {
-	a.CheckLevel0Hdr(w, levelID)
+func (a *baseAttrDef) generateEquals(w *writer, levelID string) {
+	a.checkLevel0Hdr(w, levelID)
 	w.printf("  if va%[1]s != vb%[1]s {\n    return false\n  }\n", levelID)
-	a.CheckLevel0Ftr(w, levelID)
+	a.checkLevel0Ftr(w, levelID)
 }
 
-func (a *baseAttrDef) GenerateDiff(w *writer, levelID string) {
-	a.CheckLevel0Hdr(w, levelID)
+func (a *baseAttrDef) generateDiff(w *writer, levelID string) {
+	a.checkLevel0Hdr(w, levelID)
 	format := `  if va%[1]s != vb%[1]s {
 		d%[1]s.Add(metago.New%[2]sChg(&%[3]s%[4]sSREF, vb%[1]s, va%[1]s))
 	}
 `
-	w.printf(format, levelID, strings.Title(a.Type()), a.parentType.name, a.name)
-	a.CheckLevel0Ftr(w, levelID)
+	w.printf(format, levelID, strings.Title(a.typeName()), a.parentType.name, a.nm)
+	a.checkLevel0Ftr(w, levelID)
 }
 
-func (a *baseAttrDef) GenerateIns(w *writer, levelID string) {
-	w.printf("d%[1]s.Add(metago.New%[2]sChg(&%[3]s%[4]sSREF, va%[1]s))\n", levelID, strings.Title(a.Type()), a.parentType.name, a.name)
+func (a *baseAttrDef) generateIns(w *writer, levelID string) {
+	w.printf("d%[1]s.Add(metago.New%[2]sChg(&%[3]s%[4]sSREF, va%[1]s))\n", levelID, strings.Title(a.typeName()), a.parentType.name, a.nm)
 }
 
-func (a *baseAttrDef) GenerateDel(w *writer, levelID string) {
-	w.printf("d%[1]s.Add(metago.New%[2]sChg(&%[3]s%[4]sSREF, vb%[1]s))\n", levelID, strings.Title(a.Type()), a.parentType.name, a.name)
+func (a *baseAttrDef) generateDel(w *writer, levelID string) {
+	w.printf("d%[1]s.Add(metago.New%[2]sChg(&%[3]s%[4]sSREF, vb%[1]s))\n", levelID, strings.Title(a.typeName()), a.parentType.name, a.nm)
 }
 
 /************************************************************************/
@@ -189,33 +189,28 @@ type timeAttrDef struct {
 	baseAttrDef
 }
 
-func (a *timeAttrDef) GenerateEquals(w *writer, levelID string) {
-	a.CheckLevel0Hdr(w, levelID)
+func (a *timeAttrDef) generateEquals(w *writer, levelID string) {
+	a.checkLevel0Hdr(w, levelID)
 	w.printf("  if va%[1]s.Equal(vb%[1]s) {\n    return false\n  }\n", levelID)
-	a.CheckLevel0Ftr(w, levelID)
+	a.checkLevel0Ftr(w, levelID)
 }
 
-// parameters:
-// 1: current level id
-// 2: type name
-// 3: attribute name
-const TimeDiffTemplate = `  if va%[1]s.Equal(vb%[1]s) {
+func (a *timeAttrDef) generateDiff(w *writer, levelID string) {
+	a.checkLevel0Hdr(w, levelID)
+	format := `  if va%[1]s.Equal(vb%[1]s) {
 		d%[1]s.Add(metago.NewTimeChg(&%[2]s%[3]sSREF, vb%[1]s, va%[1]s))
 	}
 `
-
-func (a *timeAttrDef) GenerateDiff(w *writer, levelID string) {
-	a.CheckLevel0Hdr(w, levelID)
-	w.printf(TimeDiffTemplate, levelID, a.parentType.name, a.name)
-	a.CheckLevel0Ftr(w, levelID)
+	w.printf(format, levelID, a.parentType.name, a.nm)
+	a.checkLevel0Ftr(w, levelID)
 }
 
-func (a *timeAttrDef) GenerateIns(w *writer, levelID string) {
-	w.printf("d%[1]s.Add(metago.NewTimeChg(&%[2]s%[3]sSREF, va%[1]s))\n", levelID, a.parentType.name, a.name)
+func (a *timeAttrDef) generateIns(w *writer, levelID string) {
+	w.printf("d%[1]s.Add(metago.NewTimeChg(&%[2]s%[3]sSREF, va%[1]s))\n", levelID, a.parentType.name, a.nm)
 }
 
-func (a *timeAttrDef) GenerateDel(w *writer, levelID string) {
-	w.printf("d%[1]s.Add(metago.NewTimeChg(&%[2]s%[3]sSREF, vb%[1]s))\n", levelID, a.parentType.name, a.name)
+func (a *timeAttrDef) generateDel(w *writer, levelID string) {
+	w.printf("d%[1]s.Add(metago.NewTimeChg(&%[2]s%[3]sSREF, vb%[1]s))\n", levelID, a.parentType.name, a.nm)
 }
 
 /************************************************************************/
@@ -227,17 +222,17 @@ type sliceAttrDef struct {
 }
 
 func newSliceAttrDef(b *baseAttrDef) (*sliceAttrDef, error) {
-	valType := b.attrType[2:]
-	valAttr, err := newAttrDef(&baseAttrDef{parentType: b.parentType, name: b.name, attrType: valType})
+	valType := b.typ[2:]
+	valAttr, err := newAttrDef(&baseAttrDef{parentType: b.parentType, nm: b.nm, typ: valType})
 	if err != nil {
-		return nil, fmt.Errorf("invalid slice attribute specification %s, line %d of file %s", b.attrType, b.srcline, b.srcfile)
+		return nil, fmt.Errorf("invalid slice attribute specification %s, line %d of file %s", b.typ, b.sline, b.sfile)
 	}
 	return &sliceAttrDef{baseAttrDef: *b, valType: valType, valAttr: valAttr}, nil
 }
 
-func (a *sliceAttrDef) GenerateEquals(w *writer, levelID string) {
+func (a *sliceAttrDef) generateEquals(w *writer, levelID string) {
 	nextLevelID := fmt.Sprintf("%s1", levelID)
-	a.CheckLevel0Hdr(w, levelID)
+	a.checkLevel0Hdr(w, levelID)
 	format := `    if len(va%[1]s) != len(vb%[1]s) {
         return false
     }
@@ -245,29 +240,29 @@ func (a *sliceAttrDef) GenerateEquals(w *writer, levelID string) {
 		vb%[2]s := vb%[1]s[idx%[1]s]
 `
 	w.printf(format, levelID, nextLevelID)
-	a.valAttr.GenerateEquals(w, nextLevelID)
+	a.valAttr.generateEquals(w, nextLevelID)
 	w.printf("  }\n")
-	a.CheckLevel0Ftr(w, levelID)
+	a.checkLevel0Ftr(w, levelID)
 }
 
-func (a *sliceAttrDef) GenerateDiff(w *writer, levelID string) {
+func (a *sliceAttrDef) generateDiff(w *writer, levelID string) {
 	nextLevelID := fmt.Sprintf("%s1", levelID)
-	a.CheckLevel0Hdr(w, levelID)
+	a.checkLevel0Hdr(w, levelID)
 	format := `    for idx%[1]s, va%[2]s := range va%[1]s {
         if idx%[1]s  < len(vb%[1]s) {
 			vb%[2]s := vb%[1]s[idx%[1]s]
 			d%[2]s := &metago.Diff{} 
 `
 	w.printf(format, levelID, nextLevelID)
-	a.valAttr.GenerateDiff(w, nextLevelID)
+	a.valAttr.generateDiff(w, nextLevelID)
 	format = `            if len(d%[2]s.Changes) != 0 {
 				d%[1]s.Changes = append(d%[1]s.Changes, metago.NewSliceChg(&%[3]s%[4]sSREF, idx%[1]s, metago.ChangeTypeModify, d%[2]s))
 			}
 		} else {
 			d%[2]s := &metago.Diff{}
 `
-	w.printf(format, levelID, nextLevelID, a.parentType.name, a.name)
-	a.valAttr.GenerateIns(w, nextLevelID)
+	w.printf(format, levelID, nextLevelID, a.parentType.name, a.nm)
+	a.valAttr.generateIns(w, nextLevelID)
 	format = `            if len(d%[2]s.Changes) != 0 {
 				d%[1]s.Changes = append(d%[1]s.Changes, metago.NewSliceChg(&%[3]s%[4]sSREF, idx%[1]s, metago.ChangeTypeInsert, d%[2]s))
 			}
@@ -276,45 +271,45 @@ func (a *sliceAttrDef) GenerateDiff(w *writer, levelID string) {
 	for idx%[1]s, vb%[2]s := range vb%[1]s {
 	    d%[2]s := &metago.Diff{}
 `
-	w.printf(format, levelID, nextLevelID, a.parentType.name, a.name)
-	a.valAttr.GenerateDel(w, nextLevelID)
+	w.printf(format, levelID, nextLevelID, a.parentType.name, a.nm)
+	a.valAttr.generateDel(w, nextLevelID)
 	format = `        if len(d%[2]s.Changes) != 0 {
 		    d%[1]s.Changes = append(d%[1]s.Changes, metago.NewSliceChg(&%[3]s%[4]sSREF, idx%[1]s, metago.ChangeTypeDelete, d%[2]s))
         }
 	}
 `
-	w.printf(format, levelID, nextLevelID, a.parentType.name, a.name)
-	a.CheckLevel0Ftr(w, levelID)
+	w.printf(format, levelID, nextLevelID, a.parentType.name, a.nm)
+	a.checkLevel0Ftr(w, levelID)
 }
 
-func (a *sliceAttrDef) GenerateIns(w *writer, levelID string) {
+func (a *sliceAttrDef) generateIns(w *writer, levelID string) {
 	nextLevelID := fmt.Sprintf("%s1", levelID)
 	format := `    for idx%[1]s, va%[2]s := range va%[1]s {
 		d%s := &metago.Diff{}
 `
 	w.printf(format, levelID, nextLevelID)
-	a.valAttr.GenerateIns(w, nextLevelID)
+	a.valAttr.generateIns(w, nextLevelID)
 	format = `        if len(d%[2]s.Changes) != 0 {
 		    d%[1]s.Changes = append(d%[1]s.Changes, metago.NewSliceChg(&%[3]s%[4]sSREF, idx%[1]s, metago.ChangeTypeInsert, d%[2]s))
 	    }
 	}
 `
-	w.printf(format, levelID, nextLevelID, a.parentType.name, a.name)
+	w.printf(format, levelID, nextLevelID, a.parentType.name, a.nm)
 }
 
-func (a *sliceAttrDef) GenerateDel(w *writer, levelID string) {
+func (a *sliceAttrDef) generateDel(w *writer, levelID string) {
 	nextLevelID := fmt.Sprintf("%s1", levelID)
 	format := `    for idx%[1]s, va%[2]s := range va%[1]s {
 		d%s := &metago.Diff{}
 `
 	w.printf(format, levelID, nextLevelID)
-	a.valAttr.GenerateDel(w, nextLevelID)
+	a.valAttr.generateDel(w, nextLevelID)
 	format = `        if len(d%[2]s.Changes) != 0 {
 		    d%[1]s.Changes = append(d%[1]s.Changes, metago.NewSliceChg(&%[3]s%[4]sSREF, idx%[1]s, metago.ChangeTypeDelete, d%[2]s))
 	    }
 	}
 `
-	w.printf(format, levelID, nextLevelID, a.parentType.name, a.name)
+	w.printf(format, levelID, nextLevelID, a.parentType.name, a.nm)
 }
 
 /************************************************************************/
@@ -329,20 +324,20 @@ type mapAttrDef struct {
 
 func newMapAttrDef(b *baseAttrDef) (*mapAttrDef, error) {
 	// map[int]string
-	i := strings.Index(b.attrType, "[")
-	j := strings.Index(b.attrType, "]")
+	i := strings.Index(b.typ, "[")
+	j := strings.Index(b.typ, "]")
 	if i == -1 || j == -1 {
-		return nil, fmt.Errorf("invalid map attribute specification %s, line %d of file %s", b.attrType, b.srcline, b.srcfile)
+		return nil, fmt.Errorf("invalid map attribute specification %s, line %d of file %s", b.typ, b.sline, b.sfile)
 	}
-	keyType := b.attrType[i+1 : j]
-	keyAttr, err := newAttrDef(&baseAttrDef{attrType: keyType})
+	keyType := b.typ[i+1 : j]
+	keyAttr, err := newAttrDef(&baseAttrDef{typ: keyType})
 	if err != nil {
-		return nil, fmt.Errorf("invalid map attribute specification %s, line %d of file %s", b.attrType, b.srcline, b.srcfile)
+		return nil, fmt.Errorf("invalid map attribute specification %s, line %d of file %s", b.typ, b.sline, b.sfile)
 	}
-	valType := b.attrType[j+1:]
-	valAttr, err := newAttrDef(&baseAttrDef{attrType: valType})
+	valType := b.typ[j+1:]
+	valAttr, err := newAttrDef(&baseAttrDef{typ: valType})
 	if err != nil {
-		return nil, fmt.Errorf("invalid map attribute specification %s, line %d of file %s", b.attrType, b.srcline, b.srcfile)
+		return nil, fmt.Errorf("invalid map attribute specification %s, line %d of file %s", b.typ, b.sline, b.sfile)
 	}
 	return &mapAttrDef{baseAttrDef: *b, keyType: keyType, keyAttr: keyAttr, valType: valType, valAttr: valAttr}, nil
 }

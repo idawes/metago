@@ -52,7 +52,7 @@ type attrdefList []attrDef
 
 func (l attrdefList) Len() int           { return len(l) }
 func (l attrdefList) Swap(i, j int)      { l[i], l[j] = l[j], l[i] }
-func (l attrdefList) Less(i, j int) bool { return l[i].AttributeID() < l[j].AttributeID() }
+func (l attrdefList) Less(i, j int) bool { return l[i].attributeID() < l[j].attributeID() }
 
 /*
 	Main internal entry point for parsing a type definition.
@@ -224,10 +224,10 @@ func (t *typedef) parseAttributeBlock(r *reader) error {
 		if err != nil {
 			return err
 		}
-		if old, present := t.attrDefsByID[a.AttributeID()]; present {
-			return fmt.Errorf("duplicate defintion of attribute id %d on line %d of file %s\n   It is also defined on line %d of file %s", a.AttributeID(), a.Srcline(), a.Srcfile(), old.Srcline(), old.Srcfile())
+		if old, present := t.attrDefsByID[a.attributeID()]; present {
+			return fmt.Errorf("duplicate defintion of attribute id %d on line %d of file %s\n   It is also defined on line %d of file %s", a.attributeID(), a.srcline(), a.srcfile(), old.srcline(), old.srcfile())
 		}
-		t.attrDefsByID[a.AttributeID()] = a
+		t.attrDefsByID[a.attributeID()] = a
 		if *veryVerbose {
 			fmt.Printf("      Found attribute spec: %v\n", a)
 		}
@@ -329,7 +329,7 @@ func (t *typedef) generateAttributes(w *writer) {
 		t.extends.generateAttributes(w)
 	}
 	for _, a := range t.attrDefsByIDInOrder {
-		w.printf("  %s %s\n", a.Name(), a.Type())
+		w.printf("  %s %s\n", a.name(), a.typeName())
 	}
 }
 
@@ -389,7 +389,7 @@ func (t *typedef) generateAttrEquals(w *writer) {
 	}
 	for _, a := range t.attrDefsByIDInOrder {
 		w.printf("\n")
-		a.GenerateEquals(w, "")
+		a.generateEquals(w, "")
 	}
 }
 
@@ -406,7 +406,7 @@ func (t *typedef) generateAttrDiffs(w *writer) {
 	}
 	for _, a := range t.attrDefsByIDInOrder {
 		w.printf("\n")
-		a.GenerateDiff(w, "")
+		a.generateDiff(w, "")
 	}
 }
 
@@ -419,7 +419,7 @@ func (t *typedef) generateSchema(w *writer) {
 	}
 	w.printf("\n  %sTID metago.TypeID = metago.TypeID{Pkg: &MetagoPackageUUID, Typ: %d}\n", t.name, t.typeID.typ)
 	for _, a := range t.attrDefsByIDInOrder {
-		w.printf("  %[1]s%[2]sAID metago.AttrID = metago.AttrID{TypeID: &%[1]sTID, Attr: %[3]d}\n", t.name, a.Name(), a.AttributeID())
-		w.printf("  %[1]s%[2]sSREF metago.Attrdef = metago.Attrdef{ID: &%[1]s%[2]sAID, Persistence: metago.%[3]s}\n", t.name, a.Name(), strings.Title(a.PersistenceClass().String()))
+		w.printf("  %[1]s%[2]sAID metago.AttrID = metago.AttrID{TypeID: &%[1]sTID, Attr: %[3]d}\n", t.name, a.name(), a.attributeID())
+		w.printf("  %[1]s%[2]sSREF metago.Attrdef = metago.Attrdef{ID: &%[1]s%[2]sAID, Persistence: metago.%[3]s}\n", t.name, a.name(), strings.Title(a.persistenceClass().String()))
 	}
 }
