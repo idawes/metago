@@ -2,14 +2,14 @@
 
 package metago
 
-type Uint64Chg struct {
+type @@T@@Chg struct {
     BaseChg
-    OldValue uint64
-    NewValue uint64
+    OldValue @@t@@
+    NewValue @@t@@
 }
 
-func NewUint64Chg(s *Attrdef, values ...uint64) Chg {
-    d := Uint64Chg{BaseChg: BaseChg{schemaref: s}}
+func New@@T@@Chg(s *Attrdef, values ...@@t@@) Chg {
+    d := @@T@@Chg{BaseChg: BaseChg{schemaref: s}}
     if len(values) > 0 {
         d.NewValue = values[0]
     }

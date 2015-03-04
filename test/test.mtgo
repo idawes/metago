@@ -77,7 +77,14 @@ type 3 SliceTestObject concrete {
 	}
 }
 
-type 4 StructTestObject concrete {
+type 6 MapTestObject concrete {
+    attributes {
+        1 o1 map[byte]string
+        2 o2 map[byte]map[byte]string
+    }
+}
+
+type 5 StructTestObject concrete {
 	attributes {
 		1 B BasicAttrTypesObject
 	}

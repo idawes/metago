@@ -1,8 +1,12 @@
 package metago
 
-type @@T@@MapAttrChg struct {
-    BaseAttrChg
-    key @@t@@
-    typ ChangeType
-    chg AttrChg
+type @@T@@MapChg struct {
+    BaseChg
+    Key @@t@@
+    Typ ChangeType
+    Chgs Diff
+}
+
+func New@@T@@MapChg(s *Attrdef, key @@t@@, typ ChangeType, chgs *Diff) Chg {
+    return &@@T@@MapChg{BaseChg: BaseChg{schemaref: s}, Key: key, Typ: typ, Chgs: *chgs}
 }

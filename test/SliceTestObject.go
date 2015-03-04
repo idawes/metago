@@ -566,7 +566,7 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
 		}
 		for idx, vb1 := range vb {
 			d1 := &metago.Diff{}
-			for idx1, va11 := range va1 {
+			for idx1, vb11 := range vb1 {
 				d11 := &metago.Diff{}
 				d11.Add(metago.NewStringChg(&SliceTestObjectString2dSliceSREF, vb11))
 				if len(d11.Changes) != 0 {
