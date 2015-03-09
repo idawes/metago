@@ -251,7 +251,7 @@ func (a *sliceAttrDef) generateDiff(w *writer, levelID string) {
 	format := `    for idx%[1]s, va%[2]s := range va%[1]s {
         if idx%[1]s  < len(vb%[1]s) {
 			vb%[2]s := vb%[1]s[idx%[1]s]
-			d%[2]s := &metago.Diff{} 
+			d%[2]s := &metago.Diff{}
 `
 	w.printf(format, levelID, nextLevelID)
 	a.valAttr.generateDiff(w, nextLevelID)
@@ -269,12 +269,12 @@ func (a *sliceAttrDef) generateDiff(w *writer, levelID string) {
 		}
 	}
 	for idx%[1]s, vb%[2]s := range vb%[1]s {
-	    d%[2]s := &metago.Diff{}
+		d%[2]s := &metago.Diff{}
 `
 	w.printf(format, levelID, nextLevelID, a.parentType.name, a.nm)
 	a.valAttr.generateDel(w, nextLevelID)
 	format = `        if len(d%[2]s.Changes) != 0 {
-		    d%[1]s.Changes = append(d%[1]s.Changes, metago.NewSliceChg(&%[3]s%[4]sSREF, idx%[1]s, metago.ChangeTypeDelete, d%[2]s))
+			d%[1]s.Changes = append(d%[1]s.Changes, metago.NewSliceChg(&%[3]s%[4]sSREF, idx%[1]s, metago.ChangeTypeDelete, d%[2]s))
         }
 	}
 `
@@ -290,8 +290,8 @@ func (a *sliceAttrDef) generateIns(w *writer, levelID string) {
 	w.printf(format, levelID, nextLevelID)
 	a.valAttr.generateIns(w, nextLevelID)
 	format = `        if len(d%[2]s.Changes) != 0 {
-		    d%[1]s.Changes = append(d%[1]s.Changes, metago.NewSliceChg(&%[3]s%[4]sSREF, idx%[1]s, metago.ChangeTypeInsert, d%[2]s))
-	    }
+			d%[1]s.Changes = append(d%[1]s.Changes, metago.NewSliceChg(&%[3]s%[4]sSREF, idx%[1]s, metago.ChangeTypeInsert, d%[2]s))
+		}
 	}
 `
 	w.printf(format, levelID, nextLevelID, a.parentType.name, a.nm)
@@ -305,8 +305,8 @@ func (a *sliceAttrDef) generateDel(w *writer, levelID string) {
 	w.printf(format, levelID, nextLevelID)
 	a.valAttr.generateDel(w, nextLevelID)
 	format = `        if len(d%[2]s.Changes) != 0 {
-		    d%[1]s.Changes = append(d%[1]s.Changes, metago.NewSliceChg(&%[3]s%[4]sSREF, idx%[1]s, metago.ChangeTypeDelete, d%[2]s))
-	    }
+			d%[1]s.Changes = append(d%[1]s.Changes, metago.NewSliceChg(&%[3]s%[4]sSREF, idx%[1]s, metago.ChangeTypeDelete, d%[2]s))
+		}
 	}
 `
 	w.printf(format, levelID, nextLevelID, a.parentType.name, a.nm)
@@ -354,7 +354,7 @@ func (a *mapAttrDef) generateEquals(w *writer, levelID string) {
 	w.printf(format, levelID, nextLevelID)
 	a.valAttr.generateEquals(w, nextLevelID)
 	format = `        } else {
-		    return false // didn't find key%[1]s in vb%[1]s
+			return false // didn't find key%[1]s in vb%[1]s
 		}
     }
 `
@@ -367,7 +367,7 @@ func (a *mapAttrDef) generateDiff(w *writer, levelID string) {
 	a.checkLevel0Hdr(w, levelID)
 	format := `    for key%[1]s, va%[2]s := range va%[1]s {
 		if vb%[2]s, ok := vb%[1]s[key%[1]s]; ok {
-			d%[2]s := &metago.Diff{} 
+			d%[2]s := &metago.Diff{}
 `
 	w.printf(format, levelID, nextLevelID)
 	a.valAttr.generateDiff(w, nextLevelID)
@@ -385,12 +385,12 @@ func (a *mapAttrDef) generateDiff(w *writer, levelID string) {
 		}
 	}
 	for key%[1]s, vb%[2]s := range vb%[1]s {
-	    d%[2]s := &metago.Diff{}
+		d%[2]s := &metago.Diff{}
 `
 	w.printf(format, levelID, nextLevelID, strings.Title(a.keyType), a.parentType.name, a.nm)
 	a.valAttr.generateDel(w, nextLevelID)
 	format = `        if len(d%[2]s.Changes) != 0 {
-		    d%[1]s.Changes = append(d%[1]s.Changes, metago.New%[3]sMapChg(&%[4]s%[5]sSREF, key%[1]s, metago.ChangeTypeDelete, d%[2]s))
+			d%[1]s.Changes = append(d%[1]s.Changes, metago.New%[3]sMapChg(&%[4]s%[5]sSREF, key%[1]s, metago.ChangeTypeDelete, d%[2]s))
         }
 	}
 `
@@ -406,8 +406,8 @@ func (a *mapAttrDef) generateIns(w *writer, levelID string) {
 	w.printf(format, levelID, nextLevelID)
 	a.valAttr.generateIns(w, nextLevelID)
 	format = `        if len(d%[2]s.Changes) != 0 {
-		    d%[1]s.Changes = append(d%[1]s.Changes, metago.New%[3]sMapChg(&%[4]s%[5]sSREF, key%[1]s, metago.ChangeTypeInsert, d%[2]s))
-	    }
+			d%[1]s.Changes = append(d%[1]s.Changes, metago.New%[3]sMapChg(&%[4]s%[5]sSREF, key%[1]s, metago.ChangeTypeInsert, d%[2]s))
+		}
 	}
 `
 	w.printf(format, levelID, nextLevelID, strings.Title(a.keyType), a.parentType.name, a.nm)
@@ -421,8 +421,8 @@ func (a *mapAttrDef) generateDel(w *writer, levelID string) {
 	w.printf(format, levelID, nextLevelID)
 	a.valAttr.generateDel(w, nextLevelID)
 	format = `        if len(d%[2]s.Changes) != 0 {
-		    d%[1]s.Changes = append(d%[1]s.Changes, metago.New%[3]sMapChg(&%[4]s%[5]sSREF, key%[1]s, metago.ChangeTypeDelete, d%[2]s))
-	    }
+			d%[1]s.Changes = append(d%[1]s.Changes, metago.New%[3]sMapChg(&%[4]s%[5]sSREF, key%[1]s, metago.ChangeTypeDelete, d%[2]s))
+		}
 	}
 `
 	w.printf(format, levelID, nextLevelID, strings.Title(a.keyType), a.parentType.name, a.nm)
