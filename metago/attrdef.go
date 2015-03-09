@@ -438,3 +438,9 @@ type structAttrDef struct {
 func newStructAttrDef(b *baseAttrDef) (*structAttrDef, error) {
 	return &structAttrDef{baseAttrDef: *b}, nil
 }
+
+func (a *structAttrDef) generateEquals(w *writer, levelID string) {
+	a.checkLevel0Hdr(w, levelID)
+	w.printf("  if va%[1]s.Equals(vb%[1]s) {\n    return false\n  }\n", levelID)
+	a.checkLevel0Ftr(w, levelID)
+}

@@ -16,7 +16,7 @@ func (o1 *StructTestObject) Equals(o2 *StructTestObject) bool {
 
 	{
 		va, vb := o1.B, o2.B
-		if va != vb {
+		if va.Equals(vb) {
 			return false
 		}
 	}
