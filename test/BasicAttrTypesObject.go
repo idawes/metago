@@ -22,6 +22,8 @@ type BasicAttrTypesObject struct {
 	S16Field    int16
 	S32Field    int32
 	S64Field    int64
+	F32Field    float32
+	F64Field    float64
 	StringField string
 	TimeField   time.Time
 }
@@ -111,6 +113,20 @@ func (o1 *BasicAttrTypesObject) Equals(o2 *BasicAttrTypesObject) bool {
 
 	{
 		va, vb := o1.S64Field, o2.S64Field
+		if va != vb {
+			return false
+		}
+	}
+
+	{
+		va, vb := o1.F32Field, o2.F32Field
+		if va != vb {
+			return false
+		}
+	}
+
+	{
+		va, vb := o1.F64Field, o2.F64Field
 		if va != vb {
 			return false
 		}
@@ -209,6 +225,20 @@ func (o1 *BasicAttrTypesObject) Diff(o2 *BasicAttrTypesObject) *metago.Diff {
 		va, vb := o1.S64Field, o2.S64Field
 		if va != vb {
 			d.Add(metago.NewInt64Chg(&BasicAttrTypesObjectS64FieldSREF, vb, va))
+		}
+	}
+
+	{
+		va, vb := o1.F32Field, o2.F32Field
+		if va != vb {
+			d.Add(metago.NewFloat32Chg(&BasicAttrTypesObjectF32FieldSREF, vb, va))
+		}
+	}
+
+	{
+		va, vb := o1.F64Field, o2.F64Field
+		if va != vb {
+			d.Add(metago.NewFloat64Chg(&BasicAttrTypesObjectF64FieldSREF, vb, va))
 		}
 	}
 

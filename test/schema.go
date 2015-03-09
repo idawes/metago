@@ -45,9 +45,13 @@ var (
 	BasicAttrTypesObjectS32FieldSREF    metago.Attrdef = metago.Attrdef{ID: &BasicAttrTypesObjectS32FieldAID, Persistence: metago.PersistenceClassPersistent}
 	BasicAttrTypesObjectS64FieldAID     metago.AttrID  = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 11}
 	BasicAttrTypesObjectS64FieldSREF    metago.Attrdef = metago.Attrdef{ID: &BasicAttrTypesObjectS64FieldAID, Persistence: metago.PersistenceClassPersistent}
-	BasicAttrTypesObjectStringFieldAID  metago.AttrID  = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 12}
+	BasicAttrTypesObjectF32FieldAID     metago.AttrID  = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 12}
+	BasicAttrTypesObjectF32FieldSREF    metago.Attrdef = metago.Attrdef{ID: &BasicAttrTypesObjectF32FieldAID, Persistence: metago.PersistenceClassPersistent}
+	BasicAttrTypesObjectF64FieldAID     metago.AttrID  = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 13}
+	BasicAttrTypesObjectF64FieldSREF    metago.Attrdef = metago.Attrdef{ID: &BasicAttrTypesObjectF64FieldAID, Persistence: metago.PersistenceClassPersistent}
+	BasicAttrTypesObjectStringFieldAID  metago.AttrID  = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 14}
 	BasicAttrTypesObjectStringFieldSREF metago.Attrdef = metago.Attrdef{ID: &BasicAttrTypesObjectStringFieldAID, Persistence: metago.PersistenceClassPersistent}
-	BasicAttrTypesObjectTimeFieldAID    metago.AttrID  = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 13}
+	BasicAttrTypesObjectTimeFieldAID    metago.AttrID  = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 15}
 	BasicAttrTypesObjectTimeFieldSREF   metago.Attrdef = metago.Attrdef{ID: &BasicAttrTypesObjectTimeFieldAID, Persistence: metago.PersistenceClassPersistent}
 
 	ExtendedObjectTID                   metago.TypeID  = metago.TypeID{Pkg: &MetagoPackageUUID, Typ: 2}

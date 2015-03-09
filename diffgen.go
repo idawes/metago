@@ -14,6 +14,8 @@ package metago
 //go:generate replacer -f genericBaseChg.tmpl -o int32Chg.go    -r "T:Int32"   -r "t:int32"
 //go:generate replacer -f genericBaseChg.tmpl -o int64Chg.go    -r "T:Int64"   -r "t:int64"
 //go:generate replacer -f genericBaseChg.tmpl -o stringChg.go   -r "T:String"  -r "t:string"
+//go:generate replacer -f genericBaseChg.tmpl -o float32Chg.go  -r "T:Float32" -r "t:float32"
+//go:generate replacer -f genericBaseChg.tmpl -o float64Chg.go  -r "T:Float64" -r "t:float64"
 //go:generate replacer -f genericBaseChg.tmpl -o timeChg.go     -r "T:Time"    -r "t:time.Time"
 //go:generate goimports -w timeChg.go
 

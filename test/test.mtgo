@@ -21,8 +21,10 @@ type 1 BasicAttrTypesObject concrete {
 		9 S16Field     int16
 		10 S32Field     int32
 		11 S64Field     int64
-		12 StringField string
-		13 TimeField   time.Time
+        12 F32Field     float32
+        13 F64Field     float64
+		14 StringField string
+		15 TimeField   time.Time
 		// test line comment at the end of attribute block
 	}
 	methods {
