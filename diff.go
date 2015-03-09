@@ -1,15 +1,15 @@
 package metago
 
 type Diff struct {
-	Changes []Chg
+	Chgs []Chg
 }
 
 func (d *Diff) Add(chg Chg) {
-	d.Changes = append(d.Changes, chg)
+	d.Chgs = append(d.Chgs, chg)
 }
 
 type Chg interface {
-	AttributeId() *AttrID
+	AttributeID() *AttrID
 	Schemaref() *Attrdef
 }
 
@@ -17,7 +17,7 @@ type BaseChg struct {
 	schemaref *Attrdef
 }
 
-func (d *BaseChg) AttributeId() *AttrID {
+func (d *BaseChg) AttributeID() *AttrID {
 	return d.schemaref.ID
 }
 

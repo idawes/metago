@@ -28,7 +28,16 @@ func (o1 *StructTestObject) Diff(o2 *StructTestObject) *metago.Diff {
 
 	{
 		va, vb := o1.B, o2.B
-		d.Changes = append(d.Changes, metago.NewStructChg(&StructTestObjectBSREF, va.Diff(&vb)))
+		d.Chgs = append(d.Chgs, metago.NewStructChg(&StructTestObjectBSREF, va.Diff(&vb)))
 	}
 	return d
+}
+
+func (o *StructTestObject) Apply(d *metago.Diff) error {
+	for _, c := range d.Chgs {
+		switch c.AttributeID() {
+
+		}
+	}
+	return nil
 }

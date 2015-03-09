@@ -257,3 +257,96 @@ func (o1 *BasicAttrTypesObject) Diff(o2 *BasicAttrTypesObject) *metago.Diff {
 	}
 	return d
 }
+
+func (o *BasicAttrTypesObject) Apply(d *metago.Diff) error {
+	for _, c := range d.Chgs {
+		switch c.AttributeID() {
+
+		case &BasicAttrTypesObjectByteFieldAID:
+			{
+				v := &o.ByteField
+				*v = c.(*metago.ByteChg).NewValue
+			}
+
+		case &BasicAttrTypesObjectUbbFieldAID:
+			{
+				v := &o.UbbField
+				*v = c.(*metago.UintChg).NewValue
+			}
+
+		case &BasicAttrTypesObjectU8FieldAID:
+			{
+				v := &o.U8Field
+				*v = c.(*metago.Uint8Chg).NewValue
+			}
+
+		case &BasicAttrTypesObjectU16FieldAID:
+			{
+				v := &o.U16Field
+				*v = c.(*metago.Uint16Chg).NewValue
+			}
+
+		case &BasicAttrTypesObjectU32FieldAID:
+			{
+				v := &o.U32Field
+				*v = c.(*metago.Uint32Chg).NewValue
+			}
+
+		case &BasicAttrTypesObjectU64FieldAID:
+			{
+				v := &o.U64Field
+				*v = c.(*metago.Uint64Chg).NewValue
+			}
+
+		case &BasicAttrTypesObjectSFieldAID:
+			{
+				v := &o.SField
+				*v = c.(*metago.IntChg).NewValue
+			}
+
+		case &BasicAttrTypesObjectS8FieldAID:
+			{
+				v := &o.S8Field
+				*v = c.(*metago.Int8Chg).NewValue
+			}
+
+		case &BasicAttrTypesObjectS16FieldAID:
+			{
+				v := &o.S16Field
+				*v = c.(*metago.Int16Chg).NewValue
+			}
+
+		case &BasicAttrTypesObjectS32FieldAID:
+			{
+				v := &o.S32Field
+				*v = c.(*metago.Int32Chg).NewValue
+			}
+
+		case &BasicAttrTypesObjectS64FieldAID:
+			{
+				v := &o.S64Field
+				*v = c.(*metago.Int64Chg).NewValue
+			}
+
+		case &BasicAttrTypesObjectF32FieldAID:
+			{
+				v := &o.F32Field
+				*v = c.(*metago.Float32Chg).NewValue
+			}
+
+		case &BasicAttrTypesObjectF64FieldAID:
+			{
+				v := &o.F64Field
+				*v = c.(*metago.Float64Chg).NewValue
+			}
+
+		case &BasicAttrTypesObjectStringFieldAID:
+			{
+				v := &o.StringField
+				*v = c.(*metago.StringChg).NewValue
+			}
+
+		}
+	}
+	return nil
+}

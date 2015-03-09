@@ -350,6 +350,7 @@ func (t *typedef) generateMethods(w *writer) {
 	}
 	t.generateEquals(w)
 	t.generateDiff(w)
+	t.generateApply(w)
 }
 
 func (t *typedef) resolveMethods(methods map[string]*methodDef) {
@@ -408,6 +409,32 @@ func (t *typedef) generateAttrDiffs(w *writer) {
 	for _, a := range t.attrDefsByIDInOrder {
 		w.printf("\n")
 		a.generateDiff(w, "")
+	}
+}
+
+func (t *typedef) generateApply(w *writer) {
+	format := `
+func (o *%[1]s) Apply(d *metago.Diff) error {
+	for _, c := range d.Chgs {
+		switch c.AttributeID() {
+`
+	w.printf(format, t.name)
+	t.generateAttrApply(w)
+	format = `		}
+	}
+	return nil
+}
+`
+	w.printf(format)
+}
+
+func (t *typedef) generateAttrApply(w *writer) {
+	if t.extends != nil {
+		t.extends.generateAttrApply(w)
+	}
+	for _, a := range t.attrDefsByIDInOrder {
+		w.printf("\n")
+		a.generateApply(w, "")
 	}
 }
 
