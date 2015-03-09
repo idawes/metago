@@ -12,10 +12,12 @@ import (
 
 type ExtendedObject struct {
 	ByteField         byte
+	UbbField          uint
 	U8Field           uint8
 	U16Field          uint16
 	U32Field          uint32
 	U64Field          uint64
+	SField            int
 	S8Field           int8
 	S16Field          int16
 	S32Field          int32
@@ -57,6 +59,13 @@ func (o1 *ExtendedObject) Equals(o2 *ExtendedObject) bool {
 	}
 
 	{
+		va, vb := o1.UbbField, o2.UbbField
+		if va != vb {
+			return false
+		}
+	}
+
+	{
 		va, vb := o1.U8Field, o2.U8Field
 		if va != vb {
 			return false
@@ -79,6 +88,13 @@ func (o1 *ExtendedObject) Equals(o2 *ExtendedObject) bool {
 
 	{
 		va, vb := o1.U64Field, o2.U64Field
+		if va != vb {
+			return false
+		}
+	}
+
+	{
+		va, vb := o1.SField, o2.SField
 		if va != vb {
 			return false
 		}
@@ -146,6 +162,13 @@ func (o1 *ExtendedObject) Diff(o2 *ExtendedObject) *metago.Diff {
 	}
 
 	{
+		va, vb := o1.UbbField, o2.UbbField
+		if va != vb {
+			d.Add(metago.NewUintChg(&BasicAttrTypesObjectUbbFieldSREF, vb, va))
+		}
+	}
+
+	{
 		va, vb := o1.U8Field, o2.U8Field
 		if va != vb {
 			d.Add(metago.NewUint8Chg(&BasicAttrTypesObjectU8FieldSREF, vb, va))
@@ -170,6 +193,13 @@ func (o1 *ExtendedObject) Diff(o2 *ExtendedObject) *metago.Diff {
 		va, vb := o1.U64Field, o2.U64Field
 		if va != vb {
 			d.Add(metago.NewUint64Chg(&BasicAttrTypesObjectU64FieldSREF, vb, va))
+		}
+	}
+
+	{
+		va, vb := o1.SField, o2.SField
+		if va != vb {
+			d.Add(metago.NewIntChg(&BasicAttrTypesObjectSFieldSREF, vb, va))
 		}
 	}
 

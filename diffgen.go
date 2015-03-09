@@ -2,17 +2,19 @@ package metago
 
 // +build: generate
 
-//go:generate replacer -f genericBaseChg.tmpl -o byteChg.go     -r "T:Byte"   -r "t:byte"   -r "s:1+1"
-//go:generate replacer -f genericBaseChg.tmpl -o uint8Chg.go    -r "T:Uint8"  -r "t:uint8"  -r "s:1+1"
-//go:generate replacer -f genericBaseChg.tmpl -o uint16Chg.go   -r "T:Uint16" -r "t:uint16" -r "s:2+2"
-//go:generate replacer -f genericBaseChg.tmpl -o uint32Chg.go   -r "T:Uint32" -r "t:uint32" -r "s:4+1"
-//go:generate replacer -f genericBaseChg.tmpl -o uint64Chg.go   -r "T:Uint64" -r "t:uint64" -r "s:8+1"
-//go:generate replacer -f genericBaseChg.tmpl -o int8Chg.go     -r "T:Int8"   -r "t:int8"   -r "s:1+1"
-//go:generate replacer -f genericBaseChg.tmpl -o int16Chg.go    -r "T:Int16"  -r "t:int16"  -r "s:2+2"
-//go:generate replacer -f genericBaseChg.tmpl -o int32Chg.go    -r "T:Int32"  -r "t:int32"  -r "s:4+4"
-//go:generate replacer -f genericBaseChg.tmpl -o int64Chg.go    -r "T:Int64"  -r "t:int64"  -r "s:8+8"
-//go:generate replacer -f genericBaseChg.tmpl -o stringChg.go    -r "T:String"  -r "t:string"  -r "s:uint32(4+len(d.OldValue)+4+len(d.NewValue))"
-//go:generate replacer -f genericBaseChg.tmpl -o timeChg.go    -r "T:Time"  -r "t:time.Time"
+//go:generate replacer -f genericBaseChg.tmpl -o byteChg.go     -r "T:Byte"    -r "t:byte"
+//go:generate replacer -f genericBaseChg.tmpl -o uintChg.go     -r "T:Uint"    -r "t:uint"
+//go:generate replacer -f genericBaseChg.tmpl -o uint8Chg.go    -r "T:Uint8"   -r "t:uint8"
+//go:generate replacer -f genericBaseChg.tmpl -o uint16Chg.go   -r "T:Uint16"  -r "t:uint16"
+//go:generate replacer -f genericBaseChg.tmpl -o uint32Chg.go   -r "T:Uint32"  -r "t:uint32"
+//go:generate replacer -f genericBaseChg.tmpl -o uint64Chg.go   -r "T:Uint64"  -r "t:uint64"
+//go:generate replacer -f genericBaseChg.tmpl -o intChg.go      -r "T:Int"     -r "t:int"
+//go:generate replacer -f genericBaseChg.tmpl -o int8Chg.go     -r "T:Int8"    -r "t:int8"
+//go:generate replacer -f genericBaseChg.tmpl -o int16Chg.go    -r "T:Int16"   -r "t:int16"
+//go:generate replacer -f genericBaseChg.tmpl -o int32Chg.go    -r "T:Int32"   -r "t:int32"
+//go:generate replacer -f genericBaseChg.tmpl -o int64Chg.go    -r "T:Int64"   -r "t:int64"
+//go:generate replacer -f genericBaseChg.tmpl -o stringChg.go   -r "T:String"  -r "t:string"
+//go:generate replacer -f genericBaseChg.tmpl -o timeChg.go     -r "T:Time"    -r "t:time.Time"
 //go:generate goimports -w timeChg.go
 
 //go:generate replacer -f genericMapChg.tmpl -o byteMapChg.go     -r "T:Byte"   -r "t:byte"

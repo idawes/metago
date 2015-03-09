@@ -10,17 +10,19 @@ type 1 BasicAttrTypesObject concrete {
 	attributes {
 		// test line comment at beginning of attribute block
 		1 ByteField    byte
-		2 U8Field      uint8
-		3 U16Field     uint16
+		2 UbbField       uint
+		3 U8Field      uint8
+		4 U16Field     uint16
 		// test line comment in the middle of attribute block 
-		4 U32Field     uint32 
-		5 U64Field     uint64
-		6 S8Field      int8
-		7 S16Field     int16
-		8 S32Field     int32
-		9 S64Field     int64
-		10 StringField string
-		11 TimeField   time.Time
+		5 U32Field     uint32 
+		6 U64Field     uint64
+		7 SField       int
+		8 S8Field      int8
+		9 S16Field     int16
+		10 S32Field     int32
+		11 S64Field     int64
+		12 StringField string
+		13 TimeField   time.Time
 		// test line comment at the end of attribute block
 	}
 	methods {

@@ -63,7 +63,7 @@ func newAttrDef(b *baseAttrDef) (attrDef, error) {
 
 func getClass(n string) (attrClass, error) {
 	switch n {
-	case "byte", "uint8", "uint16", "uint32", "uint64", "int8", "int16", "int32", "int64", "float32", "float64", "string":
+	case "byte", "uint", "uint8", "uint16", "uint32", "uint64", "int", "int8", "int16", "int32", "int64", "float32", "float64", "string":
 		return attrClassBuiltin, nil
 	case "time.Time":
 		return attrClassTime, nil
