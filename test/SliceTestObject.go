@@ -195,7 +195,8 @@ func (o1 *SliceTestObject) Equals(o2 *SliceTestObject) bool {
 	return true
 }
 
-func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) (d *metago.Diff) {
+func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) *metago.Diff {
+	d := &metago.Diff{}
 
 	{
 		va, vb := o1.ByteSlice, o2.ByteSlice

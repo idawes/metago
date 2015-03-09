@@ -116,7 +116,8 @@ func (o1 *BasicAttrTypesObject) Equals(o2 *BasicAttrTypesObject) bool {
 	return true
 }
 
-func (o1 *BasicAttrTypesObject) Diff(o2 *BasicAttrTypesObject) (d *metago.Diff) {
+func (o1 *BasicAttrTypesObject) Diff(o2 *BasicAttrTypesObject) *metago.Diff {
+	d := &metago.Diff{}
 
 	{
 		va, vb := o1.ByteField, o2.ByteField

@@ -16,20 +16,19 @@ func (o1 *StructTestObject) Equals(o2 *StructTestObject) bool {
 
 	{
 		va, vb := o1.B, o2.B
-		if va.Equals(vb) {
+		if va.Equals(&vb) {
 			return false
 		}
 	}
 	return true
 }
 
-func (o1 *StructTestObject) Diff(o2 *StructTestObject) (d *metago.Diff) {
+func (o1 *StructTestObject) Diff(o2 *StructTestObject) *metago.Diff {
+	d := &metago.Diff{}
 
 	{
 		va, vb := o1.B, o2.B
-		if va != vb {
-			d.Add(metago.NewBasicAttrTypesObjectChg(&StructTestObjectBSREF, vb, va))
-		}
+		d.Changes = append(d.Changes, metago.NewStructChg(&StructTestObjectBSREF, va.Diff(&vb)))
 	}
 	return d
 }

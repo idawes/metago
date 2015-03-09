@@ -58,7 +58,8 @@ func (o1 *MapTestObject) Equals(o2 *MapTestObject) bool {
 	return true
 }
 
-func (o1 *MapTestObject) Diff(o2 *MapTestObject) (d *metago.Diff) {
+func (o1 *MapTestObject) Diff(o2 *MapTestObject) *metago.Diff {
+	d := &metago.Diff{}
 
 	{
 		va, vb := o1.o1, o2.o1

@@ -135,7 +135,8 @@ func (o1 *ExtendedObject) Equals(o2 *ExtendedObject) bool {
 	return true
 }
 
-func (o1 *ExtendedObject) Diff(o2 *ExtendedObject) (d *metago.Diff) {
+func (o1 *ExtendedObject) Diff(o2 *ExtendedObject) *metago.Diff {
+	d := &metago.Diff{}
 
 	{
 		va, vb := o1.ByteField, o2.ByteField

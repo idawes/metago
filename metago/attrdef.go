@@ -429,7 +429,7 @@ func (a *mapAttrDef) generateDel(w *writer, levelID string) {
 }
 
 /************************************************************************/
-/**************************** Diff Obj Attribute ************************/
+/**************************** Struct Attribute **************************/
 type structAttrDef struct {
 	baseAttrDef
 	packageName string
@@ -441,6 +441,13 @@ func newStructAttrDef(b *baseAttrDef) (*structAttrDef, error) {
 
 func (a *structAttrDef) generateEquals(w *writer, levelID string) {
 	a.checkLevel0Hdr(w, levelID)
-	w.printf("  if va%[1]s.Equals(vb%[1]s) {\n    return false\n  }\n", levelID)
+	w.printf("  if va%[1]s.Equals(&vb%[1]s) {\n    return false\n  }\n", levelID)
 	a.checkLevel0Ftr(w, levelID)
+}
+
+func (a *structAttrDef) generateDiff(w *writer, levelID string) {
+	a.checkLevel0Hdr(w, levelID)
+	w.printf("    d%[1]s.Changes = append(d%[1]s.Changes, metago.NewStructChg(&%[2]s%[3]sSREF, va%[1]s.Diff(&vb%[1]s)))\n", levelID, a.parentType.name, a.nm)
+	a.checkLevel0Ftr(w, levelID)
+
 }

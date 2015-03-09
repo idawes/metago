@@ -55,3 +55,12 @@ type SliceChg struct {
 func NewSliceChg(sref *Attrdef, idx int, typ ChangeType, chgs *Diff) Chg {
 	return &SliceChg{BaseChg: BaseChg{schemaref: sref}, Idx: idx, Typ: typ, Chgs: *chgs}
 }
+
+type StructChg struct {
+	BaseChg
+	Chg Diff
+}
+
+func NewStructChg(sref *Attrdef, chg *Diff) Chg {
+	return &StructChg{BaseChg: BaseChg{schemaref: sref}, Chg: *chg}
+}
