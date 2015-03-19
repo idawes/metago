@@ -84,9 +84,11 @@ var (
 	SliceTestObjectString2dSliceAID  metago.AttrID  = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 12}
 	SliceTestObjectString2dSliceSREF metago.Attrdef = metago.Attrdef{ID: &SliceTestObjectString2dSliceAID, Persistence: metago.PersistenceClassPersistent}
 
-	StructTestObjectTID   metago.TypeID  = metago.TypeID{Pkg: &MetagoPackageUUID, Typ: 5}
-	StructTestObjectBAID  metago.AttrID  = metago.AttrID{TypeID: &StructTestObjectTID, Attr: 1}
-	StructTestObjectBSREF metago.Attrdef = metago.Attrdef{ID: &StructTestObjectBAID, Persistence: metago.PersistenceClassPersistent}
+	StructTestObjectTID    metago.TypeID  = metago.TypeID{Pkg: &MetagoPackageUUID, Typ: 5}
+	StructTestObjectBAID   metago.AttrID  = metago.AttrID{TypeID: &StructTestObjectTID, Attr: 1}
+	StructTestObjectBSREF  metago.Attrdef = metago.Attrdef{ID: &StructTestObjectBAID, Persistence: metago.PersistenceClassPersistent}
+	StructTestObjectMBAID  metago.AttrID  = metago.AttrID{TypeID: &StructTestObjectTID, Attr: 2}
+	StructTestObjectMBSREF metago.Attrdef = metago.Attrdef{ID: &StructTestObjectMBAID, Persistence: metago.PersistenceClassPersistent}
 
 	MapTestObjectTID    metago.TypeID  = metago.TypeID{Pkg: &MetagoPackageUUID, Typ: 6}
 	MapTestObjecto1AID  metago.AttrID  = metago.AttrID{TypeID: &MapTestObjectTID, Attr: 1}

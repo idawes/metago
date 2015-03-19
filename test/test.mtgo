@@ -91,6 +91,7 @@ type 6 MapTestObject concrete {
 type 5 StructTestObject concrete {
 	attributes {
 		1 B BasicAttrTypesObject
+        2 MB map[int]BasicAttrTypesObject
 	}
 }
 

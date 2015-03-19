@@ -156,6 +156,46 @@ func (o *MapTestObject) Apply(d *metago.Diff) error {
 	for _, c := range d.Chgs {
 		switch c.AttributeID() {
 
+		case &MapTestObjecto1AID:
+			{
+				m := o.o1
+				mc := c.(*metago.ByteMapChg)
+				key := mc.Key
+				for _, c1 := range mc.Chgs.Chgs {
+					sc1 := c1.(*metago.StringChg)
+					switch mc.Typ {
+					case metago.ChangeTypeModify:
+						m[key] = sc1.NewValue
+					case metago.ChangeTypeInsert:
+						m[key] = sc1.NewValue
+					case metago.ChangeTypeDelete:
+						delete(m, key)
+					}
+				}
+			}
+
+		case &MapTestObjecto2AID:
+			{
+				m := o.o2
+				mc := c.(*metago.ByteMapChg)
+				for _, c1 := range mc.Chgs.Chgs {
+					m1 := m[mc.Key]
+					mc1 := c1.(*metago.ByteMapChg)
+					switch mc.Typ {
+					case metago.ChangeTypeModify:
+						{
+							switch mc1.Typ {
+							case metago.ChangeTypeModify:
+							case metago.ChangeTypeInsert:
+							case metago.ChangeTypeDelete:
+
+							}
+						}
+					case metago.ChangeTypeInsert:
+					case metago.ChangeTypeDelete:
+					}
+				}
+			}
 		}
 	}
 	return nil

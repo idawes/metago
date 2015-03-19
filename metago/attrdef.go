@@ -457,7 +457,29 @@ func (a *mapAttrDef) generateDel(w *writer, levelID string) {
 }
 
 func (a *mapAttrDef) generateApply(w *writer, levelID string) {
+	nextLevelID := fmt.Sprintf("%s1", levelID)
+	format := `   case &%[1]s%[2]sAID:
+			{
+`
+	w.printf(format, a.parentType.name, a.nm)
+	if levelID == "" {
+		w.printf("m := o.%s\n", a.nm)
+	}
+	format = `            mc := c.(*metago.%[3]sMapChg)
+				switch mc.Typ {
+				case metago.ChangeTypeModify:
+					o%[4]s
 
+`
+	w.printf(format, a.parentType.name, a.nm, strings.Title(a.keyType))
+	format = `				case metago.ChangeTypeInsert:
+`
+	w.printf(format)
+	format = `				case metago.ChangeTypeDelete:
+            }
+		}
+`
+	w.printf(format)
 }
 
 /************************************************************************/
@@ -481,7 +503,16 @@ func (a *structAttrDef) generateDiff(w *writer, levelID string) {
 	a.checkLevel0Hdr(w, levelID)
 	w.printf("    d%[1]s.Chgs = append(d%[1]s.Chgs, metago.NewStructChg(&%[2]s%[3]sSREF, va%[1]s.Diff(&vb%[1]s)))\n", levelID, a.parentType.name, a.nm)
 	a.checkLevel0Ftr(w, levelID)
+}
 
+func (a *structAttrDef) generateIns(w *writer, levelID string) {
+	w.printf("t := %[1]s{}\n", a.typeName())
+	w.printf("d%[1]s.Add(metago.NewStructChg(&%[2]s%[3]sSREF, t.Diff(&va%[1]s)))\n", levelID, a.parentType.name, a.nm)
+}
+
+func (a *structAttrDef) generateDel(w *writer, levelID string) {
+	w.printf("t := %[1]s{}\n", a.typeName())
+	w.printf("d%[1]s.Add(metago.NewStructChg(&%[2]s%[3]sSREF, vb%[1]s.Diff(&t)))\n", levelID, a.parentType.name, a.nm)
 }
 
 func (a *structAttrDef) generateApply(w *writer, levelID string) {

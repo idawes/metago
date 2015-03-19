@@ -20,10 +20,12 @@ package metago
 //go:generate goimports -w timeChg.go
 
 //go:generate replacer -f genericMapChg.tmpl -o byteMapChg.go     -r "T:Byte"   -r "t:byte"
+//go:generate replacer -f genericMapChg.tmpl -o uintMapChg.go     -r "T:Uint"   -r "t:uint"
 //go:generate replacer -f genericMapChg.tmpl -o uint8MapChg.go    -r "T:Uint8"  -r "t:uint8"
 //go:generate replacer -f genericMapChg.tmpl -o uint16MapChg.go   -r "T:Uint16" -r "t:uint16"
 //go:generate replacer -f genericMapChg.tmpl -o uint32MapChg.go   -r "T:Uint32" -r "t:uint32"
 //go:generate replacer -f genericMapChg.tmpl -o uint64MapChg.go   -r "T:Uint64" -r "t:uint64"
+//go:generate replacer -f genericMapChg.tmpl -o intMapChg.go      -r "T:Int"    -r "t:int"
 //go:generate replacer -f genericMapChg.tmpl -o int8MapChg.go     -r "T:Int8"   -r "t:int8"
 //go:generate replacer -f genericMapChg.tmpl -o int16MapChg.go    -r "T:Int16"  -r "t:int16"
 //go:generate replacer -f genericMapChg.tmpl -o int32MapChg.go    -r "T:Int32"  -r "t:int32"
