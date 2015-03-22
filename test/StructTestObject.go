@@ -84,11 +84,13 @@ func (o *StructTestObject) Apply(d *metago.Diff) error {
 
 		case &StructTestObjectMBAID:
 			{
+				m := o.MB
 				mc := c.(*metago.IntMapChg)
+				key := mc.Key
 				switch mc.Typ {
 				case metago.ChangeTypeModify:
-					o1 := o.MB[mc.Key]
-					o1.Apply(&mc.Chgs)
+					c1 := mc.Chgs.Chgs[0]
+					m[key] = c1.(*metago.BasicAttrTypesObjectChg).NewValue
 				case metago.ChangeTypeInsert:
 				case metago.ChangeTypeDelete:
 				}

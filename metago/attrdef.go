@@ -106,6 +106,7 @@ type attrDef interface {
 	srcfile() string
 	name() string
 	typeName() string
+	isMultiValued() bool
 	generateEquals(w *writer, levelID string)
 	generateDiff(w *writer, levelID string)
 	generateIns(w *writer, levelID string)
@@ -147,6 +148,10 @@ func (a *baseAttrDef) typeName() string {
 	return a.typ
 }
 
+func (a *baseAttrDef) isMultiValued() bool {
+	return false
+}
+
 func (a *baseAttrDef) checkLevel0Hdr(w *writer, levelID string) {
 	if levelID == "" {
 		w.printf("    {\n")
@@ -172,16 +177,16 @@ func (a *baseAttrDef) generateDiff(w *writer, levelID string) {
 		d%[1]s.Add(metago.New%[2]sChg(&%[3]s%[4]sSREF, vb%[1]s, va%[1]s))
 	}
 `
-	w.printf(format, levelID, strings.Title(a.typeName()), a.parentType.name, a.nm)
+	w.printf(format, levelID, strings.Title(a.typ), a.parentType.name, a.nm)
 	a.checkLevel0Ftr(w, levelID)
 }
 
 func (a *baseAttrDef) generateIns(w *writer, levelID string) {
-	w.printf("d%[1]s.Add(metago.New%[2]sChg(&%[3]s%[4]sSREF, va%[1]s))\n", levelID, strings.Title(a.typeName()), a.parentType.name, a.nm)
+	w.printf("d%[1]s.Add(metago.New%[2]sChg(&%[3]s%[4]sSREF, va%[1]s))\n", levelID, strings.Title(a.typ), a.parentType.name, a.nm)
 }
 
 func (a *baseAttrDef) generateDel(w *writer, levelID string) {
-	w.printf("d%[1]s.Add(metago.New%[2]sChg(&%[3]s%[4]sSREF, vb%[1]s))\n", levelID, strings.Title(a.typeName()), a.parentType.name, a.nm)
+	w.printf("d%[1]s.Add(metago.New%[2]sChg(&%[3]s%[4]sSREF, vb%[1]s))\n", levelID, strings.Title(a.typ), a.parentType.name, a.nm)
 }
 
 func (a *baseAttrDef) checkLevel0ApplyHdr(w *writer, levelID string) {
@@ -199,7 +204,7 @@ func (a *baseAttrDef) checkLevel0ApplyFtr(w *writer, levelID string) {
 func (a *baseAttrDef) generateApply(w *writer, levelID string) {
 	w.printf("    case &%[1]s%[2]sAID:\n", a.parentType.name, a.nm)
 	a.checkLevel0ApplyHdr(w, levelID)
-	w.printf("        *v%[1]s = c.(*metago.%[2]sChg).NewValue\n", levelID, strings.Title(a.typeName()))
+	w.printf("        *v%[1]s = c.(*metago.%[2]sChg).NewValue\n", levelID, strings.Title(a.typ))
 	a.checkLevel0ApplyFtr(w, levelID)
 }
 
@@ -252,6 +257,10 @@ func newSliceAttrDef(b *baseAttrDef) (*sliceAttrDef, error) {
 		return nil, fmt.Errorf("invalid slice attribute specification %s, line %d of file %s", b.typ, b.sline, b.sfile)
 	}
 	return &sliceAttrDef{baseAttrDef: *b, valType: valType, valAttr: valAttr}, nil
+}
+
+func (a *sliceAttrDef) isMultiValued() bool {
+	return true
 }
 
 func (a *sliceAttrDef) generateEquals(w *writer, levelID string) {
@@ -370,6 +379,10 @@ func newMapAttrDef(b *baseAttrDef) (*mapAttrDef, error) {
 	return &mapAttrDef{baseAttrDef: *b, keyType: keyType, keyAttr: keyAttr, valType: valType, valAttr: valAttr}, nil
 }
 
+func (a *mapAttrDef) isMultiValued() bool {
+	return true
+}
+
 func (a *mapAttrDef) generateEquals(w *writer, levelID string) {
 	nextLevelID := fmt.Sprintf("%s1", levelID)
 	a.checkLevel0Hdr(w, levelID)
@@ -463,15 +476,23 @@ func (a *mapAttrDef) generateApply(w *writer, levelID string) {
 `
 	w.printf(format, a.parentType.name, a.nm)
 	if levelID == "" {
-		w.printf("m := o.%s\n", a.nm)
+		w.printf("            m := o.%s\n", a.nm)
+	} else {
+		w.printf("            m%[2]s := m%[1]s[key%[1]s]", levelID, nextLevelID)
 	}
-	format = `            mc := c.(*metago.%[3]sMapChg)
-				switch mc.Typ {
+	format = `            mc%[1]s := c%[1]s.(*metago.%[2]sMapChg)
+	            key%[1]s := mc%[1]s.Key
+				switch mc%[1]s.Typ {
 				case metago.ChangeTypeModify:
-					o%[4]s
-
 `
-	w.printf(format, a.parentType.name, a.nm, strings.Title(a.keyType))
+	w.printf(format, levelID, strings.Title(a.keyType))
+	if a.valAttr.isMultiValued() {
+		w.printf("				for _, c%[2]s := range mc%[1]s.Chgs.Chgs {\n", levelID, nextLevelID)
+		w.printf("              }\n")
+	} else {
+		w.printf("              c%[2]s := mc%[1]s.Chgs.Chgs[0]\n", levelID, nextLevelID)
+		w.printf("              m%[1]s[key%[1]s] = c%[2]s.(*metago.%[3]sChg).NewValue\n", levelID, nextLevelID, strings.Title(a.valType))
+	}
 	format = `				case metago.ChangeTypeInsert:
 `
 	w.printf(format)
@@ -506,12 +527,12 @@ func (a *structAttrDef) generateDiff(w *writer, levelID string) {
 }
 
 func (a *structAttrDef) generateIns(w *writer, levelID string) {
-	w.printf("t := %[1]s{}\n", a.typeName())
+	w.printf("t := %[1]s{}\n", a.typ)
 	w.printf("d%[1]s.Add(metago.NewStructChg(&%[2]s%[3]sSREF, t.Diff(&va%[1]s)))\n", levelID, a.parentType.name, a.nm)
 }
 
 func (a *structAttrDef) generateDel(w *writer, levelID string) {
-	w.printf("t := %[1]s{}\n", a.typeName())
+	w.printf("t := %[1]s{}\n", a.typ)
 	w.printf("d%[1]s.Add(metago.NewStructChg(&%[2]s%[3]sSREF, vb%[1]s.Diff(&t)))\n", levelID, a.parentType.name, a.nm)
 }
 
