@@ -485,17 +485,25 @@ func (a *mapAttrDef) generateDel(w *writer, levelID string) {
 }
 
 func (a *mapAttrDef) generateApply(w *writer, levelID string) {
-	nextLevelID := fmt.Sprintf("%s1", levelID)
 	format := `   case &%[1]s%[2]sAID:
 			{
+			    m := o.%[2]s
 `
 	w.printf(format, a.parentType.name, a.nm)
-	if levelID == "" {
-		w.printf("            m := o.%s\n", a.nm)
-	} else {
-		w.printf("            m%[2]s := m%[1]s[key%[1]s]", levelID, nextLevelID)
-	}
-	format = `            mc%[1]s := c%[1]s.(*metago.%[2]sMapChg)
+	a.generateApplyBody(w, levelID)
+	w.printf("			}\n")
+}
+
+func (a *mapAttrDef) generateMapModify(w *writer, levelID string) {
+	nextLevelID := fmt.Sprintf("%s1", levelID)
+	w.printf("				for _, c%[2]s := range mc%[1]s.Chgs {\n", levelID, nextLevelID)
+	w.printf("            m%[2]s := m%[1]s[key%[1]s]\n", levelID, nextLevelID)
+	a.generateApplyBody(w, nextLevelID)
+	w.printf("              }\n")
+}
+
+func (a *mapAttrDef) generateApplyBody(w *writer, levelID string) {
+	format := `            mc%[1]s := c%[1]s.(*metago.%[2]sMapChg)
 	            key%[1]s := mc%[1]s.Key
 				switch mc%[1]s.Typ {
 				case metago.ChangeTypeModify:
@@ -509,15 +517,8 @@ func (a *mapAttrDef) generateApply(w *writer, levelID string) {
 	format = `				case metago.ChangeTypeDelete:
 				delete(m%[1]s, key%[1]s)
             }
-		}
 `
-	w.printf(format, levelID, nextLevelID)
-}
-
-func (a *mapAttrDef) generateMapModify(w *writer, levelID string) {
-	nextLevelID := fmt.Sprintf("%s1", levelID)
-	w.printf("				for _, c%[2]s := range mc%[1]s.Chgs {\n", levelID, nextLevelID)
-	w.printf("              }\n")
+	w.printf(format, levelID)
 }
 
 /************************************************************************/

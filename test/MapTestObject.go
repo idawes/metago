@@ -180,9 +180,31 @@ func (o *MapTestObject) Apply(d *metago.Diff) error {
 				switch mc.Typ {
 				case metago.ChangeTypeModify:
 					for _, c1 := range mc.Chgs {
+						m1 := m[key]
+						mc1 := c1.(*metago.ByteMapChg)
+						key1 := mc1.Key
+						switch mc1.Typ {
+						case metago.ChangeTypeModify:
+							m1[key1] = mc1.Chgs[0].(*metago.StringChg).NewValue
+						case metago.ChangeTypeInsert:
+							m1[key1] = mc1.Chgs[0].(*metago.StringChg).NewValue
+						case metago.ChangeTypeDelete:
+							delete(m1, key1)
+						}
 					}
 				case metago.ChangeTypeInsert:
 					for _, c1 := range mc.Chgs {
+						m1 := m[key]
+						mc1 := c1.(*metago.ByteMapChg)
+						key1 := mc1.Key
+						switch mc1.Typ {
+						case metago.ChangeTypeModify:
+							m1[key1] = mc1.Chgs[0].(*metago.StringChg).NewValue
+						case metago.ChangeTypeInsert:
+							m1[key1] = mc1.Chgs[0].(*metago.StringChg).NewValue
+						case metago.ChangeTypeDelete:
+							delete(m1, key1)
+						}
 					}
 				case metago.ChangeTypeDelete:
 					delete(m, key)
