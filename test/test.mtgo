@@ -82,8 +82,11 @@ type 3 SliceTestObject concrete {
 }
 
 type 6 MapTestObject concrete {
+    imports {
+        "time"
+    }
     attributes {
-        1 o1 map[byte]string
+        1 o1 map[byte]time.Time
         2 o2 map[byte]map[byte]string
     }
 }

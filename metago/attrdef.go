@@ -112,6 +112,7 @@ type attrDef interface {
 	generateIns(w *writer, levelID string)
 	generateDel(w *writer, levelID string)
 	generateApply(w *writer, levelID string)
+	generateMapModify(w *writer, levelID string)
 }
 
 type baseAttrDef struct {
@@ -208,10 +209,19 @@ func (a *baseAttrDef) generateApply(w *writer, levelID string) {
 	a.checkLevel0ApplyFtr(w, levelID)
 }
 
+func (a *baseAttrDef) generateMapModify(w *writer, levelID string) {
+	nextLevelID := fmt.Sprintf("%s1", levelID)
+	w.printf("              m%[1]s[key%[1]s] = mc%[1]s.Chgs.Chgs[0].(*metago.%[3]sChg).NewValue\n", levelID, nextLevelID, strings.Title(a.typ))
+}
+
 /************************************************************************/
 /************************** Time Attribute ******************************/
 type timeAttrDef struct {
 	baseAttrDef
+}
+
+func (a *timeAttrDef) unqualifiedTypeName() string {
+	return "Time"
 }
 
 func (a *timeAttrDef) generateEquals(w *writer, levelID string) {
@@ -240,6 +250,11 @@ func (a *timeAttrDef) generateDel(w *writer, levelID string) {
 
 func (a *timeAttrDef) generateApply(w *writer, levelID string) {
 
+}
+
+func (a *timeAttrDef) generateMapModify(w *writer, levelID string) {
+	nextLevelID := fmt.Sprintf("%s1", levelID)
+	w.printf("              m%[1]s[key%[1]s] = mc%[1]s.Chgs.Chgs[0].(*metago.TimeChg).NewValue\n", levelID, nextLevelID, strings.Title(a.typ))
 }
 
 /************************************************************************/
@@ -486,21 +501,23 @@ func (a *mapAttrDef) generateApply(w *writer, levelID string) {
 				case metago.ChangeTypeModify:
 `
 	w.printf(format, levelID, strings.Title(a.keyType))
-	if a.valAttr.isMultiValued() {
-		w.printf("				for _, c%[2]s := range mc%[1]s.Chgs.Chgs {\n", levelID, nextLevelID)
-		w.printf("              }\n")
-	} else {
-		w.printf("              c%[2]s := mc%[1]s.Chgs.Chgs[0]\n", levelID, nextLevelID)
-		w.printf("              m%[1]s[key%[1]s] = c%[2]s.(*metago.%[3]sChg).NewValue\n", levelID, nextLevelID, strings.Title(a.valType))
-	}
+	a.valAttr.generateMapModify(w, levelID)
 	format = `				case metago.ChangeTypeInsert:
 `
 	w.printf(format)
+	a.valAttr.generateMapModify(w, levelID)
 	format = `				case metago.ChangeTypeDelete:
+				delete(m%[1]s, key%[1]s)
             }
 		}
 `
-	w.printf(format)
+	w.printf(format, levelID, nextLevelID)
+}
+
+func (a *mapAttrDef) generateMapModify(w *writer, levelID string) {
+	nextLevelID := fmt.Sprintf("%s1", levelID)
+	w.printf("				for _, c%[2]s := range mc%[1]s.Chgs.Chgs {\n", levelID, nextLevelID)
+	w.printf("              }\n")
 }
 
 /************************************************************************/

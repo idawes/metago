@@ -6,10 +6,11 @@ package test
 
 import (
 	"github.com/idawes/metago"
+	"time"
 )
 
 type MapTestObject struct {
-	o1 map[byte]string
+	o1 map[byte]time.Time
 	o2 map[byte]map[byte]string
 }
 
@@ -22,7 +23,7 @@ func (o1 *MapTestObject) Equals(o2 *MapTestObject) bool {
 		}
 		for key, va1 := range va {
 			if vb1, ok := vb[key]; ok {
-				if va1 != vb1 {
+				if va1.Equal(vb1) {
 					return false
 				}
 			} else {
@@ -66,15 +67,15 @@ func (o1 *MapTestObject) Diff(o2 *MapTestObject) *metago.Diff {
 		for key, va1 := range va {
 			if vb1, ok := vb[key]; ok {
 				d1 := &metago.Diff{}
-				if va1 != vb1 {
-					d1.Add(metago.NewStringChg(&MapTestObjecto1SREF, vb1, va1))
+				if va1.Equal(vb1) {
+					d1.Add(metago.NewTimeChg(&MapTestObjecto1SREF, vb1, va1))
 				}
 				if len(d1.Chgs) != 0 {
 					d.Chgs = append(d.Chgs, metago.NewByteMapChg(&MapTestObjecto1SREF, key, metago.ChangeTypeModify, d1))
 				}
 			} else {
 				d1 := &metago.Diff{}
-				d1.Add(metago.NewStringChg(&MapTestObjecto1SREF, va1))
+				d1.Add(metago.NewTimeChg(&MapTestObjecto1SREF, va1))
 				if len(d1.Chgs) != 0 {
 					d.Chgs = append(d.Chgs, metago.NewByteMapChg(&MapTestObjecto1SREF, key, metago.ChangeTypeInsert, d1))
 				}
@@ -82,7 +83,7 @@ func (o1 *MapTestObject) Diff(o2 *MapTestObject) *metago.Diff {
 		}
 		for key, vb1 := range vb {
 			d1 := &metago.Diff{}
-			d1.Add(metago.NewStringChg(&MapTestObjecto1SREF, vb1))
+			d1.Add(metago.NewTimeChg(&MapTestObjecto1SREF, vb1))
 			if len(d1.Chgs) != 0 {
 				d.Chgs = append(d.Chgs, metago.NewByteMapChg(&MapTestObjecto1SREF, key, metago.ChangeTypeDelete, d1))
 			}
@@ -163,10 +164,11 @@ func (o *MapTestObject) Apply(d *metago.Diff) error {
 				key := mc.Key
 				switch mc.Typ {
 				case metago.ChangeTypeModify:
-					c1 := mc.Chgs.Chgs[0]
-					m[key] = c1.(*metago.StringChg).NewValue
+					m[key] = mc.Chgs.Chgs[0].(*metago.TimeChg).NewValue
 				case metago.ChangeTypeInsert:
+					m[key] = mc.Chgs.Chgs[0].(*metago.TimeChg).NewValue
 				case metago.ChangeTypeDelete:
+					delete(m, key)
 				}
 			}
 
@@ -180,7 +182,10 @@ func (o *MapTestObject) Apply(d *metago.Diff) error {
 					for _, c1 := range mc.Chgs.Chgs {
 					}
 				case metago.ChangeTypeInsert:
+					for _, c1 := range mc.Chgs.Chgs {
+					}
 				case metago.ChangeTypeDelete:
+					delete(m, key)
 				}
 			}
 		}

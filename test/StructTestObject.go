@@ -89,10 +89,11 @@ func (o *StructTestObject) Apply(d *metago.Diff) error {
 				key := mc.Key
 				switch mc.Typ {
 				case metago.ChangeTypeModify:
-					c1 := mc.Chgs.Chgs[0]
-					m[key] = c1.(*metago.BasicAttrTypesObjectChg).NewValue
+					m[key] = mc.Chgs.Chgs[0].(*metago.BasicAttrTypesObjectChg).NewValue
 				case metago.ChangeTypeInsert:
+					m[key] = mc.Chgs.Chgs[0].(*metago.BasicAttrTypesObjectChg).NewValue
 				case metago.ChangeTypeDelete:
+					delete(m, key)
 				}
 			}
 		}
