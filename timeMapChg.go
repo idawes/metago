@@ -6,9 +6,9 @@ type TimeMapChg struct {
 	BaseChg
 	Key  time.Time
 	Typ  ChangeType
-	Chgs Diff
+	Chgs []Chg
 }
 
-func NewTimeMapChg(s *Attrdef, key time.Time, typ ChangeType, chgs *Diff) Chg {
-	return &TimeMapChg{BaseChg: BaseChg{schemaref: s}, Key: key, Typ: typ, Chgs: *chgs}
+func NewTimeMapChg(s *Attrdef, key time.Time, typ ChangeType, chgs []Chg) Chg {
+	return &TimeMapChg{BaseChg: BaseChg{schemaref: s}, Key: key, Typ: typ, Chgs: chgs}
 }

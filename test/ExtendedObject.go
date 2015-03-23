@@ -168,120 +168,120 @@ func (o1 *ExtendedObject) Equals(o2 *ExtendedObject) bool {
 }
 
 func (o1 *ExtendedObject) Diff(o2 *ExtendedObject) *metago.Diff {
-	d := &metago.Diff{}
+	chgs := make([]metago.Chg, 0)
 
 	{
 		va, vb := o1.ByteField, o2.ByteField
 		if va != vb {
-			d.Add(metago.NewByteChg(&BasicAttrTypesObjectByteFieldSREF, vb, va))
+			chgs = append(chgs, metago.NewByteChg(&BasicAttrTypesObjectByteFieldSREF, vb, va))
 		}
 	}
 
 	{
 		va, vb := o1.UbbField, o2.UbbField
 		if va != vb {
-			d.Add(metago.NewUintChg(&BasicAttrTypesObjectUbbFieldSREF, vb, va))
+			chgs = append(chgs, metago.NewUintChg(&BasicAttrTypesObjectUbbFieldSREF, vb, va))
 		}
 	}
 
 	{
 		va, vb := o1.U8Field, o2.U8Field
 		if va != vb {
-			d.Add(metago.NewUint8Chg(&BasicAttrTypesObjectU8FieldSREF, vb, va))
+			chgs = append(chgs, metago.NewUint8Chg(&BasicAttrTypesObjectU8FieldSREF, vb, va))
 		}
 	}
 
 	{
 		va, vb := o1.U16Field, o2.U16Field
 		if va != vb {
-			d.Add(metago.NewUint16Chg(&BasicAttrTypesObjectU16FieldSREF, vb, va))
+			chgs = append(chgs, metago.NewUint16Chg(&BasicAttrTypesObjectU16FieldSREF, vb, va))
 		}
 	}
 
 	{
 		va, vb := o1.U32Field, o2.U32Field
 		if va != vb {
-			d.Add(metago.NewUint32Chg(&BasicAttrTypesObjectU32FieldSREF, vb, va))
+			chgs = append(chgs, metago.NewUint32Chg(&BasicAttrTypesObjectU32FieldSREF, vb, va))
 		}
 	}
 
 	{
 		va, vb := o1.U64Field, o2.U64Field
 		if va != vb {
-			d.Add(metago.NewUint64Chg(&BasicAttrTypesObjectU64FieldSREF, vb, va))
+			chgs = append(chgs, metago.NewUint64Chg(&BasicAttrTypesObjectU64FieldSREF, vb, va))
 		}
 	}
 
 	{
 		va, vb := o1.SField, o2.SField
 		if va != vb {
-			d.Add(metago.NewIntChg(&BasicAttrTypesObjectSFieldSREF, vb, va))
+			chgs = append(chgs, metago.NewIntChg(&BasicAttrTypesObjectSFieldSREF, vb, va))
 		}
 	}
 
 	{
 		va, vb := o1.S8Field, o2.S8Field
 		if va != vb {
-			d.Add(metago.NewInt8Chg(&BasicAttrTypesObjectS8FieldSREF, vb, va))
+			chgs = append(chgs, metago.NewInt8Chg(&BasicAttrTypesObjectS8FieldSREF, vb, va))
 		}
 	}
 
 	{
 		va, vb := o1.S16Field, o2.S16Field
 		if va != vb {
-			d.Add(metago.NewInt16Chg(&BasicAttrTypesObjectS16FieldSREF, vb, va))
+			chgs = append(chgs, metago.NewInt16Chg(&BasicAttrTypesObjectS16FieldSREF, vb, va))
 		}
 	}
 
 	{
 		va, vb := o1.S32Field, o2.S32Field
 		if va != vb {
-			d.Add(metago.NewInt32Chg(&BasicAttrTypesObjectS32FieldSREF, vb, va))
+			chgs = append(chgs, metago.NewInt32Chg(&BasicAttrTypesObjectS32FieldSREF, vb, va))
 		}
 	}
 
 	{
 		va, vb := o1.S64Field, o2.S64Field
 		if va != vb {
-			d.Add(metago.NewInt64Chg(&BasicAttrTypesObjectS64FieldSREF, vb, va))
+			chgs = append(chgs, metago.NewInt64Chg(&BasicAttrTypesObjectS64FieldSREF, vb, va))
 		}
 	}
 
 	{
 		va, vb := o1.F32Field, o2.F32Field
 		if va != vb {
-			d.Add(metago.NewFloat32Chg(&BasicAttrTypesObjectF32FieldSREF, vb, va))
+			chgs = append(chgs, metago.NewFloat32Chg(&BasicAttrTypesObjectF32FieldSREF, vb, va))
 		}
 	}
 
 	{
 		va, vb := o1.F64Field, o2.F64Field
 		if va != vb {
-			d.Add(metago.NewFloat64Chg(&BasicAttrTypesObjectF64FieldSREF, vb, va))
+			chgs = append(chgs, metago.NewFloat64Chg(&BasicAttrTypesObjectF64FieldSREF, vb, va))
 		}
 	}
 
 	{
 		va, vb := o1.StringField, o2.StringField
 		if va != vb {
-			d.Add(metago.NewStringChg(&BasicAttrTypesObjectStringFieldSREF, vb, va))
+			chgs = append(chgs, metago.NewStringChg(&BasicAttrTypesObjectStringFieldSREF, vb, va))
 		}
 	}
 
 	{
 		va, vb := o1.TimeField, o2.TimeField
 		if va.Equal(vb) {
-			d.Add(metago.NewTimeChg(&BasicAttrTypesObjectTimeFieldSREF, vb, va))
+			chgs = append(chgs, metago.NewTimeChg(&BasicAttrTypesObjectTimeFieldSREF, vb, va))
 		}
 	}
 
 	{
 		va, vb := o1.ExtendedByteField, o2.ExtendedByteField
 		if va != vb {
-			d.Add(metago.NewByteChg(&ExtendedObjectExtendedByteFieldSREF, vb, va))
+			chgs = append(chgs, metago.NewByteChg(&ExtendedObjectExtendedByteFieldSREF, vb, va))
 		}
 	}
-	return d
+	return &metago.Diff{Chgs: chgs}
 }
 
 func (o *ExtendedObject) Apply(d *metago.Diff) error {

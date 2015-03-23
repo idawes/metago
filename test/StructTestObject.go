@@ -41,7 +41,7 @@ func (o1 *StructTestObject) Equals(o2 *StructTestObject) bool {
 }
 
 func (o1 *StructTestObject) Diff(o2 *StructTestObject) *metago.Diff {
-	d := &metago.Diff{}
+	chgs := make([]metago.Chg, 0)
 
 	{
 		va, vb := o1.B, o2.B
@@ -52,30 +52,30 @@ func (o1 *StructTestObject) Diff(o2 *StructTestObject) *metago.Diff {
 		va, vb := o1.MB, o2.MB
 		for key, va1 := range va {
 			if vb1, ok := vb[key]; ok {
-				d1 := &metago.Diff{}
+				chgs1 := make([]metago.Chg, 0)
 				d1.Chgs = append(d1.Chgs, metago.NewStructChg(&StructTestObjectMBSREF, va1.Diff(&vb1)))
-				if len(d1.Chgs) != 0 {
-					d.Chgs = append(d.Chgs, metago.NewIntMapChg(&StructTestObjectMBSREF, key, metago.ChangeTypeModify, d1))
+				if len(chgs1) != 0 {
+					chgs = append(chgs, metago.NewIntMapChg(&StructTestObjectMBSREF, key, metago.ChangeTypeModify, chgs1))
 				}
 			} else {
-				d1 := &metago.Diff{}
+				chgs1 := make([]metago.Chg, 0)
 				t := BasicAttrTypesObject{}
 				d1.Add(metago.NewStructChg(&StructTestObjectMBSREF, t.Diff(&va1)))
-				if len(d1.Chgs) != 0 {
-					d.Chgs = append(d.Chgs, metago.NewIntMapChg(&StructTestObjectMBSREF, key, metago.ChangeTypeInsert, d1))
+				if len(chgs1) != 0 {
+					chgs = append(chgs, metago.NewIntMapChg(&StructTestObjectMBSREF, key, metago.ChangeTypeInsert, chgs1))
 				}
 			}
 		}
 		for key, vb1 := range vb {
-			d1 := &metago.Diff{}
+			chgs1 := make([]metago.Chg, 0)
 			t := BasicAttrTypesObject{}
 			d1.Add(metago.NewStructChg(&StructTestObjectMBSREF, vb1.Diff(&t)))
-			if len(d1.Chgs) != 0 {
-				d.Chgs = append(d.Chgs, metago.NewIntMapChg(&StructTestObjectMBSREF, key, metago.ChangeTypeDelete, d1))
+			if len(chgs1) != 0 {
+				chgs = append(chgs, metago.NewIntMapChg(&StructTestObjectMBSREF, key, metago.ChangeTypeDelete, chgs1))
 			}
 		}
 	}
-	return d
+	return &metago.Diff{Chgs: chgs}
 }
 
 func (o *StructTestObject) Apply(d *metago.Diff) error {
@@ -89,9 +89,9 @@ func (o *StructTestObject) Apply(d *metago.Diff) error {
 				key := mc.Key
 				switch mc.Typ {
 				case metago.ChangeTypeModify:
-					m[key] = mc.Chgs.Chgs[0].(*metago.BasicAttrTypesObjectChg).NewValue
+					m[key] = mc.Chgs[0].(*metago.BasicAttrTypesObjectChg).NewValue
 				case metago.ChangeTypeInsert:
-					m[key] = mc.Chgs.Chgs[0].(*metago.BasicAttrTypesObjectChg).NewValue
+					m[key] = mc.Chgs[0].(*metago.BasicAttrTypesObjectChg).NewValue
 				case metago.ChangeTypeDelete:
 					delete(m, key)
 				}

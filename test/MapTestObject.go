@@ -60,32 +60,32 @@ func (o1 *MapTestObject) Equals(o2 *MapTestObject) bool {
 }
 
 func (o1 *MapTestObject) Diff(o2 *MapTestObject) *metago.Diff {
-	d := &metago.Diff{}
+	chgs := make([]metago.Chg, 0)
 
 	{
 		va, vb := o1.o1, o2.o1
 		for key, va1 := range va {
 			if vb1, ok := vb[key]; ok {
-				d1 := &metago.Diff{}
+				chgs1 := make([]metago.Chg, 0)
 				if va1.Equal(vb1) {
-					d1.Add(metago.NewTimeChg(&MapTestObjecto1SREF, vb1, va1))
+					chgs1 = append(chgs1, metago.NewTimeChg(&MapTestObjecto1SREF, vb1, va1))
 				}
-				if len(d1.Chgs) != 0 {
-					d.Chgs = append(d.Chgs, metago.NewByteMapChg(&MapTestObjecto1SREF, key, metago.ChangeTypeModify, d1))
+				if len(chgs1) != 0 {
+					chgs = append(chgs, metago.NewByteMapChg(&MapTestObjecto1SREF, key, metago.ChangeTypeModify, chgs1))
 				}
 			} else {
-				d1 := &metago.Diff{}
-				d1.Add(metago.NewTimeChg(&MapTestObjecto1SREF, va1))
-				if len(d1.Chgs) != 0 {
-					d.Chgs = append(d.Chgs, metago.NewByteMapChg(&MapTestObjecto1SREF, key, metago.ChangeTypeInsert, d1))
+				chgs1 := make([]metago.Chg, 0)
+				chgs1 = append(chgs1, metago.NewTimeChg(&MapTestObjecto1SREF, va1))
+				if len(chgs1) != 0 {
+					chgs = append(chgs, metago.NewByteMapChg(&MapTestObjecto1SREF, key, metago.ChangeTypeInsert, chgs1))
 				}
 			}
 		}
 		for key, vb1 := range vb {
-			d1 := &metago.Diff{}
-			d1.Add(metago.NewTimeChg(&MapTestObjecto1SREF, vb1))
-			if len(d1.Chgs) != 0 {
-				d.Chgs = append(d.Chgs, metago.NewByteMapChg(&MapTestObjecto1SREF, key, metago.ChangeTypeDelete, d1))
+			chgs1 := make([]metago.Chg, 0)
+			chgs1 = append(chgs1, metago.NewTimeChg(&MapTestObjecto1SREF, vb1))
+			if len(chgs1) != 0 {
+				chgs = append(chgs, metago.NewByteMapChg(&MapTestObjecto1SREF, key, metago.ChangeTypeDelete, chgs1))
 			}
 		}
 	}
@@ -94,63 +94,63 @@ func (o1 *MapTestObject) Diff(o2 *MapTestObject) *metago.Diff {
 		va, vb := o1.o2, o2.o2
 		for key, va1 := range va {
 			if vb1, ok := vb[key]; ok {
-				d1 := &metago.Diff{}
+				chgs1 := make([]metago.Chg, 0)
 				for key1, va11 := range va1 {
 					if vb11, ok := vb1[key1]; ok {
-						d11 := &metago.Diff{}
+						chgs11 := make([]metago.Chg, 0)
 						if va11 != vb11 {
-							d11.Add(metago.NewStringChg(&MapTestObjecto2SREF, vb11, va11))
+							chgs11 = append(chgs11, metago.NewStringChg(&MapTestObjecto2SREF, vb11, va11))
 						}
-						if len(d11.Chgs) != 0 {
-							d1.Chgs = append(d1.Chgs, metago.NewByteMapChg(&MapTestObjecto2SREF, key1, metago.ChangeTypeModify, d11))
+						if len(chgs11) != 0 {
+							chgs1 = append(chgs1, metago.NewByteMapChg(&MapTestObjecto2SREF, key1, metago.ChangeTypeModify, chgs11))
 						}
 					} else {
-						d11 := &metago.Diff{}
-						d11.Add(metago.NewStringChg(&MapTestObjecto2SREF, va11))
-						if len(d11.Chgs) != 0 {
-							d1.Chgs = append(d1.Chgs, metago.NewByteMapChg(&MapTestObjecto2SREF, key1, metago.ChangeTypeInsert, d11))
+						chgs11 := make([]metago.Chg, 0)
+						chgs11 = append(chgs11, metago.NewStringChg(&MapTestObjecto2SREF, va11))
+						if len(chgs11) != 0 {
+							chgs1 = append(chgs1, metago.NewByteMapChg(&MapTestObjecto2SREF, key1, metago.ChangeTypeInsert, chgs11))
 						}
 					}
 				}
 				for key1, vb11 := range vb1 {
-					d11 := &metago.Diff{}
-					d11.Add(metago.NewStringChg(&MapTestObjecto2SREF, vb11))
-					if len(d11.Chgs) != 0 {
-						d1.Chgs = append(d1.Chgs, metago.NewByteMapChg(&MapTestObjecto2SREF, key1, metago.ChangeTypeDelete, d11))
+					chgs11 := make([]metago.Chg, 0)
+					chgs11 = append(chgs11, metago.NewStringChg(&MapTestObjecto2SREF, vb11))
+					if len(chgs11) != 0 {
+						chgs1 = append(chgs1, metago.NewByteMapChg(&MapTestObjecto2SREF, key1, metago.ChangeTypeDelete, chgs11))
 					}
 				}
-				if len(d1.Chgs) != 0 {
-					d.Chgs = append(d.Chgs, metago.NewByteMapChg(&MapTestObjecto2SREF, key, metago.ChangeTypeModify, d1))
+				if len(chgs1) != 0 {
+					chgs = append(chgs, metago.NewByteMapChg(&MapTestObjecto2SREF, key, metago.ChangeTypeModify, chgs1))
 				}
 			} else {
-				d1 := &metago.Diff{}
+				chgs1 := make([]metago.Chg, 0)
 				for key1, va11 := range va1 {
-					d11 := &metago.Diff{}
-					d11.Add(metago.NewStringChg(&MapTestObjecto2SREF, va11))
-					if len(d11.Chgs) != 0 {
-						d1.Chgs = append(d1.Chgs, metago.NewByteMapChg(&MapTestObjecto2SREF, key1, metago.ChangeTypeInsert, d11))
+					chgs11 := make([]metago.Chg, 0)
+					chgs11 = append(chgs11, metago.NewStringChg(&MapTestObjecto2SREF, va11))
+					if len(chgs11) != 0 {
+						chgs1 = append(chgs1, metago.NewByteMapChg(&MapTestObjecto2SREF, key1, metago.ChangeTypeInsert, chgs11))
 					}
 				}
-				if len(d1.Chgs) != 0 {
-					d.Chgs = append(d.Chgs, metago.NewByteMapChg(&MapTestObjecto2SREF, key, metago.ChangeTypeInsert, d1))
+				if len(chgs1) != 0 {
+					chgs = append(chgs, metago.NewByteMapChg(&MapTestObjecto2SREF, key, metago.ChangeTypeInsert, chgs1))
 				}
 			}
 		}
 		for key, vb1 := range vb {
-			d1 := &metago.Diff{}
+			chgs1 := make([]metago.Chg, 0)
 			for key1, vb11 := range vb1 {
-				d11 := &metago.Diff{}
-				d11.Add(metago.NewStringChg(&MapTestObjecto2SREF, vb11))
-				if len(d11.Chgs) != 0 {
-					d1.Chgs = append(d1.Chgs, metago.NewByteMapChg(&MapTestObjecto2SREF, key1, metago.ChangeTypeDelete, d11))
+				chgs11 := make([]metago.Chg, 0)
+				chgs11 = append(chgs11, metago.NewStringChg(&MapTestObjecto2SREF, vb11))
+				if len(chgs11) != 0 {
+					chgs1 = append(chgs1, metago.NewByteMapChg(&MapTestObjecto2SREF, key1, metago.ChangeTypeDelete, chgs11))
 				}
 			}
-			if len(d1.Chgs) != 0 {
-				d.Chgs = append(d.Chgs, metago.NewByteMapChg(&MapTestObjecto2SREF, key, metago.ChangeTypeDelete, d1))
+			if len(chgs1) != 0 {
+				chgs = append(chgs, metago.NewByteMapChg(&MapTestObjecto2SREF, key, metago.ChangeTypeDelete, chgs1))
 			}
 		}
 	}
-	return d
+	return &metago.Diff{Chgs: chgs}
 }
 
 func (o *MapTestObject) Apply(d *metago.Diff) error {
@@ -164,9 +164,9 @@ func (o *MapTestObject) Apply(d *metago.Diff) error {
 				key := mc.Key
 				switch mc.Typ {
 				case metago.ChangeTypeModify:
-					m[key] = mc.Chgs.Chgs[0].(*metago.TimeChg).NewValue
+					m[key] = mc.Chgs[0].(*metago.TimeChg).NewValue
 				case metago.ChangeTypeInsert:
-					m[key] = mc.Chgs.Chgs[0].(*metago.TimeChg).NewValue
+					m[key] = mc.Chgs[0].(*metago.TimeChg).NewValue
 				case metago.ChangeTypeDelete:
 					delete(m, key)
 				}
@@ -179,10 +179,10 @@ func (o *MapTestObject) Apply(d *metago.Diff) error {
 				key := mc.Key
 				switch mc.Typ {
 				case metago.ChangeTypeModify:
-					for _, c1 := range mc.Chgs.Chgs {
+					for _, c1 := range mc.Chgs {
 					}
 				case metago.ChangeTypeInsert:
-					for _, c1 := range mc.Chgs.Chgs {
+					for _, c1 := range mc.Chgs {
 					}
 				case metago.ChangeTypeDelete:
 					delete(m, key)

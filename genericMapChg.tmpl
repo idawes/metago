@@ -4,9 +4,9 @@ type @@T@@MapChg struct {
     BaseChg
     Key @@t@@
     Typ ChangeType
-    Chgs Diff
+    Chgs []Chg
 }
 
-func New@@T@@MapChg(s *Attrdef, key @@t@@, typ ChangeType, chgs *Diff) Chg {
-    return &@@T@@MapChg{BaseChg: BaseChg{schemaref: s}, Key: key, Typ: typ, Chgs: *chgs}
+func New@@T@@MapChg(s *Attrdef, key @@t@@, typ ChangeType, chgs []Chg) Chg {
+    return &@@T@@MapChg{BaseChg: BaseChg{schemaref: s}, Key: key, Typ: typ, Chgs: chgs}
 }

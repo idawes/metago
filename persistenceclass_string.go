@@ -6,11 +6,16 @@ import "fmt"
 
 const _PersistenceClass_name = "PersistenceClassPersistentPersistenceClassNonPersistentPersistenceClassEphemeral"
 
-var _PersistenceClass_index = [...]uint8{0, 26, 55, 80}
+var _PersistenceClass_index = [...]uint8{26, 55, 80}
 
 func (i PersistenceClass) String() string {
-	if i < 0 || i+1 >= PersistenceClass(len(_PersistenceClass_index)) {
+	if i < 0 || i >= PersistenceClass(len(_PersistenceClass_index)) {
 		return fmt.Sprintf("PersistenceClass(%d)", i)
 	}
-	return _PersistenceClass_name[_PersistenceClass_index[i]:_PersistenceClass_index[i+1]]
+	hi := _PersistenceClass_index[i]
+	lo := uint8(0)
+	if i > 0 {
+		lo = _PersistenceClass_index[i-1]
+	}
+	return _PersistenceClass_name[lo:hi]
 }

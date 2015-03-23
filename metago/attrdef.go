@@ -175,7 +175,7 @@ func (a *baseAttrDef) generateEquals(w *writer, levelID string) {
 func (a *baseAttrDef) generateDiff(w *writer, levelID string) {
 	a.checkLevel0Hdr(w, levelID)
 	format := `  if va%[1]s != vb%[1]s {
-		d%[1]s.Add(metago.New%[2]sChg(&%[3]s%[4]sSREF, vb%[1]s, va%[1]s))
+		chgs%[1]s = append(chgs%[1]s, metago.New%[2]sChg(&%[3]s%[4]sSREF, vb%[1]s, va%[1]s))
 	}
 `
 	w.printf(format, levelID, strings.Title(a.typ), a.parentType.name, a.nm)
@@ -183,11 +183,11 @@ func (a *baseAttrDef) generateDiff(w *writer, levelID string) {
 }
 
 func (a *baseAttrDef) generateIns(w *writer, levelID string) {
-	w.printf("d%[1]s.Add(metago.New%[2]sChg(&%[3]s%[4]sSREF, va%[1]s))\n", levelID, strings.Title(a.typ), a.parentType.name, a.nm)
+	w.printf("chgs%[1]s = append(chgs%[1]s, metago.New%[2]sChg(&%[3]s%[4]sSREF, va%[1]s))\n", levelID, strings.Title(a.typ), a.parentType.name, a.nm)
 }
 
 func (a *baseAttrDef) generateDel(w *writer, levelID string) {
-	w.printf("d%[1]s.Add(metago.New%[2]sChg(&%[3]s%[4]sSREF, vb%[1]s))\n", levelID, strings.Title(a.typ), a.parentType.name, a.nm)
+	w.printf("chgs%[1]s = append(chgs%[1]s, metago.New%[2]sChg(&%[3]s%[4]sSREF, vb%[1]s))\n", levelID, strings.Title(a.typ), a.parentType.name, a.nm)
 }
 
 func (a *baseAttrDef) checkLevel0ApplyHdr(w *writer, levelID string) {
@@ -211,7 +211,7 @@ func (a *baseAttrDef) generateApply(w *writer, levelID string) {
 
 func (a *baseAttrDef) generateMapModify(w *writer, levelID string) {
 	nextLevelID := fmt.Sprintf("%s1", levelID)
-	w.printf("              m%[1]s[key%[1]s] = mc%[1]s.Chgs.Chgs[0].(*metago.%[3]sChg).NewValue\n", levelID, nextLevelID, strings.Title(a.typ))
+	w.printf("              m%[1]s[key%[1]s] = mc%[1]s.Chgs[0].(*metago.%[3]sChg).NewValue\n", levelID, nextLevelID, strings.Title(a.typ))
 }
 
 /************************************************************************/
@@ -233,7 +233,7 @@ func (a *timeAttrDef) generateEquals(w *writer, levelID string) {
 func (a *timeAttrDef) generateDiff(w *writer, levelID string) {
 	a.checkLevel0Hdr(w, levelID)
 	format := `  if va%[1]s.Equal(vb%[1]s) {
-		d%[1]s.Add(metago.NewTimeChg(&%[2]s%[3]sSREF, vb%[1]s, va%[1]s))
+		chgs%[1]s = append(chgs%[1]s, metago.NewTimeChg(&%[2]s%[3]sSREF, vb%[1]s, va%[1]s))
 	}
 `
 	w.printf(format, levelID, a.parentType.name, a.nm)
@@ -241,11 +241,11 @@ func (a *timeAttrDef) generateDiff(w *writer, levelID string) {
 }
 
 func (a *timeAttrDef) generateIns(w *writer, levelID string) {
-	w.printf("d%[1]s.Add(metago.NewTimeChg(&%[2]s%[3]sSREF, va%[1]s))\n", levelID, a.parentType.name, a.nm)
+	w.printf("chgs%[1]s = append(chgs%[1]s, metago.NewTimeChg(&%[2]s%[3]sSREF, va%[1]s))\n", levelID, a.parentType.name, a.nm)
 }
 
 func (a *timeAttrDef) generateDel(w *writer, levelID string) {
-	w.printf("d%[1]s.Add(metago.NewTimeChg(&%[2]s%[3]sSREF, vb%[1]s))\n", levelID, a.parentType.name, a.nm)
+	w.printf("chgs%[1]s = append(chgs%[1]s, metago.NewTimeChg(&%[2]s%[3]sSREF, vb%[1]s))\n", levelID, a.parentType.name, a.nm)
 }
 
 func (a *timeAttrDef) generateApply(w *writer, levelID string) {
@@ -254,7 +254,7 @@ func (a *timeAttrDef) generateApply(w *writer, levelID string) {
 
 func (a *timeAttrDef) generateMapModify(w *writer, levelID string) {
 	nextLevelID := fmt.Sprintf("%s1", levelID)
-	w.printf("              m%[1]s[key%[1]s] = mc%[1]s.Chgs.Chgs[0].(*metago.TimeChg).NewValue\n", levelID, nextLevelID, strings.Title(a.typ))
+	w.printf("              m%[1]s[key%[1]s] = mc%[1]s.Chgs[0].(*metago.TimeChg).NewValue\n", levelID, nextLevelID, strings.Title(a.typ))
 }
 
 /************************************************************************/
@@ -299,30 +299,30 @@ func (a *sliceAttrDef) generateDiff(w *writer, levelID string) {
 	format := `    for idx%[1]s, va%[2]s := range va%[1]s {
         if idx%[1]s  < len(vb%[1]s) {
 			vb%[2]s := vb%[1]s[idx%[1]s]
-			d%[2]s := &metago.Diff{}
+			chgs%[2]s := make([]metago.Chg, 0)
 `
 	w.printf(format, levelID, nextLevelID)
 	a.valAttr.generateDiff(w, nextLevelID)
-	format = `            if len(d%[2]s.Chgs) != 0 {
-				d%[1]s.Chgs = append(d%[1]s.Chgs, metago.NewSliceChg(&%[3]s%[4]sSREF, idx%[1]s, metago.ChangeTypeModify, d%[2]s))
+	format = `            if len(chgs%[2]s) != 0 {
+				chgs%[1]s = append(chgs%[1]s, metago.NewSliceChg(&%[3]s%[4]sSREF, idx%[1]s, metago.ChangeTypeModify, chgs%[2]s))
 			}
 		} else {
-			d%[2]s := &metago.Diff{}
+			chgs%[2]s := make([]metago.Chg, 0)
 `
 	w.printf(format, levelID, nextLevelID, a.parentType.name, a.nm)
 	a.valAttr.generateIns(w, nextLevelID)
-	format = `            if len(d%[2]s.Chgs) != 0 {
-				d%[1]s.Chgs = append(d%[1]s.Chgs, metago.NewSliceChg(&%[3]s%[4]sSREF, idx%[1]s, metago.ChangeTypeInsert, d%[2]s))
+	format = `            if len(chgs%[2]s) != 0 {
+				chgs%[1]s = append(chgs%[1]s, metago.NewSliceChg(&%[3]s%[4]sSREF, idx%[1]s, metago.ChangeTypeInsert, chgs%[2]s))
 			}
 		}
 	}
 	for idx%[1]s, vb%[2]s := range vb%[1]s {
-		d%[2]s := &metago.Diff{}
+		chgs%[2]s := make([]metago.Chg, 0)
 `
 	w.printf(format, levelID, nextLevelID, a.parentType.name, a.nm)
 	a.valAttr.generateDel(w, nextLevelID)
-	format = `        if len(d%[2]s.Chgs) != 0 {
-			d%[1]s.Chgs = append(d%[1]s.Chgs, metago.NewSliceChg(&%[3]s%[4]sSREF, idx%[1]s, metago.ChangeTypeDelete, d%[2]s))
+	format = `            if len(chgs%[2]s) != 0 {
+				chgs%[1]s = append(chgs%[1]s, metago.NewSliceChg(&%[3]s%[4]sSREF, idx%[1]s, metago.ChangeTypeDelete, chgs%[2]s))
         }
 	}
 `
@@ -333,12 +333,12 @@ func (a *sliceAttrDef) generateDiff(w *writer, levelID string) {
 func (a *sliceAttrDef) generateIns(w *writer, levelID string) {
 	nextLevelID := fmt.Sprintf("%s1", levelID)
 	format := `    for idx%[1]s, va%[2]s := range va%[1]s {
-		d%s := &metago.Diff{}
+		chgs%[2]s := make([]metago.Chg, 0)
 `
 	w.printf(format, levelID, nextLevelID)
 	a.valAttr.generateIns(w, nextLevelID)
-	format = `        if len(d%[2]s.Chgs) != 0 {
-			d%[1]s.Chgs = append(d%[1]s.Chgs, metago.NewSliceChg(&%[3]s%[4]sSREF, idx%[1]s, metago.ChangeTypeInsert, d%[2]s))
+	format = `            if len(chgs%[2]s) != 0 {
+				chgs%[1]s = append(chgs%[1]s, metago.NewSliceChg(&%[3]s%[4]sSREF, idx%[1]s, metago.ChangeTypeInsert, chgs%[2]s))
 		}
 	}
 `
@@ -348,12 +348,12 @@ func (a *sliceAttrDef) generateIns(w *writer, levelID string) {
 func (a *sliceAttrDef) generateDel(w *writer, levelID string) {
 	nextLevelID := fmt.Sprintf("%s1", levelID)
 	format := `    for idx%[1]s, vb%[2]s := range vb%[1]s {
-		d%s := &metago.Diff{}
+		chgs%[2]s := make([]metago.Chg, 0)
 `
 	w.printf(format, levelID, nextLevelID)
 	a.valAttr.generateDel(w, nextLevelID)
-	format = `        if len(d%[2]s.Chgs) != 0 {
-			d%[1]s.Chgs = append(d%[1]s.Chgs, metago.NewSliceChg(&%[3]s%[4]sSREF, idx%[1]s, metago.ChangeTypeDelete, d%[2]s))
+	format = `            if len(chgs%[2]s) != 0 {
+				chgs%[1]s = append(chgs%[1]s, metago.NewSliceChg(&%[3]s%[4]sSREF, idx%[1]s, metago.ChangeTypeDelete, chgs%[2]s))
 		}
 	}
 `
@@ -423,30 +423,30 @@ func (a *mapAttrDef) generateDiff(w *writer, levelID string) {
 	a.checkLevel0Hdr(w, levelID)
 	format := `    for key%[1]s, va%[2]s := range va%[1]s {
 		if vb%[2]s, ok := vb%[1]s[key%[1]s]; ok {
-			d%[2]s := &metago.Diff{}
+			chgs%[2]s := make([]metago.Chg, 0)
 `
 	w.printf(format, levelID, nextLevelID)
 	a.valAttr.generateDiff(w, nextLevelID)
-	format = `            if len(d%[2]s.Chgs) != 0 {
-				d%[1]s.Chgs = append(d%[1]s.Chgs, metago.New%[3]sMapChg(&%[4]s%[5]sSREF, key%[1]s, metago.ChangeTypeModify, d%[2]s))
+	format = `            if len(chgs%[2]s) != 0 {
+				chgs%[1]s = append(chgs%[1]s, metago.New%[3]sMapChg(&%[4]s%[5]sSREF, key%[1]s, metago.ChangeTypeModify, chgs%[2]s))
 			}
 		} else {
-			d%[2]s := &metago.Diff{}
+			chgs%[2]s := make([]metago.Chg, 0)
 `
 	w.printf(format, levelID, nextLevelID, strings.Title(a.keyType), a.parentType.name, a.nm)
 	a.valAttr.generateIns(w, nextLevelID)
-	format = `            if len(d%[2]s.Chgs) != 0 {
-				d%[1]s.Chgs = append(d%[1]s.Chgs, metago.New%[3]sMapChg(&%[4]s%[5]sSREF, key%[1]s, metago.ChangeTypeInsert, d%[2]s))
+	format = `            if len(chgs%[2]s) != 0 {
+				chgs%[1]s = append(chgs%[1]s, metago.New%[3]sMapChg(&%[4]s%[5]sSREF, key%[1]s, metago.ChangeTypeInsert, chgs%[2]s))
 			}
 		}
 	}
 	for key%[1]s, vb%[2]s := range vb%[1]s {
-		d%[2]s := &metago.Diff{}
+			chgs%[2]s := make([]metago.Chg, 0)
 `
 	w.printf(format, levelID, nextLevelID, strings.Title(a.keyType), a.parentType.name, a.nm)
 	a.valAttr.generateDel(w, nextLevelID)
-	format = `        if len(d%[2]s.Chgs) != 0 {
-			d%[1]s.Chgs = append(d%[1]s.Chgs, metago.New%[3]sMapChg(&%[4]s%[5]sSREF, key%[1]s, metago.ChangeTypeDelete, d%[2]s))
+	format = `            if len(chgs%[2]s) != 0 {
+				chgs%[1]s = append(chgs%[1]s, metago.New%[3]sMapChg(&%[4]s%[5]sSREF, key%[1]s, metago.ChangeTypeDelete, chgs%[2]s))
         }
 	}
 `
@@ -457,12 +457,12 @@ func (a *mapAttrDef) generateDiff(w *writer, levelID string) {
 func (a *mapAttrDef) generateIns(w *writer, levelID string) {
 	nextLevelID := fmt.Sprintf("%s1", levelID)
 	format := `    for key%[1]s, va%[2]s := range va%[1]s {
-		d%s := &metago.Diff{}
+			chgs%[2]s := make([]metago.Chg, 0)
 `
 	w.printf(format, levelID, nextLevelID)
 	a.valAttr.generateIns(w, nextLevelID)
-	format = `        if len(d%[2]s.Chgs) != 0 {
-			d%[1]s.Chgs = append(d%[1]s.Chgs, metago.New%[3]sMapChg(&%[4]s%[5]sSREF, key%[1]s, metago.ChangeTypeInsert, d%[2]s))
+	format = `            if len(chgs%[2]s) != 0 {
+				chgs%[1]s = append(chgs%[1]s, metago.New%[3]sMapChg(&%[4]s%[5]sSREF, key%[1]s, metago.ChangeTypeInsert, chgs%[2]s))
 		}
 	}
 `
@@ -472,12 +472,12 @@ func (a *mapAttrDef) generateIns(w *writer, levelID string) {
 func (a *mapAttrDef) generateDel(w *writer, levelID string) {
 	nextLevelID := fmt.Sprintf("%s1", levelID)
 	format := `    for key%[1]s, vb%[2]s := range vb%[1]s {
-		d%s := &metago.Diff{}
+			chgs%[2]s := make([]metago.Chg, 0)
 `
 	w.printf(format, levelID, nextLevelID)
 	a.valAttr.generateDel(w, nextLevelID)
-	format = `        if len(d%[2]s.Chgs) != 0 {
-			d%[1]s.Chgs = append(d%[1]s.Chgs, metago.New%[3]sMapChg(&%[4]s%[5]sSREF, key%[1]s, metago.ChangeTypeDelete, d%[2]s))
+	format = `            if len(chgs%[2]s) != 0 {
+				chgs%[1]s = append(chgs%[1]s, metago.New%[3]sMapChg(&%[4]s%[5]sSREF, key%[1]s, metago.ChangeTypeDelete, chgs%[2]s))
 		}
 	}
 `
@@ -516,7 +516,7 @@ func (a *mapAttrDef) generateApply(w *writer, levelID string) {
 
 func (a *mapAttrDef) generateMapModify(w *writer, levelID string) {
 	nextLevelID := fmt.Sprintf("%s1", levelID)
-	w.printf("				for _, c%[2]s := range mc%[1]s.Chgs.Chgs {\n", levelID, nextLevelID)
+	w.printf("				for _, c%[2]s := range mc%[1]s.Chgs {\n", levelID, nextLevelID)
 	w.printf("              }\n")
 }
 
