@@ -539,18 +539,18 @@ func (a *structAttrDef) generateEquals(w *writer, levelID string) {
 
 func (a *structAttrDef) generateDiff(w *writer, levelID string) {
 	a.checkLevel0Hdr(w, levelID)
-	w.printf("    d%[1]s.Chgs = append(d%[1]s.Chgs, metago.NewStructChg(&%[2]s%[3]sSREF, va%[1]s.Diff(&vb%[1]s)))\n", levelID, a.parentType.name, a.nm)
+	w.printf("    chgs%[1]s = append(chgs%[1]s, metago.NewStructChg(&%[2]s%[3]sSREF, va%[1]s.Diff(&vb%[1]s)))\n", levelID, a.parentType.name, a.nm)
 	a.checkLevel0Ftr(w, levelID)
 }
 
 func (a *structAttrDef) generateIns(w *writer, levelID string) {
 	w.printf("t := %[1]s{}\n", a.typ)
-	w.printf("d%[1]s.Add(metago.NewStructChg(&%[2]s%[3]sSREF, t.Diff(&va%[1]s)))\n", levelID, a.parentType.name, a.nm)
+	w.printf("chgs%[1]s = append(chgs%[1]s, metago.NewStructChg(&%[2]s%[3]sSREF, t.Diff(&va%[1]s)))\n", levelID, a.parentType.name, a.nm)
 }
 
 func (a *structAttrDef) generateDel(w *writer, levelID string) {
 	w.printf("t := %[1]s{}\n", a.typ)
-	w.printf("d%[1]s.Add(metago.NewStructChg(&%[2]s%[3]sSREF, vb%[1]s.Diff(&t)))\n", levelID, a.parentType.name, a.nm)
+	w.printf("chgs%[1]s = append(chgs%[1]s, metago.NewStructChg(&%[2]s%[3]sSREF, vb%[1]s.Diff(&t)))\n", levelID, a.parentType.name, a.nm)
 }
 
 func (a *structAttrDef) generateApply(w *writer, levelID string) {
