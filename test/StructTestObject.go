@@ -17,7 +17,7 @@ func (o1 *StructTestObject) Equals(o2 *StructTestObject) bool {
 
 	{
 		va, vb := o1.B, o2.B
-		if va.Equals(&vb) {
+		if !va.Equals(&vb) {
 			return false
 		}
 	}
@@ -29,7 +29,7 @@ func (o1 *StructTestObject) Equals(o2 *StructTestObject) bool {
 		}
 		for key, va1 := range va {
 			if vb1, ok := vb[key]; ok {
-				if va1.Equals(&vb1) {
+				if !va1.Equals(&vb1) {
 					return false
 				}
 			} else {
@@ -45,19 +45,25 @@ func (o1 *StructTestObject) Diff(o2 *StructTestObject) *metago.Diff {
 
 	{
 		va, vb := o1.B, o2.B
-		chgs = append(chgs, metago.NewStructChg(&StructTestObjectBSREF, va.Diff(&vb)))
+		if !va.Equals(&vb) {
+			chgs = append(chgs, metago.NewStructChg(&StructTestObjectBSREF, va.Diff(&vb)))
+		}
 	}
 
 	{
 		va, vb := o1.MB, o2.MB
 		for key, va1 := range va {
 			if vb1, ok := vb[key]; ok {
+				// "key" exists in both "va" and "vb"
 				chgs1 := make([]metago.Chg, 0)
-				chgs1 = append(chgs1, metago.NewStructChg(&StructTestObjectMBSREF, va1.Diff(&vb1)))
+				if !va1.Equals(&vb1) {
+					chgs1 = append(chgs1, metago.NewStructChg(&StructTestObjectMBSREF, va1.Diff(&vb1)))
+				}
 				if len(chgs1) != 0 {
 					chgs = append(chgs, metago.NewIntMapChg(&StructTestObjectMBSREF, key, metago.ChangeTypeModify, chgs1))
 				}
 			} else {
+				// "key" exists in "va" but not in "vb"
 				chgs1 := make([]metago.Chg, 0)
 				t := BasicAttrTypesObject{}
 				chgs1 = append(chgs1, metago.NewStructChg(&StructTestObjectMBSREF, t.Diff(&va1)))
@@ -67,6 +73,7 @@ func (o1 *StructTestObject) Diff(o2 *StructTestObject) *metago.Diff {
 			}
 		}
 		for key, vb1 := range vb {
+			// each "key" is an entry that doesn't exist in "vb"
 			chgs1 := make([]metago.Chg, 0)
 			t := BasicAttrTypesObject{}
 			chgs1 = append(chgs1, metago.NewStructChg(&StructTestObjectMBSREF, vb1.Diff(&t)))
@@ -82,6 +89,12 @@ func (o *StructTestObject) Apply(d *metago.Diff) error {
 	for _, c := range d.Chgs {
 		switch c.AttributeID() {
 
+		case &StructTestObjectBAID:
+			{
+				v := &o.B
+				*v = c.(*metago.BasicAttrTypesObjectChg).NewValue
+			}
+
 		case &StructTestObjectMBAID:
 			{
 				m := o.MB
@@ -89,9 +102,19 @@ func (o *StructTestObject) Apply(d *metago.Diff) error {
 				key := mc.Key
 				switch mc.Typ {
 				case metago.ChangeTypeModify:
-					m[key] = mc.Chgs[0].(*metago.BasicAttrTypesObjectChg).NewValue
+					{
+						s := m[key]
+						c := mc.Chgs[0].(*metago.StructChg).Chg
+						s.Apply(&c)
+						m[key] = s
+					}
 				case metago.ChangeTypeInsert:
-					m[key] = mc.Chgs[0].(*metago.BasicAttrTypesObjectChg).NewValue
+					{
+						s := BasicAttrTypesObject{}
+						c := mc.Chgs[0].(*metago.StructChg).Chg
+						s.Apply(&c)
+						m[key] = s
+					}
 				case metago.ChangeTypeDelete:
 					delete(m, key)
 				}

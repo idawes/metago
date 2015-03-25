@@ -66,6 +66,7 @@ func (o1 *MapTestObject) Diff(o2 *MapTestObject) *metago.Diff {
 		va, vb := o1.o1, o2.o1
 		for key, va1 := range va {
 			if vb1, ok := vb[key]; ok {
+				// "key" exists in both "va" and "vb"
 				chgs1 := make([]metago.Chg, 0)
 				if va1.Equal(vb1) {
 					chgs1 = append(chgs1, metago.NewTimeChg(&MapTestObjecto1SREF, vb1, va1))
@@ -74,6 +75,7 @@ func (o1 *MapTestObject) Diff(o2 *MapTestObject) *metago.Diff {
 					chgs = append(chgs, metago.NewByteMapChg(&MapTestObjecto1SREF, key, metago.ChangeTypeModify, chgs1))
 				}
 			} else {
+				// "key" exists in "va" but not in "vb"
 				chgs1 := make([]metago.Chg, 0)
 				chgs1 = append(chgs1, metago.NewTimeChg(&MapTestObjecto1SREF, va1))
 				if len(chgs1) != 0 {
@@ -82,6 +84,7 @@ func (o1 *MapTestObject) Diff(o2 *MapTestObject) *metago.Diff {
 			}
 		}
 		for key, vb1 := range vb {
+			// each "key" is an entry that doesn't exist in "vb"
 			chgs1 := make([]metago.Chg, 0)
 			chgs1 = append(chgs1, metago.NewTimeChg(&MapTestObjecto1SREF, vb1))
 			if len(chgs1) != 0 {
@@ -94,9 +97,11 @@ func (o1 *MapTestObject) Diff(o2 *MapTestObject) *metago.Diff {
 		va, vb := o1.o2, o2.o2
 		for key, va1 := range va {
 			if vb1, ok := vb[key]; ok {
+				// "key" exists in both "va" and "vb"
 				chgs1 := make([]metago.Chg, 0)
 				for key1, va11 := range va1 {
 					if vb11, ok := vb1[key1]; ok {
+						// "key1" exists in both "va1" and "vb1"
 						chgs11 := make([]metago.Chg, 0)
 						if va11 != vb11 {
 							chgs11 = append(chgs11, metago.NewStringChg(&MapTestObjecto2SREF, vb11, va11))
@@ -105,6 +110,7 @@ func (o1 *MapTestObject) Diff(o2 *MapTestObject) *metago.Diff {
 							chgs1 = append(chgs1, metago.NewByteMapChg(&MapTestObjecto2SREF, key1, metago.ChangeTypeModify, chgs11))
 						}
 					} else {
+						// "key1" exists in "va1" but not in "vb1"
 						chgs11 := make([]metago.Chg, 0)
 						chgs11 = append(chgs11, metago.NewStringChg(&MapTestObjecto2SREF, va11))
 						if len(chgs11) != 0 {
@@ -113,6 +119,7 @@ func (o1 *MapTestObject) Diff(o2 *MapTestObject) *metago.Diff {
 					}
 				}
 				for key1, vb11 := range vb1 {
+					// each "key1" is an entry that doesn't exist in "vb1"
 					chgs11 := make([]metago.Chg, 0)
 					chgs11 = append(chgs11, metago.NewStringChg(&MapTestObjecto2SREF, vb11))
 					if len(chgs11) != 0 {
@@ -123,6 +130,7 @@ func (o1 *MapTestObject) Diff(o2 *MapTestObject) *metago.Diff {
 					chgs = append(chgs, metago.NewByteMapChg(&MapTestObjecto2SREF, key, metago.ChangeTypeModify, chgs1))
 				}
 			} else {
+				// "key" exists in "va" but not in "vb"
 				chgs1 := make([]metago.Chg, 0)
 				for key1, va11 := range va1 {
 					chgs11 := make([]metago.Chg, 0)
@@ -137,6 +145,7 @@ func (o1 *MapTestObject) Diff(o2 *MapTestObject) *metago.Diff {
 			}
 		}
 		for key, vb1 := range vb {
+			// each "key" is an entry that doesn't exist in "vb"
 			chgs1 := make([]metago.Chg, 0)
 			for key1, vb11 := range vb1 {
 				chgs11 := make([]metago.Chg, 0)
