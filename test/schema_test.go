@@ -2,6 +2,7 @@ package test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/davecgh/go-spew/spew"
 )
@@ -16,10 +17,11 @@ func TestBasic(t *testing.T) {
 		spew.Dump(d)
 	}
 
-	oa := StructTestObject{}
-	oa.MB = make(map[int]BasicAttrTypesObject, 0)
-	ob := StructTestObject{B: BasicAttrTypesObject{ByteField: 3}}
-	ob.MB = make(map[int]BasicAttrTypesObject, 0)
+	oa := StructTestObject{MB: make(map[int]BasicAttrTypesObject, 0)}
+	oa.MB[0] = BasicAttrTypesObject{S8Field: 22}
+	oa.B.TimeField = time.Now()
+	ob := StructTestObject{MB: make(map[int]BasicAttrTypesObject, 0), B: BasicAttrTypesObject{ByteField: 3}}
+	ob.B.TimeField = oa.B.TimeField.Add(time.Minute)
 	ob.MB[0] = BasicAttrTypesObject{S8Field: 55}
 	ob.MB[1] = BasicAttrTypesObject{S8Field: 56}
 	ob.MB[2] = BasicAttrTypesObject{S8Field: 57}
@@ -40,9 +42,8 @@ func TestBasic(t *testing.T) {
 }
 
 func BenchmarkBasic(b *testing.B) {
-	oa := StructTestObject{}
-	ob := StructTestObject{B: BasicAttrTypesObject{ByteField: 3}}
-	ob.MB = make(map[int]BasicAttrTypesObject, 0)
+	oa := StructTestObject{MB: make(map[int]BasicAttrTypesObject, 0)}
+	ob := StructTestObject{MB: make(map[int]BasicAttrTypesObject, 0), B: BasicAttrTypesObject{ByteField: 3}}
 	ob.MB[0] = BasicAttrTypesObject{S8Field: 55}
 	ob.MB[1] = BasicAttrTypesObject{S8Field: 56}
 	ob.MB[2] = BasicAttrTypesObject{S8Field: 57}

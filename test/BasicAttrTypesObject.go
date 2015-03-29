@@ -346,6 +346,11 @@ func (o *BasicAttrTypesObject) Apply(d *metago.Diff) error {
 				*v = c.(*metago.StringChg).NewValue
 			}
 
+		case &BasicAttrTypesObjectTimeFieldAID:
+			{
+				v := &o.TimeField
+				*v = c.(*metago.TimeChg).NewValue
+			}
 		}
 	}
 	return nil

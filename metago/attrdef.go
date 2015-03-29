@@ -254,7 +254,10 @@ func (a *timeAttrDef) generateDel(w *writer, levelID string) {
 }
 
 func (a *timeAttrDef) generateApply(w *writer, levelID string) {
-
+	w.printf("    case &%[1]s%[2]sAID:\n", a.parentType.name, a.nm)
+	a.checkLevel0ApplyHdr(w, levelID)
+	w.printf("        *v%[1]s = c.(*metago.TimeChg).NewValue\n", levelID, strings.Title(a.typ))
+	a.checkLevel0ApplyFtr(w, levelID)
 }
 
 func (a *timeAttrDef) generateMapModify(w *writer, levelID string) {
