@@ -66,19 +66,22 @@ func (o1 *StructTestObject) Diff(o2 *StructTestObject) *metago.Diff {
 				// "key" exists in "va" but not in "vb"
 				chgs1 := make([]metago.Chg, 0)
 				t := BasicAttrTypesObject{}
-				chgs1 = append(chgs1, metago.NewStructChg(&StructTestObjectMBSREF, t.Diff(&va1)))
+				chgs1 = append(chgs1, metago.NewStructChg(&StructTestObjectMBSREF, va1.Diff(&t)))
 				if len(chgs1) != 0 {
-					chgs = append(chgs, metago.NewIntMapChg(&StructTestObjectMBSREF, key, metago.ChangeTypeInsert, chgs1))
+					chgs = append(chgs, metago.NewIntMapChg(&StructTestObjectMBSREF, key, metago.ChangeTypeDelete, chgs1))
 				}
 			}
 		}
 		for key, vb1 := range vb {
-			// each "key" is an entry that doesn't exist in "vb"
+			if _, ok := va[key]; ok {
+				continue
+			}
+			// "key" exists in vb but not int va"
 			chgs1 := make([]metago.Chg, 0)
 			t := BasicAttrTypesObject{}
-			chgs1 = append(chgs1, metago.NewStructChg(&StructTestObjectMBSREF, vb1.Diff(&t)))
+			chgs1 = append(chgs1, metago.NewStructChg(&StructTestObjectMBSREF, t.Diff(&vb1)))
 			if len(chgs1) != 0 {
-				chgs = append(chgs, metago.NewIntMapChg(&StructTestObjectMBSREF, key, metago.ChangeTypeDelete, chgs1))
+				chgs = append(chgs, metago.NewIntMapChg(&StructTestObjectMBSREF, key, metago.ChangeTypeInsert, chgs1))
 			}
 		}
 	}
@@ -92,7 +95,10 @@ func (o *StructTestObject) Apply(d *metago.Diff) error {
 		case &StructTestObjectBAID:
 			{
 				v := &o.B
-				*v = c.(*metago.BasicAttrTypesObjectChg).NewValue
+				{
+					c := c.(*metago.StructChg).Chg
+					v.Apply(&c)
+				}
 			}
 
 		case &StructTestObjectMBAID:

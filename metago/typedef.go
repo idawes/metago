@@ -445,9 +445,9 @@ func (t *typedef) generateSchema(w *writer) {
 	if *verbose {
 		fmt.Printf("generating Schema for %s\n", t.name)
 	}
-	w.printf("\n  %sTID metago.TypeID = metago.TypeID{Pkg: &MetagoPackageUUID, Typ: %d}\n", t.name, t.typeID.typ)
+	w.printf("\n  %sTID  = metago.TypeID{Pkg: &MetagoPackageUUID, Typ: %d, Name: \"%s\"}\n", t.name, t.typeID.typ, t.name)
 	for _, a := range t.attrDefsByIDInOrder {
-		w.printf("  %[1]s%[2]sAID metago.AttrID = metago.AttrID{TypeID: &%[1]sTID, Attr: %[3]d}\n", t.name, a.name(), a.attributeID())
-		w.printf("  %[1]s%[2]sSREF metago.Attrdef = metago.Attrdef{ID: &%[1]s%[2]sAID, Persistence: metago.%[3]s}\n", t.name, a.name(), strings.Title(a.persistenceClass().String()))
+		w.printf("  %[1]s%[2]sAID = metago.AttrID{TypeID: &%[1]sTID, Attr: %[3]d, Name: \"%[4]s\"}\n", t.name, a.name(), a.attributeID(), a.name())
+		w.printf("  %[1]s%[2]sSREF = metago.Attrdef{ID: &%[1]s%[2]sAID, Persistence: metago.%[3]s}\n", t.name, a.name(), strings.Title(a.persistenceClass().String()))
 	}
 }

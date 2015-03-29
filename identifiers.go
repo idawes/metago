@@ -8,8 +8,9 @@ import (
 
 // TypeId is a globally unique identifier for a metago object type
 type TypeID struct {
-	Pkg *uuid.UUID
-	Typ int
+	Pkg  *uuid.UUID
+	Typ  int
+	Name string
 }
 
 func (t *TypeID) Equals(o *TypeID) bool {
@@ -34,6 +35,7 @@ func (t *TypeID) Compare(o *TypeID) int {
 type AttrID struct {
 	*TypeID
 	Attr int
+	Name string
 }
 
 func (a *AttrID) Equals(o *AttrID) bool {

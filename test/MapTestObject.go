@@ -23,7 +23,7 @@ func (o1 *MapTestObject) Equals(o2 *MapTestObject) bool {
 		}
 		for key, va1 := range va {
 			if vb1, ok := vb[key]; ok {
-				if va1.Equal(vb1) {
+				if !va1.Equal(vb1) {
 					return false
 				}
 			} else {
@@ -68,7 +68,7 @@ func (o1 *MapTestObject) Diff(o2 *MapTestObject) *metago.Diff {
 			if vb1, ok := vb[key]; ok {
 				// "key" exists in both "va" and "vb"
 				chgs1 := make([]metago.Chg, 0)
-				if va1.Equal(vb1) {
+				if !va1.Equal(vb1) {
 					chgs1 = append(chgs1, metago.NewTimeChg(&MapTestObjecto1SREF, vb1, va1))
 				}
 				if len(chgs1) != 0 {
@@ -79,16 +79,19 @@ func (o1 *MapTestObject) Diff(o2 *MapTestObject) *metago.Diff {
 				chgs1 := make([]metago.Chg, 0)
 				chgs1 = append(chgs1, metago.NewTimeChg(&MapTestObjecto1SREF, va1))
 				if len(chgs1) != 0 {
-					chgs = append(chgs, metago.NewByteMapChg(&MapTestObjecto1SREF, key, metago.ChangeTypeInsert, chgs1))
+					chgs = append(chgs, metago.NewByteMapChg(&MapTestObjecto1SREF, key, metago.ChangeTypeDelete, chgs1))
 				}
 			}
 		}
 		for key, vb1 := range vb {
-			// each "key" is an entry that doesn't exist in "vb"
+			if _, ok := va[key]; ok {
+				continue
+			}
+			// "key" exists in vb but not int va"
 			chgs1 := make([]metago.Chg, 0)
 			chgs1 = append(chgs1, metago.NewTimeChg(&MapTestObjecto1SREF, vb1))
 			if len(chgs1) != 0 {
-				chgs = append(chgs, metago.NewByteMapChg(&MapTestObjecto1SREF, key, metago.ChangeTypeDelete, chgs1))
+				chgs = append(chgs, metago.NewByteMapChg(&MapTestObjecto1SREF, key, metago.ChangeTypeInsert, chgs1))
 			}
 		}
 	}
@@ -114,16 +117,19 @@ func (o1 *MapTestObject) Diff(o2 *MapTestObject) *metago.Diff {
 						chgs11 := make([]metago.Chg, 0)
 						chgs11 = append(chgs11, metago.NewStringChg(&MapTestObjecto2SREF, va11))
 						if len(chgs11) != 0 {
-							chgs1 = append(chgs1, metago.NewByteMapChg(&MapTestObjecto2SREF, key1, metago.ChangeTypeInsert, chgs11))
+							chgs1 = append(chgs1, metago.NewByteMapChg(&MapTestObjecto2SREF, key1, metago.ChangeTypeDelete, chgs11))
 						}
 					}
 				}
 				for key1, vb11 := range vb1 {
-					// each "key1" is an entry that doesn't exist in "vb1"
+					if _, ok := va1[key1]; ok {
+						continue
+					}
+					// "key1" exists in vb1 but not int va1"
 					chgs11 := make([]metago.Chg, 0)
 					chgs11 = append(chgs11, metago.NewStringChg(&MapTestObjecto2SREF, vb11))
 					if len(chgs11) != 0 {
-						chgs1 = append(chgs1, metago.NewByteMapChg(&MapTestObjecto2SREF, key1, metago.ChangeTypeDelete, chgs11))
+						chgs1 = append(chgs1, metago.NewByteMapChg(&MapTestObjecto2SREF, key1, metago.ChangeTypeInsert, chgs11))
 					}
 				}
 				if len(chgs1) != 0 {
@@ -136,26 +142,30 @@ func (o1 *MapTestObject) Diff(o2 *MapTestObject) *metago.Diff {
 					chgs11 := make([]metago.Chg, 0)
 					chgs11 = append(chgs11, metago.NewStringChg(&MapTestObjecto2SREF, va11))
 					if len(chgs11) != 0 {
-						chgs1 = append(chgs1, metago.NewByteMapChg(&MapTestObjecto2SREF, key1, metago.ChangeTypeInsert, chgs11))
+						chgs1 = append(chgs1, metago.NewByteMapChg(&MapTestObjecto2SREF, key1, metago.ChangeTypeDelete, chgs11))
 					}
 				}
 				if len(chgs1) != 0 {
-					chgs = append(chgs, metago.NewByteMapChg(&MapTestObjecto2SREF, key, metago.ChangeTypeInsert, chgs1))
+					chgs = append(chgs, metago.NewByteMapChg(&MapTestObjecto2SREF, key, metago.ChangeTypeDelete, chgs1))
 				}
 			}
 		}
 		for key, vb1 := range vb {
-			// each "key" is an entry that doesn't exist in "vb"
+			if _, ok := va[key]; ok {
+				continue
+			}
+			// "key" exists in vb but not int va"
 			chgs1 := make([]metago.Chg, 0)
 			for key1, vb11 := range vb1 {
+				// "key1" exists in "va1" but not in "vb1"
 				chgs11 := make([]metago.Chg, 0)
 				chgs11 = append(chgs11, metago.NewStringChg(&MapTestObjecto2SREF, vb11))
 				if len(chgs11) != 0 {
-					chgs1 = append(chgs1, metago.NewByteMapChg(&MapTestObjecto2SREF, key1, metago.ChangeTypeDelete, chgs11))
+					chgs1 = append(chgs1, metago.NewByteMapChg(&MapTestObjecto2SREF, key1, metago.ChangeTypeInsert, chgs11))
 				}
 			}
 			if len(chgs1) != 0 {
-				chgs = append(chgs, metago.NewByteMapChg(&MapTestObjecto2SREF, key, metago.ChangeTypeDelete, chgs1))
+				chgs = append(chgs, metago.NewByteMapChg(&MapTestObjecto2SREF, key, metago.ChangeTypeInsert, chgs1))
 			}
 		}
 	}

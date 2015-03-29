@@ -153,7 +153,7 @@ func (o1 *ExtendedObject) Equals(o2 *ExtendedObject) bool {
 
 	{
 		va, vb := o1.TimeField, o2.TimeField
-		if va.Equal(vb) {
+		if !va.Equal(vb) {
 			return false
 		}
 	}
@@ -270,7 +270,7 @@ func (o1 *ExtendedObject) Diff(o2 *ExtendedObject) *metago.Diff {
 
 	{
 		va, vb := o1.TimeField, o2.TimeField
-		if va.Equal(vb) {
+		if !va.Equal(vb) {
 			chgs = append(chgs, metago.NewTimeChg(&BasicAttrTypesObjectTimeFieldSREF, vb, va))
 		}
 	}
