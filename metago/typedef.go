@@ -71,8 +71,10 @@ func (l attrdefList) Less(i, j int) bool { return l[i].attributeID() < l[j].attr
 	Imports may occur at any point in the method block, allowing them to be specified just above the method that requires it. Imports may be duplicated, they will only be present once in the generated
 	output.
 */
-func parseTypedef(pkgUUID *uuid.UUID, r *reader) (*typedef, error) {
-	t, err := parseTypedefHeader(pkgUUID, r)
+func parseTypedef(pkg string, pkgUUID *uuid.UUID, r *reader) (*typedef, error) {
+	pkgParts := strings.Split(pkg, "/")
+	pkgTail := "\"" + pkgParts[len(pkgParts)-1] + "\""
+	t, err := parseTypedefHeader(pkgTail, pkgUUID, r)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +104,7 @@ func parseTypedef(pkgUUID *uuid.UUID, r *reader) (*typedef, error) {
 	typedef header:
 		type <typeID> <typeName> <concrete|abstract> [extends <typeName>] {
 */
-func parseTypedefHeader(pkgUUID *uuid.UUID, r *reader) (*typedef, error) {
+func parseTypedefHeader(pkg string, pkgUUID *uuid.UUID, r *reader) (*typedef, error) {
 	fields, err := r.read()
 	if err != nil {
 		return nil, err
@@ -116,7 +118,7 @@ func parseTypedefHeader(pkgUUID *uuid.UUID, r *reader) (*typedef, error) {
 	if fields[0] != "type" {
 		return nil, fmt.Errorf("expecting \"type\", found \"%s\", line %d o file %s", fields[0], r.line, r.f.Name())
 	}
-	t := &typedef{srcfile: r.f.Name(), srcline: r.line}
+	t := &typedef{pkg: pkg, srcfile: r.f.Name(), srcline: r.line}
 	subID, err := strconv.Atoi(fields[1])
 	if err != nil {
 		return nil, fmt.Errorf("expecting integer type number, found \"%s\", line %d of file %s", fields[1], r.line, r.f.Name())
@@ -445,7 +447,7 @@ func (t *typedef) generateSchema(w *writer) {
 	if *verbose {
 		fmt.Printf("generating Schema for %s\n", t.name)
 	}
-	w.printf("\n  %sTID  = metago.TypeID{Pkg: &MetagoPackageUUID, Typ: %d, Name: \"%s\"}\n", t.name, t.typeID.typ, t.name)
+	w.printf("\n  %sTID  = metago.TypeID{Pkg: &MetagoPackageUUID, PkgName: %s, Typ: %d, Name: \"%s\"}\n", t.name, t.pkg, t.typeID.typ, t.name)
 	for _, a := range t.attrDefsByIDInOrder {
 		w.printf("  %[1]s%[2]sAID = metago.AttrID{TypeID: &%[1]sTID, Attr: %[3]d, Name: \"%[4]s\"}\n", t.name, a.name(), a.attributeID(), a.name())
 		w.printf("  %[1]s%[2]sSREF = metago.Attrdef{ID: &%[1]s%[2]sAID, Persistence: metago.%[3]s}\n", t.name, a.name(), strings.Title(a.persistenceClass().String()))

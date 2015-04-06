@@ -9,26 +9,28 @@ type 1 BasicAttrTypesObject concrete {
 	}
 	attributes {
 		// test line comment at beginning of attribute block
-		1 ByteField    byte
-		2 UbbField       uint
-		3 U8Field      uint8
-		4 U16Field     uint16
+		1 VByte   byte
+		2 VUint   uint
+		3 VUint8  uint8
+		4 VUint16 uint16
+		5 VUint32 uint32
+        6 VUint64 uint64
+
 		// test line comment in the middle of attribute block 
-		5 U32Field     uint32 
-		6 U64Field     uint64
-		7 SField       int
-		8 S8Field      int8
-		9 S16Field     int16
-		10 S32Field     int32
-		11 S64Field     int64
-        12 F32Field     float32
-        13 F64Field     float64
-		14 StringField string
-		15 TimeField   time.Time
+        7  VInt     int
+        8  VInt8    int8
+		9  VInt16   int16
+		10 VInt32   int32
+		11 VInt64   int64
+        12 VFloat32 float32
+        13 VFloat64 float64
+		14 VString  string
+		15 VTime    time.Time
+
 		// test line comment at the end of attribute block
 	}
 	methods {
-		func Dump() (string) {
+		func Dump() string {
 			return spew.Sdump(*this)
 		}
 		func ConditionalDump(t bool) string {
@@ -61,18 +63,21 @@ type 3 SliceTestObject concrete {
 		"github.com/davecgh/go-spew/spew"
 	}
 	attributes {
-		1 ByteSlice    []byte
-		2 U8Slice      []uint8
-		3 U16Slice     []uint16
-		4 U32Slice     []uint32 
-		5 U64Slice     []uint64
-		6 S8Slice      []int8
-		7 S16Slice     []int16
-		8 S32Slice     []int32
-		9 S64Slice     []int64
-		10 StringSlice []string
-		11 TimeSlice   []time.Time
-		12 String2dSlice [][]string
+		1  VByte    []byte
+        2  VUint    []int
+		3  VUint8   []uint8
+		4  VUint16  []uint16
+		5  VUint32  []uint32
+		6  VUint64  []uint64
+        7  VInt     []int
+		8  VInt8    []int8
+		9  VInt16   []int16
+		10 VInt32   []int32
+		11 VInt64   []int64
+		12 VFloat32 []float32
+		14 VFloat64 []float64
+		15 VString  []string
+		16 VTime    []time.Time
 	}
 	methods {
 		func Dump() string {

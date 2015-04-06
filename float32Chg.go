@@ -1,11 +1,23 @@
-// Automatically generated from generic_diff.tmpl. DO NOT EDIT!!!!
+// Automatically generated from genericBaseChg.tmpl. DO NOT EDIT!!!!
 
 package metago
+
+import (
+    "fmt"
+    "io"
+)
 
 type Float32Chg struct {
     BaseChg
     OldValue float32
     NewValue float32
+}
+
+func (c *Float32Chg) WriteIndented(w io.Writer, lev int) {
+	for i := 0; i < lev; i++ {
+		fmt.Fprintf(w, "  ")
+	}
+    fmt.Fprintln(w, "Float32Chg --", c.BaseChg.schemaref, "-- Old:", c.OldValue, ", New:", c.NewValue) 
 }
 
 func NewFloat32Chg(s *Attrdef, values ...float32) Chg {

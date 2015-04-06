@@ -1,11 +1,23 @@
-// Automatically generated from generic_diff.tmpl. DO NOT EDIT!!!!
+// Automatically generated from genericBaseChg.tmpl. DO NOT EDIT!!!!
 
 package metago
+
+import (
+    "fmt"
+    "io"
+)
 
 type UintChg struct {
     BaseChg
     OldValue uint
     NewValue uint
+}
+
+func (c *UintChg) WriteIndented(w io.Writer, lev int) {
+	for i := 0; i < lev; i++ {
+		fmt.Fprintf(w, "  ")
+	}
+    fmt.Fprintln(w, "UintChg --", c.BaseChg.schemaref, "-- Old:", c.OldValue, ", New:", c.NewValue) 
 }
 
 func NewUintChg(s *Attrdef, values ...uint) Chg {

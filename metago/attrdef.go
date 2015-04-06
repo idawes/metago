@@ -328,7 +328,8 @@ func (a *sliceAttrDef) generateDiff(w *writer, levelID string) {
 			}
 		}
 	}
-	for idx%[1]s, vb%[2]s := range vb%[1]s {
+	for idx%[1]s := len(va%[1]s); idx%[1]s < len(vb%[1]s); idx%[1]s++ {
+		vb%[2]s := vb%[1]s[idx%[1]s]
 		chgs%[2]s := make([]metago.Chg, 0)
 `
 	w.printf(format, levelID, nextLevelID, a.parentType.name, a.nm)

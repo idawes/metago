@@ -1,5 +1,7 @@
 package metago
 
+import "fmt"
+
 type Typedef struct {
 	ID TypeID
 }
@@ -13,14 +15,23 @@ const (
 	PersistenceClassEphemeral                             // computed or temporary storage - not serialized
 )
 
+func (p PersistenceClass) ShortString() string {
+	switch p {
+	case PersistenceClassPersistent:
+		return "(P)"
+	case PersistenceClassNonPersistent:
+		return "(N)"
+	case PersistenceClassEphemeral:
+		return "(E)"
+	}
+	return "(?)"
+}
+
 type Attrdef struct {
 	ID          *AttrID
 	Persistence PersistenceClass
 }
 
-func ProcessDiff(d Diff) {
-	// for _, c := range d.Changes() {
-	// if c.AttributeId() == test.SliceTestObjectByteSliceId {
-	// }
-	// }
+func (a *Attrdef) String() string {
+	return fmt.Sprintf("%s.%s.%s - %s", a.ID.PkgName, a.ID.TypeID.Name, a.ID.Name, a.Persistence.ShortString())
 }

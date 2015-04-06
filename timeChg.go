@@ -1,13 +1,24 @@
-// Automatically generated from generic_diff.tmpl. DO NOT EDIT!!!!
+// Automatically generated from genericBaseChg.tmpl. DO NOT EDIT!!!!
 
 package metago
 
-import "time"
+import (
+	"fmt"
+	"io"
+	"time"
+)
 
 type TimeChg struct {
 	BaseChg
 	OldValue time.Time
 	NewValue time.Time
+}
+
+func (c *TimeChg) WriteIndented(w io.Writer, lev int) {
+	for i := 0; i < lev; i++ {
+		fmt.Fprintf(w, "  ")
+	}
+	fmt.Fprintln(w, "TimeChg --", c.BaseChg.schemaref, "-- Old:", c.OldValue, ", New:", c.NewValue)
 }
 
 func NewTimeChg(s *Attrdef, values ...time.Time) Chg {

@@ -98,7 +98,7 @@ func (g *generator) parseFile(f string) {
 	r := newReader(f)
 	defer r.close()
 	for {
-		t, err := parseTypedef(g.pkgUUID, r)
+		t, err := parseTypedef(g.pkg, g.pkgUUID, r)
 		if err != nil {
 			if err == io.EOF {
 				return
@@ -151,28 +151,17 @@ func (l typedefList) Less(i, j int) bool { return l[i].typeID.Compare(&l[j].type
 const schemaHeader = `
 
 import ( 
-	"fmt"
-
 	"github.com/idawes/metago"
 	"github.com/nu7hatch/gouuid"
 )
 
-var MetagoPackageUUID uuid.UUID
-
-func init() {
-	id, err := uuid.ParseHex("%s")
-	if err != nil {
-		panic(fmt.Sprintf("Couldn't parse package UUID for package %s"))
-	}
-	MetagoPackageUUID = *id
-}
-
 var (
+	MetagoPackageUUID uuid.UUID 
 `
 
 func (g *generator) generate() {
 	sw := newWriter(filepath.Join(*pkgRoot, "src", g.pkg), "schema")
-	sw.printf(schemaHeader, g.pkgUUID.String(), g.pkg)
+	sw.printf(schemaHeader)
 	sortedTypedefs := make(typedefList, 0)
 	for _, t := range g.typedefs {
 		sortedTypedefs = append(sortedTypedefs, t)
@@ -188,6 +177,11 @@ func (g *generator) generate() {
 		g.err = w.close()
 	}
 	sw.printf(")")
+	sw.printf("\n\nfunc init() {\n")
+	for i := 0; i < len(g.pkgUUID); i++ {
+		sw.printf("MetagoPackageUUID[%d] = 0x%x\n", i, g.pkgUUID[i])
+	}
+	sw.printf("}\n")
 	if g.err == nil {
 		g.err = sw.close()
 	}

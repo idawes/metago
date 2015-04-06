@@ -1,5 +1,10 @@
 package metago
 
+import (
+	"fmt"
+	"io"
+)
+
 type Diff struct {
 	Chgs []Chg
 }
@@ -8,9 +13,21 @@ func (d *Diff) Add(chg Chg) {
 	d.Chgs = append(d.Chgs, chg)
 }
 
+func (d *Diff) WriteIndented(w io.Writer, lev int) {
+	for i := 0; i < lev; i++ {
+		fmt.Fprintf(w, "  ")
+	}
+	fmt.Fprintf(w, "Diff: \n")
+	lev++
+	for _, c := range d.Chgs {
+		c.WriteIndented(w, lev)
+	}
+}
+
 type Chg interface {
 	AttributeID() *AttrID
 	Schemaref() *Attrdef
+	WriteIndented(w io.Writer, lev int)
 }
 
 type BaseChg struct {
@@ -52,6 +69,17 @@ type SliceChg struct {
 	Chgs []Chg
 }
 
+func (c *SliceChg) WriteIndented(w io.Writer, lev int) {
+	for i := 0; i < lev; i++ {
+		fmt.Fprintf(w, "  ")
+	}
+	fmt.Fprintf(w, "SliceChg (%s) -- %s -- Idx: %d\n", c.Typ, c.BaseChg.schemaref, c.Idx)
+	lev++
+	for _, c1 := range c.Chgs {
+		c1.WriteIndented(w, lev)
+	}
+}
+
 func NewSliceChg(sref *Attrdef, idx int, typ ChangeType, chgs []Chg) Chg {
 	return &SliceChg{BaseChg: BaseChg{schemaref: sref}, Idx: idx, Typ: typ, Chgs: chgs}
 }
@@ -59,6 +87,14 @@ func NewSliceChg(sref *Attrdef, idx int, typ ChangeType, chgs []Chg) Chg {
 type StructChg struct {
 	BaseChg
 	Chg Diff
+}
+
+func (c *StructChg) WriteIndented(w io.Writer, lev int) {
+	for i := 0; i < lev; i++ {
+		fmt.Fprintf(w, "  ")
+	}
+	fmt.Fprintf(w, "StructChg: ")
+	c.Chg.WriteIndented(w, lev+1)
 }
 
 func NewStructChg(sref *Attrdef, chg *Diff) Chg {

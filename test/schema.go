@@ -5,94 +5,109 @@
 package test
 
 import (
-	"fmt"
-
 	"github.com/idawes/metago"
 	"github.com/nu7hatch/gouuid"
 )
 
-var MetagoPackageUUID uuid.UUID
-
-func init() {
-	id, err := uuid.ParseHex("2ddeafcf-0764-545c-6e7b-047e00947709")
-	if err != nil {
-		panic(fmt.Sprintf("Couldn't parse package UUID for package github.com/idawes/metago/test"))
-	}
-	MetagoPackageUUID = *id
-}
-
 var (
-	BasicAttrTypesObjectTID             = metago.TypeID{Pkg: &MetagoPackageUUID, Typ: 1, Name: "BasicAttrTypesObject"}
-	BasicAttrTypesObjectByteFieldAID    = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 1, Name: "ByteField"}
-	BasicAttrTypesObjectByteFieldSREF   = metago.Attrdef{ID: &BasicAttrTypesObjectByteFieldAID, Persistence: metago.PersistenceClassPersistent}
-	BasicAttrTypesObjectUbbFieldAID     = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 2, Name: "UbbField"}
-	BasicAttrTypesObjectUbbFieldSREF    = metago.Attrdef{ID: &BasicAttrTypesObjectUbbFieldAID, Persistence: metago.PersistenceClassPersistent}
-	BasicAttrTypesObjectU8FieldAID      = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 3, Name: "U8Field"}
-	BasicAttrTypesObjectU8FieldSREF     = metago.Attrdef{ID: &BasicAttrTypesObjectU8FieldAID, Persistence: metago.PersistenceClassPersistent}
-	BasicAttrTypesObjectU16FieldAID     = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 4, Name: "U16Field"}
-	BasicAttrTypesObjectU16FieldSREF    = metago.Attrdef{ID: &BasicAttrTypesObjectU16FieldAID, Persistence: metago.PersistenceClassPersistent}
-	BasicAttrTypesObjectU32FieldAID     = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 5, Name: "U32Field"}
-	BasicAttrTypesObjectU32FieldSREF    = metago.Attrdef{ID: &BasicAttrTypesObjectU32FieldAID, Persistence: metago.PersistenceClassPersistent}
-	BasicAttrTypesObjectU64FieldAID     = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 6, Name: "U64Field"}
-	BasicAttrTypesObjectU64FieldSREF    = metago.Attrdef{ID: &BasicAttrTypesObjectU64FieldAID, Persistence: metago.PersistenceClassPersistent}
-	BasicAttrTypesObjectSFieldAID       = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 7, Name: "SField"}
-	BasicAttrTypesObjectSFieldSREF      = metago.Attrdef{ID: &BasicAttrTypesObjectSFieldAID, Persistence: metago.PersistenceClassPersistent}
-	BasicAttrTypesObjectS8FieldAID      = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 8, Name: "S8Field"}
-	BasicAttrTypesObjectS8FieldSREF     = metago.Attrdef{ID: &BasicAttrTypesObjectS8FieldAID, Persistence: metago.PersistenceClassPersistent}
-	BasicAttrTypesObjectS16FieldAID     = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 9, Name: "S16Field"}
-	BasicAttrTypesObjectS16FieldSREF    = metago.Attrdef{ID: &BasicAttrTypesObjectS16FieldAID, Persistence: metago.PersistenceClassPersistent}
-	BasicAttrTypesObjectS32FieldAID     = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 10, Name: "S32Field"}
-	BasicAttrTypesObjectS32FieldSREF    = metago.Attrdef{ID: &BasicAttrTypesObjectS32FieldAID, Persistence: metago.PersistenceClassPersistent}
-	BasicAttrTypesObjectS64FieldAID     = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 11, Name: "S64Field"}
-	BasicAttrTypesObjectS64FieldSREF    = metago.Attrdef{ID: &BasicAttrTypesObjectS64FieldAID, Persistence: metago.PersistenceClassPersistent}
-	BasicAttrTypesObjectF32FieldAID     = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 12, Name: "F32Field"}
-	BasicAttrTypesObjectF32FieldSREF    = metago.Attrdef{ID: &BasicAttrTypesObjectF32FieldAID, Persistence: metago.PersistenceClassPersistent}
-	BasicAttrTypesObjectF64FieldAID     = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 13, Name: "F64Field"}
-	BasicAttrTypesObjectF64FieldSREF    = metago.Attrdef{ID: &BasicAttrTypesObjectF64FieldAID, Persistence: metago.PersistenceClassPersistent}
-	BasicAttrTypesObjectStringFieldAID  = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 14, Name: "StringField"}
-	BasicAttrTypesObjectStringFieldSREF = metago.Attrdef{ID: &BasicAttrTypesObjectStringFieldAID, Persistence: metago.PersistenceClassPersistent}
-	BasicAttrTypesObjectTimeFieldAID    = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 15, Name: "TimeField"}
-	BasicAttrTypesObjectTimeFieldSREF   = metago.Attrdef{ID: &BasicAttrTypesObjectTimeFieldAID, Persistence: metago.PersistenceClassPersistent}
+	MetagoPackageUUID uuid.UUID
 
-	ExtendedObjectTID                   = metago.TypeID{Pkg: &MetagoPackageUUID, Typ: 2, Name: "ExtendedObject"}
+	BasicAttrTypesObjectTID          = metago.TypeID{Pkg: &MetagoPackageUUID, PkgName: "test", Typ: 1, Name: "BasicAttrTypesObject"}
+	BasicAttrTypesObjectVByteAID     = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 1, Name: "VByte"}
+	BasicAttrTypesObjectVByteSREF    = metago.Attrdef{ID: &BasicAttrTypesObjectVByteAID, Persistence: metago.PersistenceClassPersistent}
+	BasicAttrTypesObjectVUintAID     = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 2, Name: "VUint"}
+	BasicAttrTypesObjectVUintSREF    = metago.Attrdef{ID: &BasicAttrTypesObjectVUintAID, Persistence: metago.PersistenceClassPersistent}
+	BasicAttrTypesObjectVUint8AID    = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 3, Name: "VUint8"}
+	BasicAttrTypesObjectVUint8SREF   = metago.Attrdef{ID: &BasicAttrTypesObjectVUint8AID, Persistence: metago.PersistenceClassPersistent}
+	BasicAttrTypesObjectVUint16AID   = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 4, Name: "VUint16"}
+	BasicAttrTypesObjectVUint16SREF  = metago.Attrdef{ID: &BasicAttrTypesObjectVUint16AID, Persistence: metago.PersistenceClassPersistent}
+	BasicAttrTypesObjectVUint32AID   = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 5, Name: "VUint32"}
+	BasicAttrTypesObjectVUint32SREF  = metago.Attrdef{ID: &BasicAttrTypesObjectVUint32AID, Persistence: metago.PersistenceClassPersistent}
+	BasicAttrTypesObjectVUint64AID   = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 6, Name: "VUint64"}
+	BasicAttrTypesObjectVUint64SREF  = metago.Attrdef{ID: &BasicAttrTypesObjectVUint64AID, Persistence: metago.PersistenceClassPersistent}
+	BasicAttrTypesObjectVIntAID      = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 7, Name: "VInt"}
+	BasicAttrTypesObjectVIntSREF     = metago.Attrdef{ID: &BasicAttrTypesObjectVIntAID, Persistence: metago.PersistenceClassPersistent}
+	BasicAttrTypesObjectVInt8AID     = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 8, Name: "VInt8"}
+	BasicAttrTypesObjectVInt8SREF    = metago.Attrdef{ID: &BasicAttrTypesObjectVInt8AID, Persistence: metago.PersistenceClassPersistent}
+	BasicAttrTypesObjectVInt16AID    = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 9, Name: "VInt16"}
+	BasicAttrTypesObjectVInt16SREF   = metago.Attrdef{ID: &BasicAttrTypesObjectVInt16AID, Persistence: metago.PersistenceClassPersistent}
+	BasicAttrTypesObjectVInt32AID    = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 10, Name: "VInt32"}
+	BasicAttrTypesObjectVInt32SREF   = metago.Attrdef{ID: &BasicAttrTypesObjectVInt32AID, Persistence: metago.PersistenceClassPersistent}
+	BasicAttrTypesObjectVInt64AID    = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 11, Name: "VInt64"}
+	BasicAttrTypesObjectVInt64SREF   = metago.Attrdef{ID: &BasicAttrTypesObjectVInt64AID, Persistence: metago.PersistenceClassPersistent}
+	BasicAttrTypesObjectVFloat32AID  = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 12, Name: "VFloat32"}
+	BasicAttrTypesObjectVFloat32SREF = metago.Attrdef{ID: &BasicAttrTypesObjectVFloat32AID, Persistence: metago.PersistenceClassPersistent}
+	BasicAttrTypesObjectVFloat64AID  = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 13, Name: "VFloat64"}
+	BasicAttrTypesObjectVFloat64SREF = metago.Attrdef{ID: &BasicAttrTypesObjectVFloat64AID, Persistence: metago.PersistenceClassPersistent}
+	BasicAttrTypesObjectVStringAID   = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 14, Name: "VString"}
+	BasicAttrTypesObjectVStringSREF  = metago.Attrdef{ID: &BasicAttrTypesObjectVStringAID, Persistence: metago.PersistenceClassPersistent}
+	BasicAttrTypesObjectVTimeAID     = metago.AttrID{TypeID: &BasicAttrTypesObjectTID, Attr: 15, Name: "VTime"}
+	BasicAttrTypesObjectVTimeSREF    = metago.Attrdef{ID: &BasicAttrTypesObjectVTimeAID, Persistence: metago.PersistenceClassPersistent}
+
+	ExtendedObjectTID                   = metago.TypeID{Pkg: &MetagoPackageUUID, PkgName: "test", Typ: 2, Name: "ExtendedObject"}
 	ExtendedObjectExtendedByteFieldAID  = metago.AttrID{TypeID: &ExtendedObjectTID, Attr: 1, Name: "ExtendedByteField"}
 	ExtendedObjectExtendedByteFieldSREF = metago.Attrdef{ID: &ExtendedObjectExtendedByteFieldAID, Persistence: metago.PersistenceClassPersistent}
 
-	SliceTestObjectTID               = metago.TypeID{Pkg: &MetagoPackageUUID, Typ: 3, Name: "SliceTestObject"}
-	SliceTestObjectByteSliceAID      = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 1, Name: "ByteSlice"}
-	SliceTestObjectByteSliceSREF     = metago.Attrdef{ID: &SliceTestObjectByteSliceAID, Persistence: metago.PersistenceClassPersistent}
-	SliceTestObjectU8SliceAID        = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 2, Name: "U8Slice"}
-	SliceTestObjectU8SliceSREF       = metago.Attrdef{ID: &SliceTestObjectU8SliceAID, Persistence: metago.PersistenceClassPersistent}
-	SliceTestObjectU16SliceAID       = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 3, Name: "U16Slice"}
-	SliceTestObjectU16SliceSREF      = metago.Attrdef{ID: &SliceTestObjectU16SliceAID, Persistence: metago.PersistenceClassPersistent}
-	SliceTestObjectU32SliceAID       = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 4, Name: "U32Slice"}
-	SliceTestObjectU32SliceSREF      = metago.Attrdef{ID: &SliceTestObjectU32SliceAID, Persistence: metago.PersistenceClassPersistent}
-	SliceTestObjectU64SliceAID       = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 5, Name: "U64Slice"}
-	SliceTestObjectU64SliceSREF      = metago.Attrdef{ID: &SliceTestObjectU64SliceAID, Persistence: metago.PersistenceClassPersistent}
-	SliceTestObjectS8SliceAID        = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 6, Name: "S8Slice"}
-	SliceTestObjectS8SliceSREF       = metago.Attrdef{ID: &SliceTestObjectS8SliceAID, Persistence: metago.PersistenceClassPersistent}
-	SliceTestObjectS16SliceAID       = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 7, Name: "S16Slice"}
-	SliceTestObjectS16SliceSREF      = metago.Attrdef{ID: &SliceTestObjectS16SliceAID, Persistence: metago.PersistenceClassPersistent}
-	SliceTestObjectS32SliceAID       = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 8, Name: "S32Slice"}
-	SliceTestObjectS32SliceSREF      = metago.Attrdef{ID: &SliceTestObjectS32SliceAID, Persistence: metago.PersistenceClassPersistent}
-	SliceTestObjectS64SliceAID       = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 9, Name: "S64Slice"}
-	SliceTestObjectS64SliceSREF      = metago.Attrdef{ID: &SliceTestObjectS64SliceAID, Persistence: metago.PersistenceClassPersistent}
-	SliceTestObjectStringSliceAID    = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 10, Name: "StringSlice"}
-	SliceTestObjectStringSliceSREF   = metago.Attrdef{ID: &SliceTestObjectStringSliceAID, Persistence: metago.PersistenceClassPersistent}
-	SliceTestObjectTimeSliceAID      = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 11, Name: "TimeSlice"}
-	SliceTestObjectTimeSliceSREF     = metago.Attrdef{ID: &SliceTestObjectTimeSliceAID, Persistence: metago.PersistenceClassPersistent}
-	SliceTestObjectString2dSliceAID  = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 12, Name: "String2dSlice"}
-	SliceTestObjectString2dSliceSREF = metago.Attrdef{ID: &SliceTestObjectString2dSliceAID, Persistence: metago.PersistenceClassPersistent}
+	SliceTestObjectTID          = metago.TypeID{Pkg: &MetagoPackageUUID, PkgName: "test", Typ: 3, Name: "SliceTestObject"}
+	SliceTestObjectVByteAID     = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 1, Name: "VByte"}
+	SliceTestObjectVByteSREF    = metago.Attrdef{ID: &SliceTestObjectVByteAID, Persistence: metago.PersistenceClassPersistent}
+	SliceTestObjectVUintAID     = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 2, Name: "VUint"}
+	SliceTestObjectVUintSREF    = metago.Attrdef{ID: &SliceTestObjectVUintAID, Persistence: metago.PersistenceClassPersistent}
+	SliceTestObjectVUint8AID    = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 3, Name: "VUint8"}
+	SliceTestObjectVUint8SREF   = metago.Attrdef{ID: &SliceTestObjectVUint8AID, Persistence: metago.PersistenceClassPersistent}
+	SliceTestObjectVUint16AID   = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 4, Name: "VUint16"}
+	SliceTestObjectVUint16SREF  = metago.Attrdef{ID: &SliceTestObjectVUint16AID, Persistence: metago.PersistenceClassPersistent}
+	SliceTestObjectVUint32AID   = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 5, Name: "VUint32"}
+	SliceTestObjectVUint32SREF  = metago.Attrdef{ID: &SliceTestObjectVUint32AID, Persistence: metago.PersistenceClassPersistent}
+	SliceTestObjectVUint64AID   = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 6, Name: "VUint64"}
+	SliceTestObjectVUint64SREF  = metago.Attrdef{ID: &SliceTestObjectVUint64AID, Persistence: metago.PersistenceClassPersistent}
+	SliceTestObjectVIntAID      = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 7, Name: "VInt"}
+	SliceTestObjectVIntSREF     = metago.Attrdef{ID: &SliceTestObjectVIntAID, Persistence: metago.PersistenceClassPersistent}
+	SliceTestObjectVInt8AID     = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 8, Name: "VInt8"}
+	SliceTestObjectVInt8SREF    = metago.Attrdef{ID: &SliceTestObjectVInt8AID, Persistence: metago.PersistenceClassPersistent}
+	SliceTestObjectVInt16AID    = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 9, Name: "VInt16"}
+	SliceTestObjectVInt16SREF   = metago.Attrdef{ID: &SliceTestObjectVInt16AID, Persistence: metago.PersistenceClassPersistent}
+	SliceTestObjectVInt32AID    = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 10, Name: "VInt32"}
+	SliceTestObjectVInt32SREF   = metago.Attrdef{ID: &SliceTestObjectVInt32AID, Persistence: metago.PersistenceClassPersistent}
+	SliceTestObjectVInt64AID    = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 11, Name: "VInt64"}
+	SliceTestObjectVInt64SREF   = metago.Attrdef{ID: &SliceTestObjectVInt64AID, Persistence: metago.PersistenceClassPersistent}
+	SliceTestObjectVFloat32AID  = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 12, Name: "VFloat32"}
+	SliceTestObjectVFloat32SREF = metago.Attrdef{ID: &SliceTestObjectVFloat32AID, Persistence: metago.PersistenceClassPersistent}
+	SliceTestObjectVFloat64AID  = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 14, Name: "VFloat64"}
+	SliceTestObjectVFloat64SREF = metago.Attrdef{ID: &SliceTestObjectVFloat64AID, Persistence: metago.PersistenceClassPersistent}
+	SliceTestObjectVStringAID   = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 15, Name: "VString"}
+	SliceTestObjectVStringSREF  = metago.Attrdef{ID: &SliceTestObjectVStringAID, Persistence: metago.PersistenceClassPersistent}
+	SliceTestObjectVTimeAID     = metago.AttrID{TypeID: &SliceTestObjectTID, Attr: 16, Name: "VTime"}
+	SliceTestObjectVTimeSREF    = metago.Attrdef{ID: &SliceTestObjectVTimeAID, Persistence: metago.PersistenceClassPersistent}
 
-	StructTestObjectTID    = metago.TypeID{Pkg: &MetagoPackageUUID, Typ: 5, Name: "StructTestObject"}
+	StructTestObjectTID    = metago.TypeID{Pkg: &MetagoPackageUUID, PkgName: "test", Typ: 5, Name: "StructTestObject"}
 	StructTestObjectBAID   = metago.AttrID{TypeID: &StructTestObjectTID, Attr: 1, Name: "B"}
 	StructTestObjectBSREF  = metago.Attrdef{ID: &StructTestObjectBAID, Persistence: metago.PersistenceClassPersistent}
 	StructTestObjectMBAID  = metago.AttrID{TypeID: &StructTestObjectTID, Attr: 2, Name: "MB"}
 	StructTestObjectMBSREF = metago.Attrdef{ID: &StructTestObjectMBAID, Persistence: metago.PersistenceClassPersistent}
 
-	MapTestObjectTID    = metago.TypeID{Pkg: &MetagoPackageUUID, Typ: 6, Name: "MapTestObject"}
+	MapTestObjectTID    = metago.TypeID{Pkg: &MetagoPackageUUID, PkgName: "test", Typ: 6, Name: "MapTestObject"}
 	MapTestObjecto1AID  = metago.AttrID{TypeID: &MapTestObjectTID, Attr: 1, Name: "o1"}
 	MapTestObjecto1SREF = metago.Attrdef{ID: &MapTestObjecto1AID, Persistence: metago.PersistenceClassPersistent}
 	MapTestObjecto2AID  = metago.AttrID{TypeID: &MapTestObjectTID, Attr: 2, Name: "o2"}
 	MapTestObjecto2SREF = metago.Attrdef{ID: &MapTestObjecto2AID, Persistence: metago.PersistenceClassPersistent}
 )
+
+func init() {
+	MetagoPackageUUID[0] = 0x2d
+	MetagoPackageUUID[1] = 0xde
+	MetagoPackageUUID[2] = 0xaf
+	MetagoPackageUUID[3] = 0xcf
+	MetagoPackageUUID[4] = 0x7
+	MetagoPackageUUID[5] = 0x64
+	MetagoPackageUUID[6] = 0x54
+	MetagoPackageUUID[7] = 0x5c
+	MetagoPackageUUID[8] = 0x6e
+	MetagoPackageUUID[9] = 0x7b
+	MetagoPackageUUID[10] = 0x4
+	MetagoPackageUUID[11] = 0x7e
+	MetagoPackageUUID[12] = 0x0
+	MetagoPackageUUID[13] = 0x94
+	MetagoPackageUUID[14] = 0x77
+	MetagoPackageUUID[15] = 0x9
+}

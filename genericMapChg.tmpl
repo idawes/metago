@@ -1,10 +1,27 @@
 package metago
 
+import (
+    "fmt"
+    "io"
+)
+
+
 type @@T@@MapChg struct {
     BaseChg
     Key @@t@@
     Typ ChangeType
     Chgs []Chg
+}
+
+func (c *@@T@@MapChg) WriteIndented(w io.Writer, lev int) {
+	for i := 0; i < lev; i++ {
+		fmt.Fprintf(w, "  ")
+	}
+    fmt.Fprintf(w, "@@T@@MapChg (%s) -- %s -- Key: %s", c.Typ, c.BaseChg.schemaref, c.Key) 
+    lev++
+    for _, c1 := range c.Chgs {
+       c1.WriteIndented(w, lev)
+    }
 }
 
 func New@@T@@MapChg(s *Attrdef, key @@t@@, typ ChangeType, chgs []Chg) Chg {
