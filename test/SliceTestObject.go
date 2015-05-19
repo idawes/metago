@@ -690,6 +690,216 @@ func (o *SliceTestObject) Apply(d *metago.Diff) error {
 	for _, c := range d.Chgs {
 		switch c.AttributeID() {
 
+		case &SliceTestObjectVByteAID:
+			{
+				s := o.VByte
+				sc := c.(*metago.SliceChg)
+				idx := sc.Idx
+				switch sc.Typ {
+				case metago.ChangeTypeModify:
+					s[idx] = sc.Chgs[0].(*metago.ByteChg).NewValue
+				case metago.ChangeTypeInsert:
+				case metago.ChangeTypeDelete:
+					// TODO: delete element from slice.
+				}
+			}
+
+		case &SliceTestObjectVUintAID:
+			{
+				s := o.VUint
+				sc := c.(*metago.SliceChg)
+				idx := sc.Idx
+				switch sc.Typ {
+				case metago.ChangeTypeModify:
+					s[idx] = sc.Chgs[0].(*metago.IntChg).NewValue
+				case metago.ChangeTypeInsert:
+				case metago.ChangeTypeDelete:
+					// TODO: delete element from slice.
+				}
+			}
+
+		case &SliceTestObjectVUint8AID:
+			{
+				s := o.VUint8
+				sc := c.(*metago.SliceChg)
+				idx := sc.Idx
+				switch sc.Typ {
+				case metago.ChangeTypeModify:
+					s[idx] = sc.Chgs[0].(*metago.Uint8Chg).NewValue
+				case metago.ChangeTypeInsert:
+				case metago.ChangeTypeDelete:
+					// TODO: delete element from slice.
+				}
+			}
+
+		case &SliceTestObjectVUint16AID:
+			{
+				s := o.VUint16
+				sc := c.(*metago.SliceChg)
+				idx := sc.Idx
+				switch sc.Typ {
+				case metago.ChangeTypeModify:
+					s[idx] = sc.Chgs[0].(*metago.Uint16Chg).NewValue
+				case metago.ChangeTypeInsert:
+				case metago.ChangeTypeDelete:
+					// TODO: delete element from slice.
+				}
+			}
+
+		case &SliceTestObjectVUint32AID:
+			{
+				s := o.VUint32
+				sc := c.(*metago.SliceChg)
+				idx := sc.Idx
+				switch sc.Typ {
+				case metago.ChangeTypeModify:
+					s[idx] = sc.Chgs[0].(*metago.Uint32Chg).NewValue
+				case metago.ChangeTypeInsert:
+				case metago.ChangeTypeDelete:
+					// TODO: delete element from slice.
+				}
+			}
+
+		case &SliceTestObjectVUint64AID:
+			{
+				s := o.VUint64
+				sc := c.(*metago.SliceChg)
+				idx := sc.Idx
+				switch sc.Typ {
+				case metago.ChangeTypeModify:
+					s[idx] = sc.Chgs[0].(*metago.Uint64Chg).NewValue
+				case metago.ChangeTypeInsert:
+				case metago.ChangeTypeDelete:
+					// TODO: delete element from slice.
+				}
+			}
+
+		case &SliceTestObjectVIntAID:
+			{
+				s := o.VInt
+				sc := c.(*metago.SliceChg)
+				idx := sc.Idx
+				switch sc.Typ {
+				case metago.ChangeTypeModify:
+					s[idx] = sc.Chgs[0].(*metago.IntChg).NewValue
+				case metago.ChangeTypeInsert:
+				case metago.ChangeTypeDelete:
+					// TODO: delete element from slice.
+				}
+			}
+
+		case &SliceTestObjectVInt8AID:
+			{
+				s := o.VInt8
+				sc := c.(*metago.SliceChg)
+				idx := sc.Idx
+				switch sc.Typ {
+				case metago.ChangeTypeModify:
+					s[idx] = sc.Chgs[0].(*metago.Int8Chg).NewValue
+				case metago.ChangeTypeInsert:
+				case metago.ChangeTypeDelete:
+					// TODO: delete element from slice.
+				}
+			}
+
+		case &SliceTestObjectVInt16AID:
+			{
+				s := o.VInt16
+				sc := c.(*metago.SliceChg)
+				idx := sc.Idx
+				switch sc.Typ {
+				case metago.ChangeTypeModify:
+					s[idx] = sc.Chgs[0].(*metago.Int16Chg).NewValue
+				case metago.ChangeTypeInsert:
+				case metago.ChangeTypeDelete:
+					// TODO: delete element from slice.
+				}
+			}
+
+		case &SliceTestObjectVInt32AID:
+			{
+				s := o.VInt32
+				sc := c.(*metago.SliceChg)
+				idx := sc.Idx
+				switch sc.Typ {
+				case metago.ChangeTypeModify:
+					s[idx] = sc.Chgs[0].(*metago.Int32Chg).NewValue
+				case metago.ChangeTypeInsert:
+				case metago.ChangeTypeDelete:
+					// TODO: delete element from slice.
+				}
+			}
+
+		case &SliceTestObjectVInt64AID:
+			{
+				s := o.VInt64
+				sc := c.(*metago.SliceChg)
+				idx := sc.Idx
+				switch sc.Typ {
+				case metago.ChangeTypeModify:
+					s[idx] = sc.Chgs[0].(*metago.Int64Chg).NewValue
+				case metago.ChangeTypeInsert:
+				case metago.ChangeTypeDelete:
+					// TODO: delete element from slice.
+				}
+			}
+
+		case &SliceTestObjectVFloat32AID:
+			{
+				s := o.VFloat32
+				sc := c.(*metago.SliceChg)
+				idx := sc.Idx
+				switch sc.Typ {
+				case metago.ChangeTypeModify:
+					s[idx] = sc.Chgs[0].(*metago.Float32Chg).NewValue
+				case metago.ChangeTypeInsert:
+				case metago.ChangeTypeDelete:
+					// TODO: delete element from slice.
+				}
+			}
+
+		case &SliceTestObjectVFloat64AID:
+			{
+				s := o.VFloat64
+				sc := c.(*metago.SliceChg)
+				idx := sc.Idx
+				switch sc.Typ {
+				case metago.ChangeTypeModify:
+					s[idx] = sc.Chgs[0].(*metago.Float64Chg).NewValue
+				case metago.ChangeTypeInsert:
+				case metago.ChangeTypeDelete:
+					// TODO: delete element from slice.
+				}
+			}
+
+		case &SliceTestObjectVStringAID:
+			{
+				s := o.VString
+				sc := c.(*metago.SliceChg)
+				idx := sc.Idx
+				switch sc.Typ {
+				case metago.ChangeTypeModify:
+					s[idx] = sc.Chgs[0].(*metago.StringChg).NewValue
+				case metago.ChangeTypeInsert:
+				case metago.ChangeTypeDelete:
+					// TODO: delete element from slice.
+				}
+			}
+
+		case &SliceTestObjectVTimeAID:
+			{
+				s := o.VTime
+				sc := c.(*metago.SliceChg)
+				idx := sc.Idx
+				switch sc.Typ {
+				case metago.ChangeTypeModify:
+					s[idx] = sc.Chgs[0].(*metago.TimeChg).NewValue
+				case metago.ChangeTypeInsert:
+					s[idx] = sc.Chgs[0].(*metago.TimeChg).NewValue
+				case metago.ChangeTypeDelete:
+					// TODO: delete element from slice.
+				}
+			}
 		}
 	}
 	return nil
