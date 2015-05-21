@@ -110,19 +110,19 @@ type attrDef interface {
 	generateEquals(w *writer, levelID string)
 
 	generateDiff(w *writer, levelID string)
-	// generateInsChg is a special case of generateDiff to deal with the fact that va doesn't exist
+	// generateInsChg is a special case of generateDiff to deal with the fact that va (the old value) doesn't exist
 	generateInsChg(w *writer, levelID string)
-	// generateInsChg is a special case of generateDiff to deal with the fact that vb doesn't exist
+	// generateInsChg is a special case of generateDiff to deal with the fact that vb (the new value) doesn't exist
 	generateDelChg(w *writer, levelID string)
 
 	generateApply(w *writer, levelID string)
-	// generateSliceModify is a special case of generateApply to deal with modifications of an entry in a slice
+	// generateSliceModify is a special case of generateApply to deal with modifications of an entry in a slice (replace existing value for simple types, modify complex types in place)
 	generateSliceModify(w *writer, levelID string)
-	// generateSliceInsert is a special case of generateApply to deal with insertions into a slice
+	// generateSliceInsert is a special case of generateApply to deal with insertions into a slice (append)
 	generateSliceInsert(w *writer, levelID string)
 	// generateMapModify is a special case of generateApply to deal with modifications of an entry in a map
 	generateMapModify(w *writer, levelID string)
-	// generateMapInsert is a special case of generateApply to deal with insertions into a map
+	// generateMapInsert is a special case of generateApply to deal with insertions into a map (normally same as generateMapModify. Different for struct types only -- see explanation attached to struct type methdod)
 	generateMapInsert(w *writer, levelID string)
 }
 
@@ -222,10 +222,11 @@ func (a *baseAttrDef) checkLevel0ApplyFtr(w *writer, levelID string) {
 }
 
 func (a *baseAttrDef) generateSliceModify(w *writer, levelID string) {
-	w.printf("              s%[1]s[idx%[1]s] = sc%[1]s.Chgs[0].(*metago.%[2]sChg).NewValue\n", levelID, strings.Title(a.typ))
+	w.printf("              (*s)%[1]s[idx%[1]s] = sc%[1]s.Chgs[0].(*metago.%[2]sChg).NewValue\n", levelID, strings.Title(a.typ))
 }
 
 func (a *baseAttrDef) generateSliceInsert(w *writer, levelID string) {
+	w.printf("              *s = append(*s, sc%[1]s.Chgs[0].(*metago.%[2]sChg).NewValue)\n", levelID, strings.Title(a.typ))
 }
 
 func (a *baseAttrDef) generateMapModify(w *writer, levelID string) {
@@ -278,11 +279,11 @@ func (a *timeAttrDef) generateApply(w *writer, levelID string) {
 }
 
 func (a *timeAttrDef) generateSliceModify(w *writer, levelID string) {
-	w.printf("              s%[1]s[idx%[1]s] = sc%[1]s.Chgs[0].(*metago.TimeChg).NewValue\n", levelID)
+	w.printf("              (*s)%[1]s[idx%[1]s] = sc%[1]s.Chgs[0].(*metago.TimeChg).NewValue\n", levelID)
 }
 
 func (a *timeAttrDef) generateSliceInsert(w *writer, levelID string) {
-	a.generateSliceModify(w, levelID)
+	w.printf("              *s = append(*s, sc%[1]s.Chgs[0].(*metago.TimeChg).NewValue)\n", levelID)
 }
 
 func (a *timeAttrDef) generateMapModify(w *writer, levelID string) {
@@ -297,8 +298,8 @@ func (a *timeAttrDef) generateMapInsert(w *writer, levelID string) {
 /**************************** Slice Attribute ***************************/
 type sliceAttrDef struct {
 	baseAttrDef
-	valType string
-	valAttr attrDef
+	valType string  // name of the type that's contained in this slice
+	valAttr attrDef // definition
 }
 
 func newSliceAttrDef(b *baseAttrDef) (*sliceAttrDef, error) {
@@ -400,7 +401,7 @@ func (a *sliceAttrDef) generateDelChg(w *writer, levelID string) {
 func (a *sliceAttrDef) generateApply(w *writer, levelID string) {
 	format := `   case &%[1]s%[2]sAID:
 			{
-			    s := o.%[2]s
+			    s := &o.%[2]s
 `
 	w.printf(format, a.parentType.name, a.nm)
 	a.generateApplyBody(w, levelID)
@@ -420,10 +421,12 @@ func (a *sliceAttrDef) generateApplyBody(w *writer, levelID string) {
 	w.printf(format)
 	a.valAttr.generateSliceInsert(w, levelID)
 	format = `				case metago.ChangeTypeDelete:
-	            // TODO: delete element from slice.	
+				new := make([]%[1]s, sc.Idx) 
+				copy(new, *s)
+				*s = new
             }
 `
-	w.printf(format)
+	w.printf(format, a.valType)
 
 }
 
@@ -654,6 +657,7 @@ func (a *structAttrDef) generateMapModify(w *writer, levelID string) {
 }
 
 func (a *structAttrDef) generateMapInsert(w *writer, levelID string) {
+	// Because struct changes are recorded as Diffs (not as NewValues) we need to create a new value, apply the Chg to that value and then put the result into the map.
 	format := `                        {
 						s := %[2]s{} 
 						c := mc%[1]s.Chgs[0].(*metago.StructChg).Chg

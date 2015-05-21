@@ -64,7 +64,7 @@ type 3 SliceTestObject concrete {
 	}
 	attributes {
 		1  VByte    []byte
-        2  VUint    []int
+        2  VUint    []uint
 		3  VUint8   []uint8
 		4  VUint16  []uint16
 		5  VUint32  []uint32
