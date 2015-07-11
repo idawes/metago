@@ -381,7 +381,7 @@ func (t *typedef) resolveMethods(methods map[string]*methodDef) {
 }
 
 func (t *typedef) generateEquals(w *writer) {
-	w.printf("\nfunc (o1 *%[1]s) Equals(o2 *%[1]s) bool {\n", t.name)
+	w.printf("\nfunc (o1 %[1]s) Equals(o2 %[1]s) bool {\n", t.name)
 	t.generateAttrEquals(w)
 	w.printf("    return true\n}\n")
 }
@@ -397,10 +397,10 @@ func (t *typedef) generateAttrEquals(w *writer) {
 }
 
 func (t *typedef) generateDiff(w *writer) {
-	w.printf("\nfunc (o1 *%[1]s) Diff(o2 *%[1]s) *metago.Diff {\n", t.name)
+	w.printf("\nfunc (o1 %[1]s) Diff(o2 %[1]s) metago.Diff {\n", t.name)
 	w.printf("    chgs := make([]metago.Chg, 0)\n")
 	t.generateAttrDiffs(w)
-	w.printf("    return &metago.Diff{Chgs: chgs}\n}\n")
+	w.printf("    return metago.Diff{Chgs: chgs}\n}\n")
 
 }
 
@@ -416,7 +416,7 @@ func (t *typedef) generateAttrDiffs(w *writer) {
 
 func (t *typedef) generateApply(w *writer) {
 	format := `
-func (o *%[1]s) Apply(d *metago.Diff) error {
+func (orig *%[1]s) Apply(d metago.Diff) error {
 	for _, c := range d.Chgs {
 		switch c.AttributeID() {
 `

@@ -32,7 +32,7 @@ func (this *SliceTestObject) Dump() string {
 	return spew.Sdump(*this)
 }
 
-func (o1 *SliceTestObject) Equals(o2 *SliceTestObject) bool {
+func (o1 SliceTestObject) Equals(o2 SliceTestObject) bool {
 
 	{
 		va, vb := o1.VByte, o2.VByte
@@ -231,7 +231,7 @@ func (o1 *SliceTestObject) Equals(o2 *SliceTestObject) bool {
 	return true
 }
 
-func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) *metago.Diff {
+func (o1 SliceTestObject) Diff(o2 SliceTestObject) metago.Diff {
 	chgs := make([]metago.Chg, 0)
 
 	{
@@ -683,16 +683,16 @@ func (o1 *SliceTestObject) Diff(o2 *SliceTestObject) *metago.Diff {
 			}
 		}
 	}
-	return &metago.Diff{Chgs: chgs}
+	return metago.Diff{Chgs: chgs}
 }
 
-func (o *SliceTestObject) Apply(d *metago.Diff) error {
+func (orig *SliceTestObject) Apply(d metago.Diff) error {
 	for _, c := range d.Chgs {
 		switch c.AttributeID() {
 
 		case &SliceTestObjectVByteAID:
 			{
-				s := &o.VByte
+				s := &orig.VByte
 				sc := c.(*metago.SliceChg)
 				idx := sc.Idx
 				switch sc.Typ {
@@ -701,15 +701,19 @@ func (o *SliceTestObject) Apply(d *metago.Diff) error {
 				case metago.ChangeTypeInsert:
 					*s = append(*s, sc.Chgs[0].(*metago.ByteChg).NewValue)
 				case metago.ChangeTypeDelete:
-					new := make([]byte, sc.Idx)
-					copy(new, *s)
-					*s = new
+					if idx == 0 {
+						*s = nil
+					} else {
+						new := make([]byte, idx)
+						copy(new, *s)
+						*s = new
+					}
 				}
 			}
 
 		case &SliceTestObjectVUintAID:
 			{
-				s := &o.VUint
+				s := &orig.VUint
 				sc := c.(*metago.SliceChg)
 				idx := sc.Idx
 				switch sc.Typ {
@@ -718,15 +722,19 @@ func (o *SliceTestObject) Apply(d *metago.Diff) error {
 				case metago.ChangeTypeInsert:
 					*s = append(*s, sc.Chgs[0].(*metago.UintChg).NewValue)
 				case metago.ChangeTypeDelete:
-					new := make([]uint, sc.Idx)
-					copy(new, *s)
-					*s = new
+					if idx == 0 {
+						*s = nil
+					} else {
+						new := make([]uint, idx)
+						copy(new, *s)
+						*s = new
+					}
 				}
 			}
 
 		case &SliceTestObjectVUint8AID:
 			{
-				s := &o.VUint8
+				s := &orig.VUint8
 				sc := c.(*metago.SliceChg)
 				idx := sc.Idx
 				switch sc.Typ {
@@ -735,15 +743,19 @@ func (o *SliceTestObject) Apply(d *metago.Diff) error {
 				case metago.ChangeTypeInsert:
 					*s = append(*s, sc.Chgs[0].(*metago.Uint8Chg).NewValue)
 				case metago.ChangeTypeDelete:
-					new := make([]uint8, sc.Idx)
-					copy(new, *s)
-					*s = new
+					if idx == 0 {
+						*s = nil
+					} else {
+						new := make([]uint8, idx)
+						copy(new, *s)
+						*s = new
+					}
 				}
 			}
 
 		case &SliceTestObjectVUint16AID:
 			{
-				s := &o.VUint16
+				s := &orig.VUint16
 				sc := c.(*metago.SliceChg)
 				idx := sc.Idx
 				switch sc.Typ {
@@ -752,15 +764,19 @@ func (o *SliceTestObject) Apply(d *metago.Diff) error {
 				case metago.ChangeTypeInsert:
 					*s = append(*s, sc.Chgs[0].(*metago.Uint16Chg).NewValue)
 				case metago.ChangeTypeDelete:
-					new := make([]uint16, sc.Idx)
-					copy(new, *s)
-					*s = new
+					if idx == 0 {
+						*s = nil
+					} else {
+						new := make([]uint16, idx)
+						copy(new, *s)
+						*s = new
+					}
 				}
 			}
 
 		case &SliceTestObjectVUint32AID:
 			{
-				s := &o.VUint32
+				s := &orig.VUint32
 				sc := c.(*metago.SliceChg)
 				idx := sc.Idx
 				switch sc.Typ {
@@ -769,15 +785,19 @@ func (o *SliceTestObject) Apply(d *metago.Diff) error {
 				case metago.ChangeTypeInsert:
 					*s = append(*s, sc.Chgs[0].(*metago.Uint32Chg).NewValue)
 				case metago.ChangeTypeDelete:
-					new := make([]uint32, sc.Idx)
-					copy(new, *s)
-					*s = new
+					if idx == 0 {
+						*s = nil
+					} else {
+						new := make([]uint32, idx)
+						copy(new, *s)
+						*s = new
+					}
 				}
 			}
 
 		case &SliceTestObjectVUint64AID:
 			{
-				s := &o.VUint64
+				s := &orig.VUint64
 				sc := c.(*metago.SliceChg)
 				idx := sc.Idx
 				switch sc.Typ {
@@ -786,15 +806,19 @@ func (o *SliceTestObject) Apply(d *metago.Diff) error {
 				case metago.ChangeTypeInsert:
 					*s = append(*s, sc.Chgs[0].(*metago.Uint64Chg).NewValue)
 				case metago.ChangeTypeDelete:
-					new := make([]uint64, sc.Idx)
-					copy(new, *s)
-					*s = new
+					if idx == 0 {
+						*s = nil
+					} else {
+						new := make([]uint64, idx)
+						copy(new, *s)
+						*s = new
+					}
 				}
 			}
 
 		case &SliceTestObjectVIntAID:
 			{
-				s := &o.VInt
+				s := &orig.VInt
 				sc := c.(*metago.SliceChg)
 				idx := sc.Idx
 				switch sc.Typ {
@@ -803,15 +827,19 @@ func (o *SliceTestObject) Apply(d *metago.Diff) error {
 				case metago.ChangeTypeInsert:
 					*s = append(*s, sc.Chgs[0].(*metago.IntChg).NewValue)
 				case metago.ChangeTypeDelete:
-					new := make([]int, sc.Idx)
-					copy(new, *s)
-					*s = new
+					if idx == 0 {
+						*s = nil
+					} else {
+						new := make([]int, idx)
+						copy(new, *s)
+						*s = new
+					}
 				}
 			}
 
 		case &SliceTestObjectVInt8AID:
 			{
-				s := &o.VInt8
+				s := &orig.VInt8
 				sc := c.(*metago.SliceChg)
 				idx := sc.Idx
 				switch sc.Typ {
@@ -820,15 +848,19 @@ func (o *SliceTestObject) Apply(d *metago.Diff) error {
 				case metago.ChangeTypeInsert:
 					*s = append(*s, sc.Chgs[0].(*metago.Int8Chg).NewValue)
 				case metago.ChangeTypeDelete:
-					new := make([]int8, sc.Idx)
-					copy(new, *s)
-					*s = new
+					if idx == 0 {
+						*s = nil
+					} else {
+						new := make([]int8, idx)
+						copy(new, *s)
+						*s = new
+					}
 				}
 			}
 
 		case &SliceTestObjectVInt16AID:
 			{
-				s := &o.VInt16
+				s := &orig.VInt16
 				sc := c.(*metago.SliceChg)
 				idx := sc.Idx
 				switch sc.Typ {
@@ -837,15 +869,19 @@ func (o *SliceTestObject) Apply(d *metago.Diff) error {
 				case metago.ChangeTypeInsert:
 					*s = append(*s, sc.Chgs[0].(*metago.Int16Chg).NewValue)
 				case metago.ChangeTypeDelete:
-					new := make([]int16, sc.Idx)
-					copy(new, *s)
-					*s = new
+					if idx == 0 {
+						*s = nil
+					} else {
+						new := make([]int16, idx)
+						copy(new, *s)
+						*s = new
+					}
 				}
 			}
 
 		case &SliceTestObjectVInt32AID:
 			{
-				s := &o.VInt32
+				s := &orig.VInt32
 				sc := c.(*metago.SliceChg)
 				idx := sc.Idx
 				switch sc.Typ {
@@ -854,15 +890,19 @@ func (o *SliceTestObject) Apply(d *metago.Diff) error {
 				case metago.ChangeTypeInsert:
 					*s = append(*s, sc.Chgs[0].(*metago.Int32Chg).NewValue)
 				case metago.ChangeTypeDelete:
-					new := make([]int32, sc.Idx)
-					copy(new, *s)
-					*s = new
+					if idx == 0 {
+						*s = nil
+					} else {
+						new := make([]int32, idx)
+						copy(new, *s)
+						*s = new
+					}
 				}
 			}
 
 		case &SliceTestObjectVInt64AID:
 			{
-				s := &o.VInt64
+				s := &orig.VInt64
 				sc := c.(*metago.SliceChg)
 				idx := sc.Idx
 				switch sc.Typ {
@@ -871,15 +911,19 @@ func (o *SliceTestObject) Apply(d *metago.Diff) error {
 				case metago.ChangeTypeInsert:
 					*s = append(*s, sc.Chgs[0].(*metago.Int64Chg).NewValue)
 				case metago.ChangeTypeDelete:
-					new := make([]int64, sc.Idx)
-					copy(new, *s)
-					*s = new
+					if idx == 0 {
+						*s = nil
+					} else {
+						new := make([]int64, idx)
+						copy(new, *s)
+						*s = new
+					}
 				}
 			}
 
 		case &SliceTestObjectVFloat32AID:
 			{
-				s := &o.VFloat32
+				s := &orig.VFloat32
 				sc := c.(*metago.SliceChg)
 				idx := sc.Idx
 				switch sc.Typ {
@@ -888,15 +932,19 @@ func (o *SliceTestObject) Apply(d *metago.Diff) error {
 				case metago.ChangeTypeInsert:
 					*s = append(*s, sc.Chgs[0].(*metago.Float32Chg).NewValue)
 				case metago.ChangeTypeDelete:
-					new := make([]float32, sc.Idx)
-					copy(new, *s)
-					*s = new
+					if idx == 0 {
+						*s = nil
+					} else {
+						new := make([]float32, idx)
+						copy(new, *s)
+						*s = new
+					}
 				}
 			}
 
 		case &SliceTestObjectVFloat64AID:
 			{
-				s := &o.VFloat64
+				s := &orig.VFloat64
 				sc := c.(*metago.SliceChg)
 				idx := sc.Idx
 				switch sc.Typ {
@@ -905,15 +953,19 @@ func (o *SliceTestObject) Apply(d *metago.Diff) error {
 				case metago.ChangeTypeInsert:
 					*s = append(*s, sc.Chgs[0].(*metago.Float64Chg).NewValue)
 				case metago.ChangeTypeDelete:
-					new := make([]float64, sc.Idx)
-					copy(new, *s)
-					*s = new
+					if idx == 0 {
+						*s = nil
+					} else {
+						new := make([]float64, idx)
+						copy(new, *s)
+						*s = new
+					}
 				}
 			}
 
 		case &SliceTestObjectVStringAID:
 			{
-				s := &o.VString
+				s := &orig.VString
 				sc := c.(*metago.SliceChg)
 				idx := sc.Idx
 				switch sc.Typ {
@@ -922,15 +974,19 @@ func (o *SliceTestObject) Apply(d *metago.Diff) error {
 				case metago.ChangeTypeInsert:
 					*s = append(*s, sc.Chgs[0].(*metago.StringChg).NewValue)
 				case metago.ChangeTypeDelete:
-					new := make([]string, sc.Idx)
-					copy(new, *s)
-					*s = new
+					if idx == 0 {
+						*s = nil
+					} else {
+						new := make([]string, idx)
+						copy(new, *s)
+						*s = new
+					}
 				}
 			}
 
 		case &SliceTestObjectVTimeAID:
 			{
-				s := &o.VTime
+				s := &orig.VTime
 				sc := c.(*metago.SliceChg)
 				idx := sc.Idx
 				switch sc.Typ {
@@ -939,9 +995,13 @@ func (o *SliceTestObject) Apply(d *metago.Diff) error {
 				case metago.ChangeTypeInsert:
 					*s = append(*s, sc.Chgs[0].(*metago.TimeChg).NewValue)
 				case metago.ChangeTypeDelete:
-					new := make([]time.Time, sc.Idx)
-					copy(new, *s)
-					*s = new
+					if idx == 0 {
+						*s = nil
+					} else {
+						new := make([]time.Time, idx)
+						copy(new, *s)
+						*s = new
+					}
 				}
 			}
 		}

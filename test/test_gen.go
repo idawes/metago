@@ -2,6 +2,7 @@ package test
 
 // +build: generate
 
+//go:generate rm -f basic*.go
 //go:generate replacer -f basic_test.tmpl -o basic_byte_test.go    -r "T:Byte"    -r "VA:3" -r "VB:5"
 //go:generate replacer -f basic_test.tmpl -o basic_uint_test.go    -r "T:Uint"    -r "VA:3" -r "VB:5"
 //go:generate replacer -f basic_test.tmpl -o basic_uint8_test.go   -r "T:Uint8"   -r "VA:3" -r "VB:5"
@@ -19,6 +20,7 @@ package test
 //go:generate replacer -f basic_test.tmpl -o basic_time_test.go -r "T:Time" -r "VA:time.Now()" -r "VB:time.Now().Add(5 * time.Hour)"
 //go:generate goimports -w basic_time_test.go
 
+//go:generate rm -f slice*.go
 //go:generate replacer  -f slice_test.tmpl -o slice_byte_test.go    -r "T:Byte"    -r "t:byte"    -r "VA:3"          -r "VB:5"
 //go:generate replacer  -f slice_test.tmpl -o slice_uint_test.go    -r "T:Uint"    -r "t:uint"    -r "VA:3"          -r "VB:5"
 //go:generate replacer  -f slice_test.tmpl -o slice_uint8_test.go   -r "T:Uint8"   -r "t:uint8"   -r "VA:3"          -r "VB:5"

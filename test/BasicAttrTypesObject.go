@@ -39,7 +39,7 @@ func (this *BasicAttrTypesObject) Dump() string {
 	return spew.Sdump(*this)
 }
 
-func (o1 *BasicAttrTypesObject) Equals(o2 *BasicAttrTypesObject) bool {
+func (o1 BasicAttrTypesObject) Equals(o2 BasicAttrTypesObject) bool {
 
 	{
 		va, vb := o1.VByte, o2.VByte
@@ -148,7 +148,7 @@ func (o1 *BasicAttrTypesObject) Equals(o2 *BasicAttrTypesObject) bool {
 	return true
 }
 
-func (o1 *BasicAttrTypesObject) Diff(o2 *BasicAttrTypesObject) *metago.Diff {
+func (o1 BasicAttrTypesObject) Diff(o2 BasicAttrTypesObject) metago.Diff {
 	chgs := make([]metago.Chg, 0)
 
 	{
@@ -255,100 +255,100 @@ func (o1 *BasicAttrTypesObject) Diff(o2 *BasicAttrTypesObject) *metago.Diff {
 			chgs = append(chgs, metago.NewTimeChg(&BasicAttrTypesObjectVTimeSREF, vb, va))
 		}
 	}
-	return &metago.Diff{Chgs: chgs}
+	return metago.Diff{Chgs: chgs}
 }
 
-func (o *BasicAttrTypesObject) Apply(d *metago.Diff) error {
+func (orig *BasicAttrTypesObject) Apply(d metago.Diff) error {
 	for _, c := range d.Chgs {
 		switch c.AttributeID() {
 
 		case &BasicAttrTypesObjectVByteAID:
 			{
-				v := &o.VByte
+				v := &orig.VByte
 				*v = c.(*metago.ByteChg).NewValue
 			}
 
 		case &BasicAttrTypesObjectVUintAID:
 			{
-				v := &o.VUint
+				v := &orig.VUint
 				*v = c.(*metago.UintChg).NewValue
 			}
 
 		case &BasicAttrTypesObjectVUint8AID:
 			{
-				v := &o.VUint8
+				v := &orig.VUint8
 				*v = c.(*metago.Uint8Chg).NewValue
 			}
 
 		case &BasicAttrTypesObjectVUint16AID:
 			{
-				v := &o.VUint16
+				v := &orig.VUint16
 				*v = c.(*metago.Uint16Chg).NewValue
 			}
 
 		case &BasicAttrTypesObjectVUint32AID:
 			{
-				v := &o.VUint32
+				v := &orig.VUint32
 				*v = c.(*metago.Uint32Chg).NewValue
 			}
 
 		case &BasicAttrTypesObjectVUint64AID:
 			{
-				v := &o.VUint64
+				v := &orig.VUint64
 				*v = c.(*metago.Uint64Chg).NewValue
 			}
 
 		case &BasicAttrTypesObjectVIntAID:
 			{
-				v := &o.VInt
+				v := &orig.VInt
 				*v = c.(*metago.IntChg).NewValue
 			}
 
 		case &BasicAttrTypesObjectVInt8AID:
 			{
-				v := &o.VInt8
+				v := &orig.VInt8
 				*v = c.(*metago.Int8Chg).NewValue
 			}
 
 		case &BasicAttrTypesObjectVInt16AID:
 			{
-				v := &o.VInt16
+				v := &orig.VInt16
 				*v = c.(*metago.Int16Chg).NewValue
 			}
 
 		case &BasicAttrTypesObjectVInt32AID:
 			{
-				v := &o.VInt32
+				v := &orig.VInt32
 				*v = c.(*metago.Int32Chg).NewValue
 			}
 
 		case &BasicAttrTypesObjectVInt64AID:
 			{
-				v := &o.VInt64
+				v := &orig.VInt64
 				*v = c.(*metago.Int64Chg).NewValue
 			}
 
 		case &BasicAttrTypesObjectVFloat32AID:
 			{
-				v := &o.VFloat32
+				v := &orig.VFloat32
 				*v = c.(*metago.Float32Chg).NewValue
 			}
 
 		case &BasicAttrTypesObjectVFloat64AID:
 			{
-				v := &o.VFloat64
+				v := &orig.VFloat64
 				*v = c.(*metago.Float64Chg).NewValue
 			}
 
 		case &BasicAttrTypesObjectVStringAID:
 			{
-				v := &o.VString
+				v := &orig.VString
 				*v = c.(*metago.StringChg).NewValue
 			}
 
 		case &BasicAttrTypesObjectVTimeAID:
 			{
-				v := &o.VTime
+				v := &orig.VTime
 				*v = c.(*metago.TimeChg).NewValue
 			}
 		}

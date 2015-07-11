@@ -13,11 +13,11 @@ type StructTestObject struct {
 	MB map[int]BasicAttrTypesObject
 }
 
-func (o1 *StructTestObject) Equals(o2 *StructTestObject) bool {
+func (o1 StructTestObject) Equals(o2 StructTestObject) bool {
 
 	{
 		va, vb := o1.B, o2.B
-		if !va.Equals(&vb) {
+		if !va.Equals(vb) {
 			return false
 		}
 	}
@@ -29,7 +29,7 @@ func (o1 *StructTestObject) Equals(o2 *StructTestObject) bool {
 		}
 		for key, va1 := range va {
 			if vb1, ok := vb[key]; ok {
-				if !va1.Equals(&vb1) {
+				if !va1.Equals(vb1) {
 					return false
 				}
 			} else {
@@ -40,13 +40,13 @@ func (o1 *StructTestObject) Equals(o2 *StructTestObject) bool {
 	return true
 }
 
-func (o1 *StructTestObject) Diff(o2 *StructTestObject) *metago.Diff {
+func (o1 StructTestObject) Diff(o2 StructTestObject) metago.Diff {
 	chgs := make([]metago.Chg, 0)
 
 	{
 		va, vb := o1.B, o2.B
-		if !va.Equals(&vb) {
-			chgs = append(chgs, metago.NewStructChg(&StructTestObjectBSREF, va.Diff(&vb)))
+		if !va.Equals(vb) {
+			chgs = append(chgs, metago.NewStructChg(&StructTestObjectBSREF, va.Diff(vb)))
 		}
 	}
 
@@ -56,8 +56,8 @@ func (o1 *StructTestObject) Diff(o2 *StructTestObject) *metago.Diff {
 			if vb1, ok := vb[key]; ok {
 				// "key" exists in both "va" and "vb"
 				chgs1 := make([]metago.Chg, 0)
-				if !va1.Equals(&vb1) {
-					chgs1 = append(chgs1, metago.NewStructChg(&StructTestObjectMBSREF, va1.Diff(&vb1)))
+				if !va1.Equals(vb1) {
+					chgs1 = append(chgs1, metago.NewStructChg(&StructTestObjectMBSREF, va1.Diff(vb1)))
 				}
 				if len(chgs1) != 0 {
 					chgs = append(chgs, metago.NewIntMapChg(&StructTestObjectMBSREF, key, metago.ChangeTypeModify, chgs1))
@@ -66,7 +66,7 @@ func (o1 *StructTestObject) Diff(o2 *StructTestObject) *metago.Diff {
 				// "key" exists in "va" but not in "vb"
 				chgs1 := make([]metago.Chg, 0)
 				t := BasicAttrTypesObject{}
-				chgs1 = append(chgs1, metago.NewStructChg(&StructTestObjectMBSREF, va1.Diff(&t)))
+				chgs1 = append(chgs1, metago.NewStructChg(&StructTestObjectMBSREF, va1.Diff(t)))
 				if len(chgs1) != 0 {
 					chgs = append(chgs, metago.NewIntMapChg(&StructTestObjectMBSREF, key, metago.ChangeTypeDelete, chgs1))
 				}
@@ -79,31 +79,31 @@ func (o1 *StructTestObject) Diff(o2 *StructTestObject) *metago.Diff {
 			// "key" exists in vb but not int va"
 			chgs1 := make([]metago.Chg, 0)
 			t := BasicAttrTypesObject{}
-			chgs1 = append(chgs1, metago.NewStructChg(&StructTestObjectMBSREF, t.Diff(&vb1)))
+			chgs1 = append(chgs1, metago.NewStructChg(&StructTestObjectMBSREF, t.Diff(vb1)))
 			if len(chgs1) != 0 {
 				chgs = append(chgs, metago.NewIntMapChg(&StructTestObjectMBSREF, key, metago.ChangeTypeInsert, chgs1))
 			}
 		}
 	}
-	return &metago.Diff{Chgs: chgs}
+	return metago.Diff{Chgs: chgs}
 }
 
-func (o *StructTestObject) Apply(d *metago.Diff) error {
+func (orig *StructTestObject) Apply(d metago.Diff) error {
 	for _, c := range d.Chgs {
 		switch c.AttributeID() {
 
 		case &StructTestObjectBAID:
 			{
-				v := &o.B
+				v := &orig.B
 				{
 					c := c.(*metago.StructChg).Chg
-					v.Apply(&c)
+					v.Apply(c)
 				}
 			}
 
 		case &StructTestObjectMBAID:
 			{
-				m := o.MB
+				m := orig.MB
 				mc := c.(*metago.IntMapChg)
 				key := mc.Key
 				switch mc.Typ {
@@ -111,14 +111,14 @@ func (o *StructTestObject) Apply(d *metago.Diff) error {
 					{
 						s := m[key]
 						c := mc.Chgs[0].(*metago.StructChg).Chg
-						s.Apply(&c)
+						s.Apply(c)
 						m[key] = s
 					}
 				case metago.ChangeTypeInsert:
 					{
 						s := BasicAttrTypesObject{}
 						c := mc.Chgs[0].(*metago.StructChg).Chg
-						s.Apply(&c)
+						s.Apply(c)
 						m[key] = s
 					}
 				case metago.ChangeTypeDelete:

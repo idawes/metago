@@ -1,6 +1,7 @@
 package metago
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 )
@@ -9,11 +10,7 @@ type Diff struct {
 	Chgs []Chg
 }
 
-func (d *Diff) Add(chg Chg) {
-	d.Chgs = append(d.Chgs, chg)
-}
-
-func (d *Diff) WriteIndented(w io.Writer, lev int) {
+func (d Diff) WriteIndented(w io.Writer, lev int) {
 	for i := 0; i < lev; i++ {
 		fmt.Fprintf(w, "  ")
 	}
@@ -34,19 +31,19 @@ type BaseChg struct {
 	schemaref *Attrdef
 }
 
-func (d *BaseChg) AttributeID() *AttrID {
+func (d BaseChg) AttributeID() *AttrID {
 	return d.schemaref.ID
 }
 
-func (d *BaseChg) Schemaref() *Attrdef {
+func (d BaseChg) Schemaref() *Attrdef {
 	return d.schemaref
 }
 
-func (d *BaseChg) PersistenceClass() PersistenceClass {
+func (d BaseChg) PersistenceClass() PersistenceClass {
 	return d.schemaref.Persistence
 }
 
-func (d *BaseChg) WriteTo(w *Writer) error {
+func (d BaseChg) WriteTo(w *Writer) error {
 	w.Write(d.schemaref.ID.Pkg[:])
 	w.WriteVarint(int64(d.schemaref.ID.Typ))
 	w.WriteVarint(int64(d.schemaref.ID.Attr))
@@ -69,7 +66,7 @@ type SliceChg struct {
 	Chgs []Chg
 }
 
-func (c *SliceChg) WriteIndented(w io.Writer, lev int) {
+func (c SliceChg) WriteIndented(w io.Writer, lev int) {
 	for i := 0; i < lev; i++ {
 		fmt.Fprintf(w, "  ")
 	}
@@ -89,7 +86,7 @@ type StructChg struct {
 	Chg Diff
 }
 
-func (c *StructChg) WriteIndented(w io.Writer, lev int) {
+func (c StructChg) WriteIndented(w io.Writer, lev int) {
 	for i := 0; i < lev; i++ {
 		fmt.Fprintf(w, "  ")
 	}
@@ -97,6 +94,25 @@ func (c *StructChg) WriteIndented(w io.Writer, lev int) {
 	c.Chg.WriteIndented(w, lev+1)
 }
 
-func NewStructChg(sref *Attrdef, chg *Diff) Chg {
-	return &StructChg{BaseChg: BaseChg{schemaref: sref}, Chg: *chg}
+func NewStructChg(sref *Attrdef, chg Diff) Chg {
+	return &StructChg{BaseChg: BaseChg{schemaref: sref}, Chg: chg}
+}
+
+type DiffApplyError struct {
+	errChain []error
+}
+
+func (e DiffApplyError) Error() string {
+	buf := &bytes.Buffer{}
+	for i, err := range e.errChain {
+		if i != 0 {
+			fmt.Fprintln(buf, " Caused by:")
+		}
+		for j := 0; j < i; j++ {
+			fmt.Fprint(buf, "  ")
+		}
+		fmt.Fprint(buf, err)
+	}
+	fmt.Fprintln(buf)
+	return buf.String()
 }

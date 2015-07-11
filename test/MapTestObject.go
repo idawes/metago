@@ -14,7 +14,7 @@ type MapTestObject struct {
 	o2 map[byte]map[byte]string
 }
 
-func (o1 *MapTestObject) Equals(o2 *MapTestObject) bool {
+func (o1 MapTestObject) Equals(o2 MapTestObject) bool {
 
 	{
 		va, vb := o1.o1, o2.o1
@@ -59,7 +59,7 @@ func (o1 *MapTestObject) Equals(o2 *MapTestObject) bool {
 	return true
 }
 
-func (o1 *MapTestObject) Diff(o2 *MapTestObject) *metago.Diff {
+func (o1 MapTestObject) Diff(o2 MapTestObject) metago.Diff {
 	chgs := make([]metago.Chg, 0)
 
 	{
@@ -169,16 +169,16 @@ func (o1 *MapTestObject) Diff(o2 *MapTestObject) *metago.Diff {
 			}
 		}
 	}
-	return &metago.Diff{Chgs: chgs}
+	return metago.Diff{Chgs: chgs}
 }
 
-func (o *MapTestObject) Apply(d *metago.Diff) error {
+func (orig *MapTestObject) Apply(d metago.Diff) error {
 	for _, c := range d.Chgs {
 		switch c.AttributeID() {
 
 		case &MapTestObjecto1AID:
 			{
-				m := o.o1
+				m := orig.o1
 				mc := c.(*metago.ByteMapChg)
 				key := mc.Key
 				switch mc.Typ {
@@ -193,7 +193,7 @@ func (o *MapTestObject) Apply(d *metago.Diff) error {
 
 		case &MapTestObjecto2AID:
 			{
-				m := o.o2
+				m := orig.o2
 				mc := c.(*metago.ByteMapChg)
 				key := mc.Key
 				switch mc.Typ {

@@ -211,7 +211,7 @@ func (a *baseAttrDef) generateApply(w *writer, levelID string) {
 func (a *baseAttrDef) checkLevel0ApplyHdr(w *writer, levelID string) {
 	if levelID == "" {
 		w.printf("    {\n")
-		w.printf("        v := &o.%[1]s\n", a.nm)
+		w.printf("        v := &orig.%[1]s\n", a.nm)
 	}
 }
 
@@ -401,7 +401,7 @@ func (a *sliceAttrDef) generateDelChg(w *writer, levelID string) {
 func (a *sliceAttrDef) generateApply(w *writer, levelID string) {
 	format := `   case &%[1]s%[2]sAID:
 			{
-			    s := &o.%[2]s
+			    s := &orig.%[2]s
 `
 	w.printf(format, a.parentType.name, a.nm)
 	a.generateApplyBody(w, levelID)
@@ -410,24 +410,27 @@ func (a *sliceAttrDef) generateApply(w *writer, levelID string) {
 
 func (a *sliceAttrDef) generateApplyBody(w *writer, levelID string) {
 	format := `            sc%[1]s := c%[1]s.(*metago.SliceChg)
-	            idx%[1]s := sc%[1]s.Idx
+                idx := sc.Idx
 				switch sc%[1]s.Typ {
 				case metago.ChangeTypeModify:
 `
 	w.printf(format, levelID)
 	a.valAttr.generateSliceModify(w, levelID)
-	format = `				case metago.ChangeTypeInsert:
+	format = `              case metago.ChangeTypeInsert:
 `
 	w.printf(format)
 	a.valAttr.generateSliceInsert(w, levelID)
 	format = `				case metago.ChangeTypeDelete:
-				new := make([]%[1]s, sc.Idx) 
-				copy(new, *s)
-				*s = new
+				if idx == 0 {
+					*s = nil 
+				} else {
+					new := make([]%[1]s, idx) 
+					copy(new, *s)
+					*s = new
+				}
             }
 `
 	w.printf(format, a.valType)
-
 }
 
 /************************************************************************/
@@ -558,7 +561,7 @@ func (a *mapAttrDef) generateDelChg(w *writer, levelID string) {
 func (a *mapAttrDef) generateApply(w *writer, levelID string) {
 	format := `   case &%[1]s%[2]sAID:
 			{
-			    m := o.%[2]s
+			    m := orig.%[2]s
 `
 	w.printf(format, a.parentType.name, a.nm)
 	a.generateApplyBody(w, levelID)
@@ -609,14 +612,14 @@ func newStructAttrDef(b *baseAttrDef) (*structAttrDef, error) {
 
 func (a *structAttrDef) generateEquals(w *writer, levelID string) {
 	a.checkLevel0Hdr(w, levelID)
-	w.printf("  if !va%[1]s.Equals(&vb%[1]s) {\n    return false\n  }\n", levelID)
+	w.printf("  if !va%[1]s.Equals(vb%[1]s) {\n    return false\n  }\n", levelID)
 	a.checkLevel0Ftr(w, levelID)
 }
 
 func (a *structAttrDef) generateDiff(w *writer, levelID string) {
 	a.checkLevel0Hdr(w, levelID)
-	format := `        if !va%[1]s.Equals(&vb%[1]s) {
-			chgs%[1]s = append(chgs%[1]s, metago.NewStructChg(&%[2]s%[3]sSREF, va%[1]s.Diff(&vb%[1]s)))
+	format := `        if !va%[1]s.Equals(vb%[1]s) {
+			chgs%[1]s = append(chgs%[1]s, metago.NewStructChg(&%[2]s%[3]sSREF, va%[1]s.Diff(vb%[1]s)))
 		}
 `
 	w.printf(format, levelID, a.parentType.name, a.nm)
@@ -625,20 +628,20 @@ func (a *structAttrDef) generateDiff(w *writer, levelID string) {
 
 func (a *structAttrDef) generateInsChg(w *writer, levelID string) {
 	w.printf("t := %[1]s{}\n", a.typ)
-	w.printf("chgs%[1]s = append(chgs%[1]s, metago.NewStructChg(&%[2]s%[3]sSREF, t.Diff(&vb%[1]s)))\n", levelID, a.parentType.name, a.nm)
+	w.printf("chgs%[1]s = append(chgs%[1]s, metago.NewStructChg(&%[2]s%[3]sSREF, t.Diff(vb%[1]s)))\n", levelID, a.parentType.name, a.nm)
 }
 
 func (a *structAttrDef) generateDelChg(w *writer, levelID string) {
 	w.printf("t := %[1]s{}\n", a.typ)
-	w.printf("chgs%[1]s = append(chgs%[1]s, metago.NewStructChg(&%[2]s%[3]sSREF, va%[1]s.Diff(&t)))\n", levelID, a.parentType.name, a.nm)
+	w.printf("chgs%[1]s = append(chgs%[1]s, metago.NewStructChg(&%[2]s%[3]sSREF, va%[1]s.Diff(t)))\n", levelID, a.parentType.name, a.nm)
 }
 
 func (a *structAttrDef) generateApply(w *writer, levelID string) {
 	w.printf("    case &%[1]s%[2]sAID:\n", a.parentType.name, a.nm)
 	a.checkLevel0ApplyHdr(w, levelID)
 	format := `                        {
-						c :=c.(*metago.StructChg).Chg
-						v.Apply(&c)
+						c := c.(*metago.StructChg).Chg
+						v.Apply(c)
 					}
 `
 	w.printf(format)
@@ -649,7 +652,7 @@ func (a *structAttrDef) generateMapModify(w *writer, levelID string) {
 	format := `                        {
 						s := m%[1]s[key%[1]s]
 						c := mc%[1]s.Chgs[0].(*metago.StructChg).Chg
-						s.Apply(&c)
+						s.Apply(c)
 						m%[1]s[key%[1]s] = s
 					}
 `
@@ -661,7 +664,7 @@ func (a *structAttrDef) generateMapInsert(w *writer, levelID string) {
 	format := `                        {
 						s := %[2]s{} 
 						c := mc%[1]s.Chgs[0].(*metago.StructChg).Chg
-						s.Apply(&c)
+						s.Apply(c)
 						m%[1]s[key%[1]s] = s
 					}
 `

@@ -1,32 +1,27 @@
 package test
 
 import (
+	"fmt"
 	"testing"
 	"time"
+
+	"github.com/davecgh/go-spew/spew"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestBasicTime(t *testing.T) {
 	a := BasicAttrTypesObject{}
 	b := BasicAttrTypesObject{}
 
-	if !a.Equals(&b) {
-		t.Errorf("a and b should be equal")
-	}
-
 	a.VTime = time.Now()
 	b.VTime = time.Now().Add(5 * time.Hour)
+	assert.NotEqual(t, a, b)
+	assert.Equal(t, a.Equals(b), false, fmt.Sprintf("\na:\n%s\nb:\n%s\n", spew.Sdump(a), spew.Sdump(b)))
 
-	if a.Equals(&b) {
-		t.Errorf("a and b should not be equal")
-	}
-
-	d := a.Diff(&b)
-	if len(d.Chgs) != 1 {
-		t.Errorf("Found %d differences between a and b, expected 1", len(d.Chgs))
-	}
+	d := a.Diff(b)
+	assert.Equal(t, len(d.Chgs), 1, spew.Sdump(d))
 
 	a.Apply(d)
-	if !a.Equals(&b) {
-		t.Errorf("a and b should be equal")
-	}
+	assert.Equal(t, a, b)
+	assert.Equal(t, a.Equals(b), true, fmt.Sprintf("\nn:\a%s\nb:\n%s\n", spew.Sdump(a), spew.Sdump(b)))
 }
