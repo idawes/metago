@@ -15,36 +15,36 @@ func TestSliceInt8(t *testing.T) {
 
     // make a longer than b
     a.VInt8 = append(a.VInt8, 3)
-    testSliceInt8DiffAndApply(t, a, b)
+    testSliceInt8DiffAndApply(t, a, b, 1)
     
     // make a and b the same length, but with a change.
     b.VInt8 = append(b.VInt8, 5)
-    testSliceInt8DiffAndApply(t, a, b)
+    testSliceInt8DiffAndApply(t, a, b, 1)
 
     // make a shorter than b
     a = SliceTestObject{}
-    testSliceInt8DiffAndApply(t, a, b)
+    testSliceInt8DiffAndApply(t, a, b, 1)
 
     // make both non-nil, and a longer than b
     a.VInt8 = append(a.VInt8, 5)
     a.VInt8 = append(a.VInt8, 3)
-    testSliceInt8DiffAndApply(t, a, b)
+    testSliceInt8DiffAndApply(t, a, b, 1)
 
     // make both same length, but with a change
     b.VInt8 = append(b.VInt8, 5)
-    testSliceInt8DiffAndApply(t, a, b)
+    testSliceInt8DiffAndApply(t, a, b, 1)
     
     // make both non-nil, and a shorter than b
     a.VInt8 = a.VInt8[:len(a.VInt8)-1]
-    testSliceInt8DiffAndApply(t, a, b)
+    testSliceInt8DiffAndApply(t, a, b, 1)
 }
 
-func testSliceInt8DiffAndApply(t *testing.T, a, b SliceTestObject) {
+func testSliceInt8DiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {
     assert.Equal(t, a.Equals(b), false, fmt.Sprintf("\na:\n%s\nb:\n%s\n", spew.Sdump(a), spew.Sdump(b)))
     assert.NotEqual(t, a, b)
 
 	d := a.Diff(b)
-    assert.Equal(t, 1, len(d.Chgs), spew.Sdump(d))
+    assert.Equal(t, numChanges , len(d.Chgs), spew.Sdump(d))
 
 	a.Apply(d)
     assert.Equal(t, a.Equals(b), true, fmt.Sprintf("\na:\n%s\nb:\n%s\ndiff:\n%s", spew.Sdump(a), spew.Sdump(b), spew.Sdump(d)))
