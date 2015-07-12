@@ -2,6 +2,10 @@ package test
 
 // +build: generate
 
+//go:generate go install github.com/idawes/metago/metago
+//go:generate go install github.com/idawes/replacer
+//go:generate metago github.com/idawes/metago/test
+
 //go:generate rm -f basic*test.go
 //go:generate replacer -f basic_test.tmpl -o basic_byte_test.go    -r "T:Byte"    -r "VA:3" -r "VB:5"
 //go:generate replacer -f basic_test.tmpl -o basic_uint_test.go    -r "T:Uint"    -r "VA:3" -r "VB:5"
