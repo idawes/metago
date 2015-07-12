@@ -37,6 +37,10 @@ func TestSliceInt64(t *testing.T) {
     // make both non-nil, and a shorter than b
     a.VInt64 = a.VInt64[:len(a.VInt64)-1]
     testSliceInt64DiffAndApply(t, a, b, 1)
+
+    // make 2 changes
+    a.VInt64[0] = 3
+    testSliceInt64DiffAndApply(t, a, b, 2)
 }
 
 func testSliceInt64DiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {

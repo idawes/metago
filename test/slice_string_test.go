@@ -37,6 +37,10 @@ func TestSliceString(t *testing.T) {
     // make both non-nil, and a shorter than b
     a.VString = a.VString[:len(a.VString)-1]
     testSliceStringDiffAndApply(t, a, b, 1)
+
+    // make 2 changes
+    a.VString[0] = "Foo"
+    testSliceStringDiffAndApply(t, a, b, 2)
 }
 
 func testSliceStringDiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {

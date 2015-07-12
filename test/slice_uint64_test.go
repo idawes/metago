@@ -37,6 +37,10 @@ func TestSliceUint64(t *testing.T) {
     // make both non-nil, and a shorter than b
     a.VUint64 = a.VUint64[:len(a.VUint64)-1]
     testSliceUint64DiffAndApply(t, a, b, 1)
+
+    // make 2 changes
+    a.VUint64[0] = 3
+    testSliceUint64DiffAndApply(t, a, b, 2)
 }
 
 func testSliceUint64DiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {

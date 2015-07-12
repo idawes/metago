@@ -37,6 +37,10 @@ func TestSliceByte(t *testing.T) {
     // make both non-nil, and a shorter than b
     a.VByte = a.VByte[:len(a.VByte)-1]
     testSliceByteDiffAndApply(t, a, b, 1)
+
+    // make 2 changes
+    a.VByte[0] = 3
+    testSliceByteDiffAndApply(t, a, b, 2)
 }
 
 func testSliceByteDiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {

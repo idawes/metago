@@ -37,6 +37,10 @@ func TestSliceFloat32(t *testing.T) {
     // make both non-nil, and a shorter than b
     a.VFloat32 = a.VFloat32[:len(a.VFloat32)-1]
     testSliceFloat32DiffAndApply(t, a, b, 1)
+
+    // make 2 changes
+    a.VFloat32[0] = 3.34
+    testSliceFloat32DiffAndApply(t, a, b, 2)
 }
 
 func testSliceFloat32DiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {

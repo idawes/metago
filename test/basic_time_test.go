@@ -13,8 +13,8 @@ func TestBasicTime(t *testing.T) {
 	a := BasicAttrTypesObject{}
 	b := BasicAttrTypesObject{}
 
-	a.VTime = time.Now()
-	b.VTime = time.Now().Add(5 * time.Hour)
+	a.VTime = time.Unix(1436000000, 0)
+	b.VTime = time.Unix(1436100000, 0)
 	assert.NotEqual(t, a, b)
 	assert.Equal(t, a.Equals(b), false, fmt.Sprintf("\na:\n%s\nb:\n%s\n", spew.Sdump(a), spew.Sdump(b)))
 

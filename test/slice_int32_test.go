@@ -37,6 +37,10 @@ func TestSliceInt32(t *testing.T) {
     // make both non-nil, and a shorter than b
     a.VInt32 = a.VInt32[:len(a.VInt32)-1]
     testSliceInt32DiffAndApply(t, a, b, 1)
+
+    // make 2 changes
+    a.VInt32[0] = 3
+    testSliceInt32DiffAndApply(t, a, b, 2)
 }
 
 func testSliceInt32DiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {

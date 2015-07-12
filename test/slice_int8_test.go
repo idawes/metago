@@ -37,6 +37,10 @@ func TestSliceInt8(t *testing.T) {
     // make both non-nil, and a shorter than b
     a.VInt8 = a.VInt8[:len(a.VInt8)-1]
     testSliceInt8DiffAndApply(t, a, b, 1)
+
+    // make 2 changes
+    a.VInt8[0] = 3
+    testSliceInt8DiffAndApply(t, a, b, 2)
 }
 
 func testSliceInt8DiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {

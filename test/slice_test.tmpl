@@ -37,6 +37,10 @@ func TestSlice@@T@@(t *testing.T) {
     // make both non-nil, and a shorter than b
     a.V@@T@@ = a.V@@T@@[:len(a.V@@T@@)-1]
     testSlice@@T@@DiffAndApply(t, a, b, 1)
+
+    // make 2 changes
+    a.V@@T@@[0] = @@VA@@
+    testSlice@@T@@DiffAndApply(t, a, b, 2)
 }
 
 func testSlice@@T@@DiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {

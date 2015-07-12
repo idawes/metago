@@ -37,6 +37,10 @@ func TestSliceUint16(t *testing.T) {
     // make both non-nil, and a shorter than b
     a.VUint16 = a.VUint16[:len(a.VUint16)-1]
     testSliceUint16DiffAndApply(t, a, b, 1)
+
+    // make 2 changes
+    a.VUint16[0] = 3
+    testSliceUint16DiffAndApply(t, a, b, 2)
 }
 
 func testSliceUint16DiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {

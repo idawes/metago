@@ -37,6 +37,10 @@ func TestSliceFloat64(t *testing.T) {
     // make both non-nil, and a shorter than b
     a.VFloat64 = a.VFloat64[:len(a.VFloat64)-1]
     testSliceFloat64DiffAndApply(t, a, b, 1)
+
+    // make 2 changes
+    a.VFloat64[0] = 3.23
+    testSliceFloat64DiffAndApply(t, a, b, 2)
 }
 
 func testSliceFloat64DiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {

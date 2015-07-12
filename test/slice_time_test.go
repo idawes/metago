@@ -16,11 +16,11 @@ func TestSliceTime(t *testing.T) {
 	assert.Equal(t, a.Equals(b), true, fmt.Sprintf("\an:\n%s\nb:\n%s\n", spew.Sdump(a), spew.Sdump(b)))
 
 	// make a longer than b
-	a.VTime = append(a.VTime, time.Now())
+	a.VTime = append(a.VTime, time.Unix(1436000000, 0))
 	testSliceTimeDiffAndApply(t, a, b, 1)
 
 	// make a and b the same length, but with a change.
-	b.VTime = append(b.VTime, time.Now().Add(5*time.Hour))
+	b.VTime = append(b.VTime, time.Unix(1436100000, 0))
 	testSliceTimeDiffAndApply(t, a, b, 1)
 
 	// make a shorter than b
@@ -28,17 +28,21 @@ func TestSliceTime(t *testing.T) {
 	testSliceTimeDiffAndApply(t, a, b, 1)
 
 	// make both non-nil, and a longer than b
-	a.VTime = append(a.VTime, time.Now().Add(5*time.Hour))
-	a.VTime = append(a.VTime, time.Now())
+	a.VTime = append(a.VTime, time.Unix(1436100000, 0))
+	a.VTime = append(a.VTime, time.Unix(1436000000, 0))
 	testSliceTimeDiffAndApply(t, a, b, 1)
 
 	// make both same length, but with a change
-	b.VTime = append(b.VTime, time.Now().Add(5*time.Hour))
+	b.VTime = append(b.VTime, time.Unix(1436100000, 0))
 	testSliceTimeDiffAndApply(t, a, b, 1)
 
 	// make both non-nil, and a shorter than b
 	a.VTime = a.VTime[:len(a.VTime)-1]
 	testSliceTimeDiffAndApply(t, a, b, 1)
+
+	// make 2 changes
+	a.VTime[0] = time.Unix(1436000000, 0)
+	testSliceTimeDiffAndApply(t, a, b, 2)
 }
 
 func testSliceTimeDiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {
