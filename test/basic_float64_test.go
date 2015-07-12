@@ -21,5 +21,5 @@ func TestBasicFloat64(t *testing.T) {
 
 	a.Apply(d)
     assert.Equal(t, a, b)
-    assert.Equal(t, a.Equals(b), true, fmt.Sprintf("\nn:\a%s\nb:\n%s\n", spew.Sdump(a), spew.Sdump(b)))
+    assert.Equal(t, a.Equals(b), true, fmt.Sprintf("\nn:\a%s\nb:\n%s\ndiff:\n%s", spew.Sdump(a), spew.Sdump(b), spew.Sdump(d)))
 }
