@@ -148,6 +148,7 @@ func (o1 BasicAttrTypesObject) Equals(o2 BasicAttrTypesObject) bool {
 	return true
 }
 
+// Diff returns a record of the differences between o1 and o2 such that applying the generated record to o1 would make it equal to o2
 func (o1 BasicAttrTypesObject) Diff(o2 BasicAttrTypesObject) metago.Diff {
 	chgs := make([]metago.Chg, 0)
 

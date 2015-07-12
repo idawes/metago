@@ -420,11 +420,20 @@ func (a *sliceAttrDef) generateApplyBody(w *writer, levelID string) {
 `
 	w.printf(format)
 	a.valAttr.generateSliceInsert(w, levelID)
+	// When we have a slice truncation, there will be one deletion change recorded for each element that was deleted.
+	// The first one processed will truncate the slice, the remaining are purely for information. The newlen >= len(*s) check
+	// ignores those. Also, when truncating to zero len, we chuck out the entire slice so we don't have two representations
+	// of empty slices in the canonical form. This makes the tests easier, because reflect.DeepEquals works. Also, it avoids
+	// allocating a slice until it's actually needed.
 	format = `				case metago.ChangeTypeDelete:
-				if idx == 0 {
+				newlen := idx
+				if newlen >= len(*s) {
+					break
+				}
+				if newlen == 0 {
 					*s = nil 
 				} else {
-					new := make([]%[1]s, idx) 
+					new := make([]%[1]s, newlen) 
 					copy(new, *s)
 					*s = new
 				}

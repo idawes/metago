@@ -13,34 +13,39 @@ func TestSliceUint32(t *testing.T) {
     assert.Equal(t, a, b)
     assert.Equal(t, a.Equals(b), true, fmt.Sprintf("\an:\n%s\nb:\n%s\n", spew.Sdump(a), spew.Sdump(b)))
 
-    // make a longer than b
-    a.VUint32 = append(a.VUint32, 3)
+    // single deletion diff at index 0
+    a.VUint32 = append(a.VUint32, 3) // sa = {VA}, sb = nil
     testSliceUint32DiffAndApply(t, a, b, 1)
     
-    // make a and b the same length, but with a change.
-    b.VUint32 = append(b.VUint32, 5)
+    // single modification diff at index 0
+    b.VUint32 = append(b.VUint32, 5) // sa = {VA}, sb = {VB}
     testSliceUint32DiffAndApply(t, a, b, 1)
 
-    // make a shorter than b
-    a = SliceTestObject{}
+    // single insertion diff at index 0
+    a = SliceTestObject{} // sa = nil, sb = {VB}
     testSliceUint32DiffAndApply(t, a, b, 1)
 
-    // make both non-nil, and a longer than b
+    // single deletion diff at index > 0 
     a.VUint32 = append(a.VUint32, 5)
-    a.VUint32 = append(a.VUint32, 3)
+    a.VUint32 = append(a.VUint32, 3) // sa = {VB, VA}, sb = {VB}
     testSliceUint32DiffAndApply(t, a, b, 1)
 
-    // make both same length, but with a change
-    b.VUint32 = append(b.VUint32, 5)
+    // single modification diff at index > 0
+    b.VUint32 = append(b.VUint32, 5) // sa = {VB, VA}, sb = {VB, VB}
     testSliceUint32DiffAndApply(t, a, b, 1)
     
-    // make both non-nil, and a shorter than b
-    a.VUint32 = a.VUint32[:len(a.VUint32)-1]
+    // single insertion diff at index > 0
+    a.VUint32 = a.VUint32[:len(a.VUint32)-1] // sa = {VB}, sb = {VB, VB}
     testSliceUint32DiffAndApply(t, a, b, 1)
 
-    // make 2 changes
-    a.VUint32[0] = 3
-    testSliceUint32DiffAndApply(t, a, b, 2)
+    // multiple deletion diff
+    a.VUint32 = append(a.VUint32, 3)
+    a.VUint32 = append(a.VUint32, 3)
+    a.VUint32 = append(a.VUint32, 3)
+    a.VUint32 = append(a.VUint32, 3) 
+    b = SliceTestObject{}
+    b.VUint32 = append(b.VUint32, 5) // sa = {VB, VA, VA, VA, VA}, sb = {VA}
+    testSliceUint32DiffAndApply(t, a, b, 4)
 }
 
 func testSliceUint32DiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {

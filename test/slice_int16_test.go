@@ -13,34 +13,39 @@ func TestSliceInt16(t *testing.T) {
     assert.Equal(t, a, b)
     assert.Equal(t, a.Equals(b), true, fmt.Sprintf("\an:\n%s\nb:\n%s\n", spew.Sdump(a), spew.Sdump(b)))
 
-    // make a longer than b
-    a.VInt16 = append(a.VInt16, 3)
+    // single deletion diff at index 0
+    a.VInt16 = append(a.VInt16, 3) // sa = {VA}, sb = nil
     testSliceInt16DiffAndApply(t, a, b, 1)
     
-    // make a and b the same length, but with a change.
-    b.VInt16 = append(b.VInt16, 5)
+    // single modification diff at index 0
+    b.VInt16 = append(b.VInt16, 5) // sa = {VA}, sb = {VB}
     testSliceInt16DiffAndApply(t, a, b, 1)
 
-    // make a shorter than b
-    a = SliceTestObject{}
+    // single insertion diff at index 0
+    a = SliceTestObject{} // sa = nil, sb = {VB}
     testSliceInt16DiffAndApply(t, a, b, 1)
 
-    // make both non-nil, and a longer than b
+    // single deletion diff at index > 0 
     a.VInt16 = append(a.VInt16, 5)
-    a.VInt16 = append(a.VInt16, 3)
+    a.VInt16 = append(a.VInt16, 3) // sa = {VB, VA}, sb = {VB}
     testSliceInt16DiffAndApply(t, a, b, 1)
 
-    // make both same length, but with a change
-    b.VInt16 = append(b.VInt16, 5)
+    // single modification diff at index > 0
+    b.VInt16 = append(b.VInt16, 5) // sa = {VB, VA}, sb = {VB, VB}
     testSliceInt16DiffAndApply(t, a, b, 1)
     
-    // make both non-nil, and a shorter than b
-    a.VInt16 = a.VInt16[:len(a.VInt16)-1]
+    // single insertion diff at index > 0
+    a.VInt16 = a.VInt16[:len(a.VInt16)-1] // sa = {VB}, sb = {VB, VB}
     testSliceInt16DiffAndApply(t, a, b, 1)
 
-    // make 2 changes
-    a.VInt16[0] = 3
-    testSliceInt16DiffAndApply(t, a, b, 2)
+    // multiple deletion diff
+    a.VInt16 = append(a.VInt16, 3)
+    a.VInt16 = append(a.VInt16, 3)
+    a.VInt16 = append(a.VInt16, 3)
+    a.VInt16 = append(a.VInt16, 3) 
+    b = SliceTestObject{}
+    b.VInt16 = append(b.VInt16, 5) // sa = {VB, VA, VA, VA, VA}, sb = {VA}
+    testSliceInt16DiffAndApply(t, a, b, 4)
 }
 
 func testSliceInt16DiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {

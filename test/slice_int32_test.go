@@ -13,34 +13,39 @@ func TestSliceInt32(t *testing.T) {
     assert.Equal(t, a, b)
     assert.Equal(t, a.Equals(b), true, fmt.Sprintf("\an:\n%s\nb:\n%s\n", spew.Sdump(a), spew.Sdump(b)))
 
-    // make a longer than b
-    a.VInt32 = append(a.VInt32, 3)
+    // single deletion diff at index 0
+    a.VInt32 = append(a.VInt32, 3) // sa = {VA}, sb = nil
     testSliceInt32DiffAndApply(t, a, b, 1)
     
-    // make a and b the same length, but with a change.
-    b.VInt32 = append(b.VInt32, 5)
+    // single modification diff at index 0
+    b.VInt32 = append(b.VInt32, 5) // sa = {VA}, sb = {VB}
     testSliceInt32DiffAndApply(t, a, b, 1)
 
-    // make a shorter than b
-    a = SliceTestObject{}
+    // single insertion diff at index 0
+    a = SliceTestObject{} // sa = nil, sb = {VB}
     testSliceInt32DiffAndApply(t, a, b, 1)
 
-    // make both non-nil, and a longer than b
+    // single deletion diff at index > 0 
     a.VInt32 = append(a.VInt32, 5)
-    a.VInt32 = append(a.VInt32, 3)
+    a.VInt32 = append(a.VInt32, 3) // sa = {VB, VA}, sb = {VB}
     testSliceInt32DiffAndApply(t, a, b, 1)
 
-    // make both same length, but with a change
-    b.VInt32 = append(b.VInt32, 5)
+    // single modification diff at index > 0
+    b.VInt32 = append(b.VInt32, 5) // sa = {VB, VA}, sb = {VB, VB}
     testSliceInt32DiffAndApply(t, a, b, 1)
     
-    // make both non-nil, and a shorter than b
-    a.VInt32 = a.VInt32[:len(a.VInt32)-1]
+    // single insertion diff at index > 0
+    a.VInt32 = a.VInt32[:len(a.VInt32)-1] // sa = {VB}, sb = {VB, VB}
     testSliceInt32DiffAndApply(t, a, b, 1)
 
-    // make 2 changes
-    a.VInt32[0] = 3
-    testSliceInt32DiffAndApply(t, a, b, 2)
+    // multiple deletion diff
+    a.VInt32 = append(a.VInt32, 3)
+    a.VInt32 = append(a.VInt32, 3)
+    a.VInt32 = append(a.VInt32, 3)
+    a.VInt32 = append(a.VInt32, 3) 
+    b = SliceTestObject{}
+    b.VInt32 = append(b.VInt32, 5) // sa = {VB, VA, VA, VA, VA}, sb = {VA}
+    testSliceInt32DiffAndApply(t, a, b, 4)
 }
 
 func testSliceInt32DiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {

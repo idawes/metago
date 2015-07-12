@@ -13,34 +13,39 @@ func TestSliceInt(t *testing.T) {
     assert.Equal(t, a, b)
     assert.Equal(t, a.Equals(b), true, fmt.Sprintf("\an:\n%s\nb:\n%s\n", spew.Sdump(a), spew.Sdump(b)))
 
-    // make a longer than b
-    a.VInt = append(a.VInt, 3)
+    // single deletion diff at index 0
+    a.VInt = append(a.VInt, 3) // sa = {VA}, sb = nil
     testSliceIntDiffAndApply(t, a, b, 1)
     
-    // make a and b the same length, but with a change.
-    b.VInt = append(b.VInt, 5)
+    // single modification diff at index 0
+    b.VInt = append(b.VInt, 5) // sa = {VA}, sb = {VB}
     testSliceIntDiffAndApply(t, a, b, 1)
 
-    // make a shorter than b
-    a = SliceTestObject{}
+    // single insertion diff at index 0
+    a = SliceTestObject{} // sa = nil, sb = {VB}
     testSliceIntDiffAndApply(t, a, b, 1)
 
-    // make both non-nil, and a longer than b
+    // single deletion diff at index > 0 
     a.VInt = append(a.VInt, 5)
-    a.VInt = append(a.VInt, 3)
+    a.VInt = append(a.VInt, 3) // sa = {VB, VA}, sb = {VB}
     testSliceIntDiffAndApply(t, a, b, 1)
 
-    // make both same length, but with a change
-    b.VInt = append(b.VInt, 5)
+    // single modification diff at index > 0
+    b.VInt = append(b.VInt, 5) // sa = {VB, VA}, sb = {VB, VB}
     testSliceIntDiffAndApply(t, a, b, 1)
     
-    // make both non-nil, and a shorter than b
-    a.VInt = a.VInt[:len(a.VInt)-1]
+    // single insertion diff at index > 0
+    a.VInt = a.VInt[:len(a.VInt)-1] // sa = {VB}, sb = {VB, VB}
     testSliceIntDiffAndApply(t, a, b, 1)
 
-    // make 2 changes
-    a.VInt[0] = 3
-    testSliceIntDiffAndApply(t, a, b, 2)
+    // multiple deletion diff
+    a.VInt = append(a.VInt, 3)
+    a.VInt = append(a.VInt, 3)
+    a.VInt = append(a.VInt, 3)
+    a.VInt = append(a.VInt, 3) 
+    b = SliceTestObject{}
+    b.VInt = append(b.VInt, 5) // sa = {VB, VA, VA, VA, VA}, sb = {VA}
+    testSliceIntDiffAndApply(t, a, b, 4)
 }
 
 func testSliceIntDiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {

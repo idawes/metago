@@ -397,6 +397,7 @@ func (t *typedef) generateAttrEquals(w *writer) {
 }
 
 func (t *typedef) generateDiff(w *writer) {
+	w.printf("\n// Diff returns a record of the differences between o1 and o2 such that applying the generated record to o1 would make it equal to o2")
 	w.printf("\nfunc (o1 %[1]s) Diff(o2 %[1]s) metago.Diff {\n", t.name)
 	w.printf("    chgs := make([]metago.Chg, 0)\n")
 	t.generateAttrDiffs(w)

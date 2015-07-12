@@ -167,6 +167,7 @@ func (o1 ExtendedObject) Equals(o2 ExtendedObject) bool {
 	return true
 }
 
+// Diff returns a record of the differences between o1 and o2 such that applying the generated record to o1 would make it equal to o2
 func (o1 ExtendedObject) Diff(o2 ExtendedObject) metago.Diff {
 	chgs := make([]metago.Chg, 0)
 

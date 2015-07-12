@@ -231,6 +231,7 @@ func (o1 SliceTestObject) Equals(o2 SliceTestObject) bool {
 	return true
 }
 
+// Diff returns a record of the differences between o1 and o2 such that applying the generated record to o1 would make it equal to o2
 func (o1 SliceTestObject) Diff(o2 SliceTestObject) metago.Diff {
 	chgs := make([]metago.Chg, 0)
 
@@ -701,10 +702,14 @@ func (orig *SliceTestObject) Apply(d metago.Diff) error {
 				case metago.ChangeTypeInsert:
 					*s = append(*s, sc.Chgs[0].(*metago.ByteChg).NewValue)
 				case metago.ChangeTypeDelete:
-					if idx == 0 {
+					newlen := idx
+					if newlen >= len(*s) {
+						break
+					}
+					if newlen == 0 {
 						*s = nil
 					} else {
-						new := make([]byte, idx)
+						new := make([]byte, newlen)
 						copy(new, *s)
 						*s = new
 					}
@@ -722,10 +727,14 @@ func (orig *SliceTestObject) Apply(d metago.Diff) error {
 				case metago.ChangeTypeInsert:
 					*s = append(*s, sc.Chgs[0].(*metago.UintChg).NewValue)
 				case metago.ChangeTypeDelete:
-					if idx == 0 {
+					newlen := idx
+					if newlen >= len(*s) {
+						break
+					}
+					if newlen == 0 {
 						*s = nil
 					} else {
-						new := make([]uint, idx)
+						new := make([]uint, newlen)
 						copy(new, *s)
 						*s = new
 					}
@@ -743,10 +752,14 @@ func (orig *SliceTestObject) Apply(d metago.Diff) error {
 				case metago.ChangeTypeInsert:
 					*s = append(*s, sc.Chgs[0].(*metago.Uint8Chg).NewValue)
 				case metago.ChangeTypeDelete:
-					if idx == 0 {
+					newlen := idx
+					if newlen >= len(*s) {
+						break
+					}
+					if newlen == 0 {
 						*s = nil
 					} else {
-						new := make([]uint8, idx)
+						new := make([]uint8, newlen)
 						copy(new, *s)
 						*s = new
 					}
@@ -764,10 +777,14 @@ func (orig *SliceTestObject) Apply(d metago.Diff) error {
 				case metago.ChangeTypeInsert:
 					*s = append(*s, sc.Chgs[0].(*metago.Uint16Chg).NewValue)
 				case metago.ChangeTypeDelete:
-					if idx == 0 {
+					newlen := idx
+					if newlen >= len(*s) {
+						break
+					}
+					if newlen == 0 {
 						*s = nil
 					} else {
-						new := make([]uint16, idx)
+						new := make([]uint16, newlen)
 						copy(new, *s)
 						*s = new
 					}
@@ -785,10 +802,14 @@ func (orig *SliceTestObject) Apply(d metago.Diff) error {
 				case metago.ChangeTypeInsert:
 					*s = append(*s, sc.Chgs[0].(*metago.Uint32Chg).NewValue)
 				case metago.ChangeTypeDelete:
-					if idx == 0 {
+					newlen := idx
+					if newlen >= len(*s) {
+						break
+					}
+					if newlen == 0 {
 						*s = nil
 					} else {
-						new := make([]uint32, idx)
+						new := make([]uint32, newlen)
 						copy(new, *s)
 						*s = new
 					}
@@ -806,10 +827,14 @@ func (orig *SliceTestObject) Apply(d metago.Diff) error {
 				case metago.ChangeTypeInsert:
 					*s = append(*s, sc.Chgs[0].(*metago.Uint64Chg).NewValue)
 				case metago.ChangeTypeDelete:
-					if idx == 0 {
+					newlen := idx
+					if newlen >= len(*s) {
+						break
+					}
+					if newlen == 0 {
 						*s = nil
 					} else {
-						new := make([]uint64, idx)
+						new := make([]uint64, newlen)
 						copy(new, *s)
 						*s = new
 					}
@@ -827,10 +852,14 @@ func (orig *SliceTestObject) Apply(d metago.Diff) error {
 				case metago.ChangeTypeInsert:
 					*s = append(*s, sc.Chgs[0].(*metago.IntChg).NewValue)
 				case metago.ChangeTypeDelete:
-					if idx == 0 {
+					newlen := idx
+					if newlen >= len(*s) {
+						break
+					}
+					if newlen == 0 {
 						*s = nil
 					} else {
-						new := make([]int, idx)
+						new := make([]int, newlen)
 						copy(new, *s)
 						*s = new
 					}
@@ -848,10 +877,14 @@ func (orig *SliceTestObject) Apply(d metago.Diff) error {
 				case metago.ChangeTypeInsert:
 					*s = append(*s, sc.Chgs[0].(*metago.Int8Chg).NewValue)
 				case metago.ChangeTypeDelete:
-					if idx == 0 {
+					newlen := idx
+					if newlen >= len(*s) {
+						break
+					}
+					if newlen == 0 {
 						*s = nil
 					} else {
-						new := make([]int8, idx)
+						new := make([]int8, newlen)
 						copy(new, *s)
 						*s = new
 					}
@@ -869,10 +902,14 @@ func (orig *SliceTestObject) Apply(d metago.Diff) error {
 				case metago.ChangeTypeInsert:
 					*s = append(*s, sc.Chgs[0].(*metago.Int16Chg).NewValue)
 				case metago.ChangeTypeDelete:
-					if idx == 0 {
+					newlen := idx
+					if newlen >= len(*s) {
+						break
+					}
+					if newlen == 0 {
 						*s = nil
 					} else {
-						new := make([]int16, idx)
+						new := make([]int16, newlen)
 						copy(new, *s)
 						*s = new
 					}
@@ -890,10 +927,14 @@ func (orig *SliceTestObject) Apply(d metago.Diff) error {
 				case metago.ChangeTypeInsert:
 					*s = append(*s, sc.Chgs[0].(*metago.Int32Chg).NewValue)
 				case metago.ChangeTypeDelete:
-					if idx == 0 {
+					newlen := idx
+					if newlen >= len(*s) {
+						break
+					}
+					if newlen == 0 {
 						*s = nil
 					} else {
-						new := make([]int32, idx)
+						new := make([]int32, newlen)
 						copy(new, *s)
 						*s = new
 					}
@@ -911,10 +952,14 @@ func (orig *SliceTestObject) Apply(d metago.Diff) error {
 				case metago.ChangeTypeInsert:
 					*s = append(*s, sc.Chgs[0].(*metago.Int64Chg).NewValue)
 				case metago.ChangeTypeDelete:
-					if idx == 0 {
+					newlen := idx
+					if newlen >= len(*s) {
+						break
+					}
+					if newlen == 0 {
 						*s = nil
 					} else {
-						new := make([]int64, idx)
+						new := make([]int64, newlen)
 						copy(new, *s)
 						*s = new
 					}
@@ -932,10 +977,14 @@ func (orig *SliceTestObject) Apply(d metago.Diff) error {
 				case metago.ChangeTypeInsert:
 					*s = append(*s, sc.Chgs[0].(*metago.Float32Chg).NewValue)
 				case metago.ChangeTypeDelete:
-					if idx == 0 {
+					newlen := idx
+					if newlen >= len(*s) {
+						break
+					}
+					if newlen == 0 {
 						*s = nil
 					} else {
-						new := make([]float32, idx)
+						new := make([]float32, newlen)
 						copy(new, *s)
 						*s = new
 					}
@@ -953,10 +1002,14 @@ func (orig *SliceTestObject) Apply(d metago.Diff) error {
 				case metago.ChangeTypeInsert:
 					*s = append(*s, sc.Chgs[0].(*metago.Float64Chg).NewValue)
 				case metago.ChangeTypeDelete:
-					if idx == 0 {
+					newlen := idx
+					if newlen >= len(*s) {
+						break
+					}
+					if newlen == 0 {
 						*s = nil
 					} else {
-						new := make([]float64, idx)
+						new := make([]float64, newlen)
 						copy(new, *s)
 						*s = new
 					}
@@ -974,10 +1027,14 @@ func (orig *SliceTestObject) Apply(d metago.Diff) error {
 				case metago.ChangeTypeInsert:
 					*s = append(*s, sc.Chgs[0].(*metago.StringChg).NewValue)
 				case metago.ChangeTypeDelete:
-					if idx == 0 {
+					newlen := idx
+					if newlen >= len(*s) {
+						break
+					}
+					if newlen == 0 {
 						*s = nil
 					} else {
-						new := make([]string, idx)
+						new := make([]string, newlen)
 						copy(new, *s)
 						*s = new
 					}
@@ -995,10 +1052,14 @@ func (orig *SliceTestObject) Apply(d metago.Diff) error {
 				case metago.ChangeTypeInsert:
 					*s = append(*s, sc.Chgs[0].(*metago.TimeChg).NewValue)
 				case metago.ChangeTypeDelete:
-					if idx == 0 {
+					newlen := idx
+					if newlen >= len(*s) {
+						break
+					}
+					if newlen == 0 {
 						*s = nil
 					} else {
-						new := make([]time.Time, idx)
+						new := make([]time.Time, newlen)
 						copy(new, *s)
 						*s = new
 					}

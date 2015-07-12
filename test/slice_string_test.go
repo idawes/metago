@@ -13,34 +13,39 @@ func TestSliceString(t *testing.T) {
     assert.Equal(t, a, b)
     assert.Equal(t, a.Equals(b), true, fmt.Sprintf("\an:\n%s\nb:\n%s\n", spew.Sdump(a), spew.Sdump(b)))
 
-    // make a longer than b
-    a.VString = append(a.VString, "Foo")
+    // single deletion diff at index 0
+    a.VString = append(a.VString, "Foo") // sa = {VA}, sb = nil
     testSliceStringDiffAndApply(t, a, b, 1)
     
-    // make a and b the same length, but with a change.
-    b.VString = append(b.VString, "Bar")
+    // single modification diff at index 0
+    b.VString = append(b.VString, "Bar") // sa = {VA}, sb = {VB}
     testSliceStringDiffAndApply(t, a, b, 1)
 
-    // make a shorter than b
-    a = SliceTestObject{}
+    // single insertion diff at index 0
+    a = SliceTestObject{} // sa = nil, sb = {VB}
     testSliceStringDiffAndApply(t, a, b, 1)
 
-    // make both non-nil, and a longer than b
+    // single deletion diff at index > 0 
     a.VString = append(a.VString, "Bar")
-    a.VString = append(a.VString, "Foo")
+    a.VString = append(a.VString, "Foo") // sa = {VB, VA}, sb = {VB}
     testSliceStringDiffAndApply(t, a, b, 1)
 
-    // make both same length, but with a change
-    b.VString = append(b.VString, "Bar")
+    // single modification diff at index > 0
+    b.VString = append(b.VString, "Bar") // sa = {VB, VA}, sb = {VB, VB}
     testSliceStringDiffAndApply(t, a, b, 1)
     
-    // make both non-nil, and a shorter than b
-    a.VString = a.VString[:len(a.VString)-1]
+    // single insertion diff at index > 0
+    a.VString = a.VString[:len(a.VString)-1] // sa = {VB}, sb = {VB, VB}
     testSliceStringDiffAndApply(t, a, b, 1)
 
-    // make 2 changes
-    a.VString[0] = "Foo"
-    testSliceStringDiffAndApply(t, a, b, 2)
+    // multiple deletion diff
+    a.VString = append(a.VString, "Foo")
+    a.VString = append(a.VString, "Foo")
+    a.VString = append(a.VString, "Foo")
+    a.VString = append(a.VString, "Foo") 
+    b = SliceTestObject{}
+    b.VString = append(b.VString, "Bar") // sa = {VB, VA, VA, VA, VA}, sb = {VA}
+    testSliceStringDiffAndApply(t, a, b, 4)
 }
 
 func testSliceStringDiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {

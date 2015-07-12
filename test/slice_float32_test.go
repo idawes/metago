@@ -13,34 +13,39 @@ func TestSliceFloat32(t *testing.T) {
     assert.Equal(t, a, b)
     assert.Equal(t, a.Equals(b), true, fmt.Sprintf("\an:\n%s\nb:\n%s\n", spew.Sdump(a), spew.Sdump(b)))
 
-    // make a longer than b
-    a.VFloat32 = append(a.VFloat32, 3.34)
+    // single deletion diff at index 0
+    a.VFloat32 = append(a.VFloat32, 3.34) // sa = {VA}, sb = nil
     testSliceFloat32DiffAndApply(t, a, b, 1)
     
-    // make a and b the same length, but with a change.
-    b.VFloat32 = append(b.VFloat32, 5.42)
+    // single modification diff at index 0
+    b.VFloat32 = append(b.VFloat32, 5.42) // sa = {VA}, sb = {VB}
     testSliceFloat32DiffAndApply(t, a, b, 1)
 
-    // make a shorter than b
-    a = SliceTestObject{}
+    // single insertion diff at index 0
+    a = SliceTestObject{} // sa = nil, sb = {VB}
     testSliceFloat32DiffAndApply(t, a, b, 1)
 
-    // make both non-nil, and a longer than b
+    // single deletion diff at index > 0 
     a.VFloat32 = append(a.VFloat32, 5.42)
-    a.VFloat32 = append(a.VFloat32, 3.34)
+    a.VFloat32 = append(a.VFloat32, 3.34) // sa = {VB, VA}, sb = {VB}
     testSliceFloat32DiffAndApply(t, a, b, 1)
 
-    // make both same length, but with a change
-    b.VFloat32 = append(b.VFloat32, 5.42)
+    // single modification diff at index > 0
+    b.VFloat32 = append(b.VFloat32, 5.42) // sa = {VB, VA}, sb = {VB, VB}
     testSliceFloat32DiffAndApply(t, a, b, 1)
     
-    // make both non-nil, and a shorter than b
-    a.VFloat32 = a.VFloat32[:len(a.VFloat32)-1]
+    // single insertion diff at index > 0
+    a.VFloat32 = a.VFloat32[:len(a.VFloat32)-1] // sa = {VB}, sb = {VB, VB}
     testSliceFloat32DiffAndApply(t, a, b, 1)
 
-    // make 2 changes
-    a.VFloat32[0] = 3.34
-    testSliceFloat32DiffAndApply(t, a, b, 2)
+    // multiple deletion diff
+    a.VFloat32 = append(a.VFloat32, 3.34)
+    a.VFloat32 = append(a.VFloat32, 3.34)
+    a.VFloat32 = append(a.VFloat32, 3.34)
+    a.VFloat32 = append(a.VFloat32, 3.34) 
+    b = SliceTestObject{}
+    b.VFloat32 = append(b.VFloat32, 5.42) // sa = {VB, VA, VA, VA, VA}, sb = {VA}
+    testSliceFloat32DiffAndApply(t, a, b, 4)
 }
 
 func testSliceFloat32DiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {

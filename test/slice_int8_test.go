@@ -13,34 +13,39 @@ func TestSliceInt8(t *testing.T) {
     assert.Equal(t, a, b)
     assert.Equal(t, a.Equals(b), true, fmt.Sprintf("\an:\n%s\nb:\n%s\n", spew.Sdump(a), spew.Sdump(b)))
 
-    // make a longer than b
-    a.VInt8 = append(a.VInt8, 3)
+    // single deletion diff at index 0
+    a.VInt8 = append(a.VInt8, 3) // sa = {VA}, sb = nil
     testSliceInt8DiffAndApply(t, a, b, 1)
     
-    // make a and b the same length, but with a change.
-    b.VInt8 = append(b.VInt8, 5)
+    // single modification diff at index 0
+    b.VInt8 = append(b.VInt8, 5) // sa = {VA}, sb = {VB}
     testSliceInt8DiffAndApply(t, a, b, 1)
 
-    // make a shorter than b
-    a = SliceTestObject{}
+    // single insertion diff at index 0
+    a = SliceTestObject{} // sa = nil, sb = {VB}
     testSliceInt8DiffAndApply(t, a, b, 1)
 
-    // make both non-nil, and a longer than b
+    // single deletion diff at index > 0 
     a.VInt8 = append(a.VInt8, 5)
-    a.VInt8 = append(a.VInt8, 3)
+    a.VInt8 = append(a.VInt8, 3) // sa = {VB, VA}, sb = {VB}
     testSliceInt8DiffAndApply(t, a, b, 1)
 
-    // make both same length, but with a change
-    b.VInt8 = append(b.VInt8, 5)
+    // single modification diff at index > 0
+    b.VInt8 = append(b.VInt8, 5) // sa = {VB, VA}, sb = {VB, VB}
     testSliceInt8DiffAndApply(t, a, b, 1)
     
-    // make both non-nil, and a shorter than b
-    a.VInt8 = a.VInt8[:len(a.VInt8)-1]
+    // single insertion diff at index > 0
+    a.VInt8 = a.VInt8[:len(a.VInt8)-1] // sa = {VB}, sb = {VB, VB}
     testSliceInt8DiffAndApply(t, a, b, 1)
 
-    // make 2 changes
-    a.VInt8[0] = 3
-    testSliceInt8DiffAndApply(t, a, b, 2)
+    // multiple deletion diff
+    a.VInt8 = append(a.VInt8, 3)
+    a.VInt8 = append(a.VInt8, 3)
+    a.VInt8 = append(a.VInt8, 3)
+    a.VInt8 = append(a.VInt8, 3) 
+    b = SliceTestObject{}
+    b.VInt8 = append(b.VInt8, 5) // sa = {VB, VA, VA, VA, VA}, sb = {VA}
+    testSliceInt8DiffAndApply(t, a, b, 4)
 }
 
 func testSliceInt8DiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {

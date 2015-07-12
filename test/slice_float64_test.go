@@ -13,34 +13,39 @@ func TestSliceFloat64(t *testing.T) {
     assert.Equal(t, a, b)
     assert.Equal(t, a.Equals(b), true, fmt.Sprintf("\an:\n%s\nb:\n%s\n", spew.Sdump(a), spew.Sdump(b)))
 
-    // make a longer than b
-    a.VFloat64 = append(a.VFloat64, 3.23)
+    // single deletion diff at index 0
+    a.VFloat64 = append(a.VFloat64, 3.23) // sa = {VA}, sb = nil
     testSliceFloat64DiffAndApply(t, a, b, 1)
     
-    // make a and b the same length, but with a change.
-    b.VFloat64 = append(b.VFloat64, 5.332)
+    // single modification diff at index 0
+    b.VFloat64 = append(b.VFloat64, 5.332) // sa = {VA}, sb = {VB}
     testSliceFloat64DiffAndApply(t, a, b, 1)
 
-    // make a shorter than b
-    a = SliceTestObject{}
+    // single insertion diff at index 0
+    a = SliceTestObject{} // sa = nil, sb = {VB}
     testSliceFloat64DiffAndApply(t, a, b, 1)
 
-    // make both non-nil, and a longer than b
+    // single deletion diff at index > 0 
     a.VFloat64 = append(a.VFloat64, 5.332)
-    a.VFloat64 = append(a.VFloat64, 3.23)
+    a.VFloat64 = append(a.VFloat64, 3.23) // sa = {VB, VA}, sb = {VB}
     testSliceFloat64DiffAndApply(t, a, b, 1)
 
-    // make both same length, but with a change
-    b.VFloat64 = append(b.VFloat64, 5.332)
+    // single modification diff at index > 0
+    b.VFloat64 = append(b.VFloat64, 5.332) // sa = {VB, VA}, sb = {VB, VB}
     testSliceFloat64DiffAndApply(t, a, b, 1)
     
-    // make both non-nil, and a shorter than b
-    a.VFloat64 = a.VFloat64[:len(a.VFloat64)-1]
+    // single insertion diff at index > 0
+    a.VFloat64 = a.VFloat64[:len(a.VFloat64)-1] // sa = {VB}, sb = {VB, VB}
     testSliceFloat64DiffAndApply(t, a, b, 1)
 
-    // make 2 changes
-    a.VFloat64[0] = 3.23
-    testSliceFloat64DiffAndApply(t, a, b, 2)
+    // multiple deletion diff
+    a.VFloat64 = append(a.VFloat64, 3.23)
+    a.VFloat64 = append(a.VFloat64, 3.23)
+    a.VFloat64 = append(a.VFloat64, 3.23)
+    a.VFloat64 = append(a.VFloat64, 3.23) 
+    b = SliceTestObject{}
+    b.VFloat64 = append(b.VFloat64, 5.332) // sa = {VB, VA, VA, VA, VA}, sb = {VA}
+    testSliceFloat64DiffAndApply(t, a, b, 4)
 }
 
 func testSliceFloat64DiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {
