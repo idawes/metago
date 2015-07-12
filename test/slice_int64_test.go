@@ -59,6 +59,12 @@ func TestSliceInt64(t *testing.T) {
     a.VInt64[0] = 3
     a.VInt64 = a.VInt64[:1] // sa = {VA}, sb = {VA, VB, VB, VB, VB}
     testSliceInt64DiffAndApply(t, a, b, 4)
+
+    // multiple modifications and insertions diff
+    a.VInt64[0] = 5
+    a.VInt64 = append(a.VInt64, 3)
+    testSliceInt64DiffAndApply(t, a, b, 5)
+
 }
 
 func testSliceInt64DiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {

@@ -59,6 +59,12 @@ func TestSlice@@T@@(t *testing.T) {
     a.V@@T@@[0] = @@VA@@
     a.V@@T@@ = a.V@@T@@[:1] // sa = {VA}, sb = {VA, VB, VB, VB, VB}
     testSlice@@T@@DiffAndApply(t, a, b, 4)
+
+    // multiple modifications and insertions diff
+    a.V@@T@@[0] = @@VB@@
+    a.V@@T@@ = append(a.V@@T@@, @@VA@@)
+    testSlice@@T@@DiffAndApply(t, a, b, 5)
+
 }
 
 func testSlice@@T@@DiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {
