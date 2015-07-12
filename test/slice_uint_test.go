@@ -44,8 +44,17 @@ func TestSliceUint(t *testing.T) {
     a.VUint = append(a.VUint, 3)
     a.VUint = append(a.VUint, 3) 
     b = SliceTestObject{}
-    b.VUint = append(b.VUint, 5) // sa = {VB, VA, VA, VA, VA}, sb = {VA}
+    b.VUint = append(b.VUint, 5) // sa = {VB, VA, VA, VA, VA}, sb = {VB}
     testSliceUintDiffAndApply(t, a, b, 4)
+
+    // multiple modification diff
+    b.VUint[0] = 3
+    b.VUint = append(b.VUint, 5) 
+    b.VUint = append(b.VUint, 5) 
+    b.VUint = append(b.VUint, 5) 
+    b.VUint = append(b.VUint, 5) // sa = {VB, VA, VA, VA, VA}, sb = {VA, VB, VB, VB, VB}
+    testSliceUintDiffAndApply(t, a, b, 5)
+    
 }
 
 func testSliceUintDiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {

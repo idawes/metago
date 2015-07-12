@@ -44,8 +44,17 @@ func TestSliceString(t *testing.T) {
     a.VString = append(a.VString, "Foo")
     a.VString = append(a.VString, "Foo") 
     b = SliceTestObject{}
-    b.VString = append(b.VString, "Bar") // sa = {VB, VA, VA, VA, VA}, sb = {VA}
+    b.VString = append(b.VString, "Bar") // sa = {VB, VA, VA, VA, VA}, sb = {VB}
     testSliceStringDiffAndApply(t, a, b, 4)
+
+    // multiple modification diff
+    b.VString[0] = "Foo"
+    b.VString = append(b.VString, "Bar") 
+    b.VString = append(b.VString, "Bar") 
+    b.VString = append(b.VString, "Bar") 
+    b.VString = append(b.VString, "Bar") // sa = {VB, VA, VA, VA, VA}, sb = {VA, VB, VB, VB, VB}
+    testSliceStringDiffAndApply(t, a, b, 5)
+    
 }
 
 func testSliceStringDiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {

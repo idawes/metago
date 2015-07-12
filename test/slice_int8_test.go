@@ -44,8 +44,17 @@ func TestSliceInt8(t *testing.T) {
     a.VInt8 = append(a.VInt8, 3)
     a.VInt8 = append(a.VInt8, 3) 
     b = SliceTestObject{}
-    b.VInt8 = append(b.VInt8, 5) // sa = {VB, VA, VA, VA, VA}, sb = {VA}
+    b.VInt8 = append(b.VInt8, 5) // sa = {VB, VA, VA, VA, VA}, sb = {VB}
     testSliceInt8DiffAndApply(t, a, b, 4)
+
+    // multiple modification diff
+    b.VInt8[0] = 3
+    b.VInt8 = append(b.VInt8, 5) 
+    b.VInt8 = append(b.VInt8, 5) 
+    b.VInt8 = append(b.VInt8, 5) 
+    b.VInt8 = append(b.VInt8, 5) // sa = {VB, VA, VA, VA, VA}, sb = {VA, VB, VB, VB, VB}
+    testSliceInt8DiffAndApply(t, a, b, 5)
+    
 }
 
 func testSliceInt8DiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {
