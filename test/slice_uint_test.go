@@ -55,6 +55,10 @@ func TestSliceUint(t *testing.T) {
     b.VUint = append(b.VUint, 5) // sa = {VB, VA, VA, VA, VA}, sb = {VA, VB, VB, VB, VB}
     testSliceUintDiffAndApply(t, a, b, 5)
     
+    // multiple insertion diff
+    a.VUint[0] = 3
+    a.VUint = a.VUint[:1] // sa = {VA}, sb = {VA, VB, VB, VB, VB}
+    testSliceUintDiffAndApply(t, a, b, 4)
 }
 
 func testSliceUintDiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {

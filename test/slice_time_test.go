@@ -57,6 +57,10 @@ func TestSliceTime(t *testing.T) {
 	b.VTime = append(b.VTime, time.Unix(1436100000, 0)) // sa = {VB, VA, VA, VA, VA}, sb = {VA, VB, VB, VB, VB}
 	testSliceTimeDiffAndApply(t, a, b, 5)
 
+	// multiple insertion diff
+	a.VTime[0] = time.Unix(1436000000, 0)
+	a.VTime = a.VTime[:1] // sa = {VA}, sb = {VA, VB, VB, VB, VB}
+	testSliceTimeDiffAndApply(t, a, b, 4)
 }
 
 func testSliceTimeDiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {

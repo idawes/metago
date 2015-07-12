@@ -55,6 +55,10 @@ func TestSliceInt8(t *testing.T) {
     b.VInt8 = append(b.VInt8, 5) // sa = {VB, VA, VA, VA, VA}, sb = {VA, VB, VB, VB, VB}
     testSliceInt8DiffAndApply(t, a, b, 5)
     
+    // multiple insertion diff
+    a.VInt8[0] = 3
+    a.VInt8 = a.VInt8[:1] // sa = {VA}, sb = {VA, VB, VB, VB, VB}
+    testSliceInt8DiffAndApply(t, a, b, 4)
 }
 
 func testSliceInt8DiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {

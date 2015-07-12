@@ -55,6 +55,10 @@ func TestSliceByte(t *testing.T) {
     b.VByte = append(b.VByte, 5) // sa = {VB, VA, VA, VA, VA}, sb = {VA, VB, VB, VB, VB}
     testSliceByteDiffAndApply(t, a, b, 5)
     
+    // multiple insertion diff
+    a.VByte[0] = 3
+    a.VByte = a.VByte[:1] // sa = {VA}, sb = {VA, VB, VB, VB, VB}
+    testSliceByteDiffAndApply(t, a, b, 4)
 }
 
 func testSliceByteDiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {

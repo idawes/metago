@@ -55,6 +55,10 @@ func TestSliceInt16(t *testing.T) {
     b.VInt16 = append(b.VInt16, 5) // sa = {VB, VA, VA, VA, VA}, sb = {VA, VB, VB, VB, VB}
     testSliceInt16DiffAndApply(t, a, b, 5)
     
+    // multiple insertion diff
+    a.VInt16[0] = 3
+    a.VInt16 = a.VInt16[:1] // sa = {VA}, sb = {VA, VB, VB, VB, VB}
+    testSliceInt16DiffAndApply(t, a, b, 4)
 }
 
 func testSliceInt16DiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {

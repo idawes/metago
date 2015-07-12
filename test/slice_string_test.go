@@ -55,6 +55,10 @@ func TestSliceString(t *testing.T) {
     b.VString = append(b.VString, "Bar") // sa = {VB, VA, VA, VA, VA}, sb = {VA, VB, VB, VB, VB}
     testSliceStringDiffAndApply(t, a, b, 5)
     
+    // multiple insertion diff
+    a.VString[0] = "Foo"
+    a.VString = a.VString[:1] // sa = {VA}, sb = {VA, VB, VB, VB, VB}
+    testSliceStringDiffAndApply(t, a, b, 4)
 }
 
 func testSliceStringDiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {
