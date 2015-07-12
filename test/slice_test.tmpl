@@ -62,9 +62,8 @@ func TestSlice@@T@@(t *testing.T) {
 
     // multiple modifications and insertions diff
     a.V@@T@@[0] = @@VB@@
-    a.V@@T@@ = append(a.V@@T@@, @@VA@@)
+    a.V@@T@@ = append(a.V@@T@@, @@VA@@) // sa = {VA, VB}, sb = {VA, VB, VB, VB, VB}
     testSlice@@T@@DiffAndApply(t, a, b, 5)
-
 }
 
 func testSlice@@T@@DiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {
