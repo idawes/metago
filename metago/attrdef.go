@@ -287,7 +287,7 @@ func (a *timeAttrDef) generateSliceInsert(w *writer, levelID string) {
 }
 
 func (a *timeAttrDef) generateMapModify(w *writer, levelID string) {
-	w.printf("              m%[1]s[key%[1]s] = mc%[1]s.Chgs[0].(*metago.TimeChg).NewValue\n", levelID)
+	w.printf("              *m%[1]s[key%[1]s] = mc%[1]s.Chgs[0].(*metago.TimeChg).NewValue\n", levelID)
 }
 
 func (a *timeAttrDef) generateMapInsert(w *writer, levelID string) {
@@ -570,7 +570,7 @@ func (a *mapAttrDef) generateDelChg(w *writer, levelID string) {
 func (a *mapAttrDef) generateApply(w *writer, levelID string) {
 	format := `   case &%[1]s%[2]sAID:
 			{
-			    m := orig.%[2]s
+			    m := &orig.%[2]s
 `
 	w.printf(format, a.parentType.name, a.nm)
 	a.generateApplyBody(w, levelID)
@@ -590,7 +590,10 @@ func (a *mapAttrDef) generateApplyBody(w *writer, levelID string) {
 	w.printf(format)
 	a.valAttr.generateMapInsert(w, levelID)
 	format = `				case metago.ChangeTypeDelete:
-				delete(m%[1]s, key%[1]s)
+				delete(*m%[1]s, key%[1]s)
+				if len(*m%[1]s) == 0 {
+					*m%[1]s = nil
+				}
             }
 `
 	w.printf(format, levelID)

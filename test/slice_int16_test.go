@@ -64,7 +64,6 @@ func TestSliceInt16(t *testing.T) {
     a.VInt16[0] = 5
     a.VInt16 = append(a.VInt16, 3) // sa = {VA, VB}, sb = {VA, VB, VB, VB, VB}
     testSliceInt16DiffAndApply(t, a, b, 5)
-
 }
 
 func testSliceInt16DiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {

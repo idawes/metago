@@ -1,0 +1,82 @@
+package test
+
+import (
+    "fmt"
+	"testing"
+    "github.com/stretchr/testify/assert"
+    "github.com/davecgh/go-spew/spew"
+)
+
+func TestMap@@T@@(t *testing.T) {
+	a := MapTestObject{}
+	b := MapTestObject{}
+    assert.Equal(t, a, b)
+    assert.Equal(t, a.Equals(b), true, fmt.Sprintf("\an:\n%s\nb:\n%s\n", spew.Sdump(a), spew.Sdump(b)))
+
+    // single deletion diff at index 0
+    a.V@@T@@ = make(map[@@kt@@]@@vt@@)
+    a.V@@T@@[@@K@@] =  @@VA@@ // sa = {K:VA}, sb = nil
+    testMap@@T@@DiffAndApply(t, a, b, 1)
+
+ /*   
+    // single modification diff at index 0
+    b.V@@T@@ = append(b.V@@T@@, @@VB@@) // sa = {VA}, sb = {VB}
+    testMap@@T@@DiffAndApply(t, a, b, 1)
+
+    // single insertion diff at index 0
+    a = MapTestObject{} // sa = nil, sb = {VB}
+    testMap@@T@@DiffAndApply(t, a, b, 1)
+
+    // single deletion diff at index > 0 
+    a.V@@T@@ = append(a.V@@T@@, @@VB@@)
+    a.V@@T@@ = append(a.V@@T@@, @@VA@@) // sa = {VB, VA}, sb = {VB}
+    testMap@@T@@DiffAndApply(t, a, b, 1)
+
+    // single modification diff at index > 0
+    b.V@@T@@ = append(b.V@@T@@, @@VB@@) // sa = {VB, VA}, sb = {VB, VB}
+    testMap@@T@@DiffAndApply(t, a, b, 1)
+    
+    // single insertion diff at index > 0
+    a.V@@T@@ = a.V@@T@@[:len(a.V@@T@@)-1] // sa = {VB}, sb = {VB, VB}
+    testMap@@T@@DiffAndApply(t, a, b, 1)
+
+    // multiple deletion diff
+    a.V@@T@@ = append(a.V@@T@@, @@VA@@)
+    a.V@@T@@ = append(a.V@@T@@, @@VA@@)
+    a.V@@T@@ = append(a.V@@T@@, @@VA@@)
+    a.V@@T@@ = append(a.V@@T@@, @@VA@@) 
+    b = MapTestObject{}
+    b.V@@T@@ = append(b.V@@T@@, @@VB@@) // sa = {VB, VA, VA, VA, VA}, sb = {VB}
+    testMap@@T@@DiffAndApply(t, a, b, 4)
+
+    // multiple modification diff
+    b.V@@T@@[0] = @@VA@@
+    b.V@@T@@ = append(b.V@@T@@, @@VB@@) 
+    b.V@@T@@ = append(b.V@@T@@, @@VB@@) 
+    b.V@@T@@ = append(b.V@@T@@, @@VB@@) 
+    b.V@@T@@ = append(b.V@@T@@, @@VB@@) // sa = {VB, VA, VA, VA, VA}, sb = {VA, VB, VB, VB, VB}
+    testMap@@T@@DiffAndApply(t, a, b, 5)
+    
+    // multiple insertion diff
+    a.V@@T@@[0] = @@VA@@
+    a.V@@T@@ = a.V@@T@@[:1] // sa = {VA}, sb = {VA, VB, VB, VB, VB}
+    testMap@@T@@DiffAndApply(t, a, b, 4)
+
+    // multiple modifications and insertions diff
+    a.V@@T@@[0] = @@VB@@
+    a.V@@T@@ = append(a.V@@T@@, @@VA@@) // sa = {VA, VB}, sb = {VA, VB, VB, VB, VB}
+    testMap@@T@@DiffAndApply(t, a, b, 5)
+     */
+}
+
+func testMap@@T@@DiffAndApply(t *testing.T, a, b MapTestObject, numChanges int) {
+    assert.Equal(t, a.Equals(b), false, fmt.Sprintf("\na:\n%s\nb:\n%s\n", spew.Sdump(a), spew.Sdump(b)))
+    assert.NotEqual(t, a, b)
+
+	d := a.Diff(b)
+    assert.Equal(t, numChanges , len(d.Chgs), spew.Sdump(d))
+
+	a.Apply(d)
+    assert.Equal(t, a.Equals(b), true, fmt.Sprintf("\na:\n%s\nb:\n%s\ndiff:\n%s", spew.Sdump(a), spew.Sdump(b), spew.Sdump(d)))
+    assert.Equal(t, a, b)
+}

@@ -64,7 +64,6 @@ func TestSliceUint32(t *testing.T) {
     a.VUint32[0] = 5
     a.VUint32 = append(a.VUint32, 3) // sa = {VA, VB}, sb = {VA, VB, VB, VB, VB}
     testSliceUint32DiffAndApply(t, a, b, 5)
-
 }
 
 func testSliceUint32DiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {

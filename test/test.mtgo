@@ -91,8 +91,18 @@ type 6 MapTestObject concrete {
         "time"
     }
     attributes {
-        1 o1 map[byte]time.Time
-        2 o2 map[byte]map[byte]string
+        1 VByteByte   map[byte]byte
+        2 VByteUint   map[byte]uint
+        3 VByteUint8  map[byte]uint8
+        4 VByteUint16 map[byte]uint16
+        5 VByteUint32 map[byte]uint32
+        6 VByteUint64 map[byte]uint64
+        7 VByteInt    map[byte]int
+        8 VByteInt8   map[byte]int8
+        9 VByteInt16  map[byte]int16
+        10 VByteInt32  map[byte]int32
+        11 VByteInt64  map[byte]int64
+        12 VByteTime  map[byte]time.Time
     }
 }
 

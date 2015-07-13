@@ -86,11 +86,31 @@ var (
 	StructTestObjectMBAID  = metago.AttrID{TypeID: &StructTestObjectTID, Attr: 2, Name: "MB"}
 	StructTestObjectMBSREF = metago.Attrdef{ID: &StructTestObjectMBAID, Persistence: metago.PersistenceClassPersistent}
 
-	MapTestObjectTID    = metago.TypeID{Pkg: &MetagoPackageUUID, PkgName: "test", Typ: 6, Name: "MapTestObject"}
-	MapTestObjecto1AID  = metago.AttrID{TypeID: &MapTestObjectTID, Attr: 1, Name: "o1"}
-	MapTestObjecto1SREF = metago.Attrdef{ID: &MapTestObjecto1AID, Persistence: metago.PersistenceClassPersistent}
-	MapTestObjecto2AID  = metago.AttrID{TypeID: &MapTestObjectTID, Attr: 2, Name: "o2"}
-	MapTestObjecto2SREF = metago.Attrdef{ID: &MapTestObjecto2AID, Persistence: metago.PersistenceClassPersistent}
+	MapTestObjectTID             = metago.TypeID{Pkg: &MetagoPackageUUID, PkgName: "test", Typ: 6, Name: "MapTestObject"}
+	MapTestObjectVByteByteAID    = metago.AttrID{TypeID: &MapTestObjectTID, Attr: 1, Name: "VByteByte"}
+	MapTestObjectVByteByteSREF   = metago.Attrdef{ID: &MapTestObjectVByteByteAID, Persistence: metago.PersistenceClassPersistent}
+	MapTestObjectVByteUintAID    = metago.AttrID{TypeID: &MapTestObjectTID, Attr: 2, Name: "VByteUint"}
+	MapTestObjectVByteUintSREF   = metago.Attrdef{ID: &MapTestObjectVByteUintAID, Persistence: metago.PersistenceClassPersistent}
+	MapTestObjectVByteUint8AID   = metago.AttrID{TypeID: &MapTestObjectTID, Attr: 3, Name: "VByteUint8"}
+	MapTestObjectVByteUint8SREF  = metago.Attrdef{ID: &MapTestObjectVByteUint8AID, Persistence: metago.PersistenceClassPersistent}
+	MapTestObjectVByteUint16AID  = metago.AttrID{TypeID: &MapTestObjectTID, Attr: 4, Name: "VByteUint16"}
+	MapTestObjectVByteUint16SREF = metago.Attrdef{ID: &MapTestObjectVByteUint16AID, Persistence: metago.PersistenceClassPersistent}
+	MapTestObjectVByteUint32AID  = metago.AttrID{TypeID: &MapTestObjectTID, Attr: 5, Name: "VByteUint32"}
+	MapTestObjectVByteUint32SREF = metago.Attrdef{ID: &MapTestObjectVByteUint32AID, Persistence: metago.PersistenceClassPersistent}
+	MapTestObjectVByteUint64AID  = metago.AttrID{TypeID: &MapTestObjectTID, Attr: 6, Name: "VByteUint64"}
+	MapTestObjectVByteUint64SREF = metago.Attrdef{ID: &MapTestObjectVByteUint64AID, Persistence: metago.PersistenceClassPersistent}
+	MapTestObjectVByteIntAID     = metago.AttrID{TypeID: &MapTestObjectTID, Attr: 7, Name: "VByteInt"}
+	MapTestObjectVByteIntSREF    = metago.Attrdef{ID: &MapTestObjectVByteIntAID, Persistence: metago.PersistenceClassPersistent}
+	MapTestObjectVByteInt8AID    = metago.AttrID{TypeID: &MapTestObjectTID, Attr: 8, Name: "VByteInt8"}
+	MapTestObjectVByteInt8SREF   = metago.Attrdef{ID: &MapTestObjectVByteInt8AID, Persistence: metago.PersistenceClassPersistent}
+	MapTestObjectVByteInt16AID   = metago.AttrID{TypeID: &MapTestObjectTID, Attr: 9, Name: "VByteInt16"}
+	MapTestObjectVByteInt16SREF  = metago.Attrdef{ID: &MapTestObjectVByteInt16AID, Persistence: metago.PersistenceClassPersistent}
+	MapTestObjectVByteInt32AID   = metago.AttrID{TypeID: &MapTestObjectTID, Attr: 10, Name: "VByteInt32"}
+	MapTestObjectVByteInt32SREF  = metago.Attrdef{ID: &MapTestObjectVByteInt32AID, Persistence: metago.PersistenceClassPersistent}
+	MapTestObjectVByteInt64AID   = metago.AttrID{TypeID: &MapTestObjectTID, Attr: 11, Name: "VByteInt64"}
+	MapTestObjectVByteInt64SREF  = metago.Attrdef{ID: &MapTestObjectVByteInt64AID, Persistence: metago.PersistenceClassPersistent}
+	MapTestObjectVByteTimeAID    = metago.AttrID{TypeID: &MapTestObjectTID, Attr: 12, Name: "VByteTime"}
+	MapTestObjectVByteTimeSREF   = metago.Attrdef{ID: &MapTestObjectVByteTimeAID, Persistence: metago.PersistenceClassPersistent}
 )
 
 func init() {

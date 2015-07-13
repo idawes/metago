@@ -64,7 +64,6 @@ func TestSliceFloat32(t *testing.T) {
     a.VFloat32[0] = 5.42
     a.VFloat32 = append(a.VFloat32, 3.34) // sa = {VA, VB}, sb = {VA, VB, VB, VB, VB}
     testSliceFloat32DiffAndApply(t, a, b, 5)
-
 }
 
 func testSliceFloat32DiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {

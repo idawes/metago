@@ -104,7 +104,7 @@ func (orig *StructTestObject) Apply(d metago.Diff) error {
 
 		case &StructTestObjectMBAID:
 			{
-				m := orig.MB
+				m := &orig.MB
 				mc := c.(*metago.IntMapChg)
 				key := mc.Key
 				switch mc.Typ {
@@ -123,7 +123,10 @@ func (orig *StructTestObject) Apply(d metago.Diff) error {
 						m[key] = s
 					}
 				case metago.ChangeTypeDelete:
-					delete(m, key)
+					delete(*m, key)
+					if len(*m) == 0 {
+						*m = nil
+					}
 				}
 			}
 		}

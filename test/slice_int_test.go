@@ -64,7 +64,6 @@ func TestSliceInt(t *testing.T) {
     a.VInt[0] = 5
     a.VInt = append(a.VInt, 3) // sa = {VA, VB}, sb = {VA, VB, VB, VB, VB}
     testSliceIntDiffAndApply(t, a, b, 5)
-
 }
 
 func testSliceIntDiffAndApply(t *testing.T, a, b SliceTestObject, numChanges int) {
