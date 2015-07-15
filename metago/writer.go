@@ -38,6 +38,7 @@ func (w *writer) printf(format string, args ...interface{}) {
 func (w *writer) close() error {
 	buf, err := format.Source(w.buf.Bytes())
 	if err != nil {
+		// generate a view of the output with line numbers to allow for easier location of the error.
 		b := &bytes.Buffer{}
 		r := bufio.NewReader(&w.buf)
 		for i := 1; ; i++ {
